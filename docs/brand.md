@@ -11,8 +11,8 @@ Resux should feel fast, technical, and futuristic without losing readability.
 
 The mark combines:
 
-- A resumability loop for pause/resume behavior.
-- A plus/cross shape for composition and framework primitives.
+- A monoline `R` for the Resux runtime.
+- Route-like start and finish nodes for resumable interaction.
 - Cyan, violet, and mint gradients for runtime energy.
 
 ## Color palette
@@ -56,4 +56,5 @@ radial-gradient(circle at 50% 50%, rgba(124, 58, 237, 0.28), rgba(6, 182, 212, 0
 docs/public/logo.svg
 docs/public/logo-mark.svg
 docs/public/og-image.svg
+docs/public/og-image.png
 ```

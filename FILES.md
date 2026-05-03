@@ -41,6 +41,7 @@
 - `docs/public/llms.txt`
 - `docs/public/logo-mark.svg`
 - `docs/public/logo.svg`
+- `docs/public/og-image.png`
 - `docs/public/og-image.svg`
 - `docs/reference/cli.md`
 - `docs/reference/compiler.md`

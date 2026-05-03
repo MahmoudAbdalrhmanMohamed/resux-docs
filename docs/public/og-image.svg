@@ -1,29 +1,40 @@
-<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Resux Documentation</title>
+  <desc id="desc">Open Graph card for the Resux documentation site.</desc>
   <defs>
-    <radialGradient id="r1" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(245 122) rotate(45) scale(620)">
-      <stop stop-color="#7C3AED" stop-opacity="0.58"/>
-      <stop offset="1" stop-color="#070A13" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="r2" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(983 504) rotate(45) scale(480)">
-      <stop stop-color="#06B6D4" stop-opacity="0.55"/>
-      <stop offset="1" stop-color="#070A13" stop-opacity="0"/>
-    </radialGradient>
-    <linearGradient id="g" x1="98" y1="92" x2="194" y2="200" gradientUnits="userSpaceOnUse">
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#101827"/>
+      <stop offset="0.55" stop-color="#07111F"/>
+      <stop offset="1" stop-color="#020617"/>
+    </linearGradient>
+    <linearGradient id="route" x1="104" y1="102" x2="206" y2="216" gradientUnits="userSpaceOnUse">
       <stop stop-color="#22D3EE"/>
-      <stop offset="0.48" stop-color="#7C3AED"/>
+      <stop offset="0.58" stop-color="#7C3AED"/>
       <stop offset="1" stop-color="#10B981"/>
     </linearGradient>
+    <linearGradient id="headline" x1="86" y1="278" x2="1054" y2="392" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="0.74" stop-color="#D7E2F2"/>
+      <stop offset="1" stop-color="#A7F3D0"/>
+    </linearGradient>
+    <filter id="glow" x="40" y="42" width="244" height="244" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="13"/>
+    </filter>
   </defs>
-  <rect width="1200" height="630" fill="#070A13"/>
-  <rect width="1200" height="630" fill="url(#r1)"/>
-  <rect width="1200" height="630" fill="url(#r2)"/>
-  <rect x="86" y="88" width="132" height="132" rx="33" fill="#070A13" stroke="rgba(255,255,255,0.16)" stroke-width="1"/>
-  <circle cx="152" cy="154" r="52" fill="url(#g)" opacity="0.18"/>
-  <path d="M120 130c16-18 46-21 65-5l8 6h-22c-11-6-26-4-34 5-11 13-9 32 3 43 11 9 27 10 38 1" stroke="url(#g)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M184 178c-16 18-46 21-65 5l-8-6h22c11 6 26 4 34-5 11-13 9-32-3-43-11-9-27-10-38-1" stroke="url(#g)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M152 120v66" stroke="#F8FAFC" stroke-width="11" stroke-linecap="round"/>
-  <path d="M135 154h34" stroke="#F8FAFC" stroke-width="11" stroke-linecap="round"/>
-  <text x="86" y="318" fill="#F8FAFC" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="86" font-weight="850" letter-spacing="-4">Resux Documentation</text>
-  <text x="92" y="390" fill="#C4B5FD" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="36" font-weight="700">Server-rendered Vue-like apps that resume on interaction.</text>
-  <text x="94" y="486" fill="#94A3B8" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="28" font-weight="600">resuxjs - custom resumable runtime - file routing - SSR - islands</text>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <path d="M770 82H1088" stroke="#22D3EE" stroke-opacity="0.18" stroke-width="3" stroke-linecap="round"/>
+  <path d="M830 122H1112" stroke="#7C3AED" stroke-opacity="0.16" stroke-width="3" stroke-linecap="round"/>
+  <path d="M728 548H1088" stroke="#10B981" stroke-opacity="0.18" stroke-width="3" stroke-linecap="round"/>
+  <path d="M780 508H1030" stroke="#22D3EE" stroke-opacity="0.14" stroke-width="3" stroke-linecap="round"/>
+  <rect x="86" y="86" width="152" height="152" rx="38" fill="#030712"/>
+  <rect x="86.5" y="86.5" width="151" height="151" rx="37.5" stroke="#F8FAFC" stroke-opacity="0.12"/>
+  <path d="M118 127C132 109 156 101 180 105C204 109 221 125 221 147C221 170 203 185 176 185H143V217" stroke="#38BDF8" stroke-opacity="0.22" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
+  <path d="M124 211V116H174C200 116 217 129 217 148C217 168 200 181 174 181H143" stroke="url(#route)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M170 181L211 211" stroke="url(#route)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M130 134H174C186 134 194 140 194 148C194 157 186 163 174 163H130" stroke="#F8FAFC" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="124" cy="116" r="7" fill="#22D3EE"/>
+  <circle cx="211" cy="211" r="7" fill="#10B981"/>
+  <text x="86" y="350" fill="url(#headline)" font-family="Segoe UI, Arial, sans-serif" font-size="86" font-weight="850">Resux Documentation</text>
+  <text x="92" y="424" fill="#A7F3D0" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="700">Server-rendered Vue-like apps that resume on interaction.</text>
+  <text x="94" y="512" fill="#94A3B8" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="650">resuxjs / custom resumable runtime / file routing / SSR / islands</text>
 </svg>
