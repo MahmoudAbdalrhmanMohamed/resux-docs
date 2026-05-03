@@ -1,0 +1,20 @@
+# Resux Documentation
+
+Resux is an experimental web framework prototype with a custom resumable runtime.
+It uses Vue-like single-file components, pages routing, SSR, serialized state, lazy event handler loading, and optional Vue runtime islands.
+
+Important pages:
+
+- /guide/what-is-resux
+- /guide/getting-started
+- /guide/template-syntax
+- /guide/async-data
+- /guide/routing
+- /reference/composables
+- /reference/cli
+- /reference/configuration
+- /reference/limits
+
+Package: resuxjs
+Source: https://github.com/MahmoudAbdalrhmanMohamed/resux
+Docs: https://github.com/MahmoudAbdalrhmanMohamed/resux-docs
