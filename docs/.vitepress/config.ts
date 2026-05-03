@@ -46,7 +46,9 @@ export default defineConfig({
         collapsed: false,
         items: [
           { text: 'What is Resux?', link: '/guide/what-is-resux' },
+          { text: 'Core Concepts', link: '/guide/core-concepts' },
           { text: 'Getting Started', link: '/guide/getting-started' },
+          { text: 'Execution Contexts', link: '/guide/execution-contexts' },
           { text: 'Project Structure', link: '/guide/project-structure' },
           { text: 'Mental Model', link: '/guide/mental-model' }
         ]
@@ -55,6 +57,9 @@ export default defineConfig({
         text: 'Core Guide',
         collapsed: false,
         items: [
+          { text: 'Rendering Lifecycle', link: '/guide/rendering-lifecycle' },
+          { text: 'Resumability and Handlers', link: '/guide/resumability-handlers' },
+          { text: 'App Shell and Errors', link: '/guide/app-shell-errors' },
           { text: 'Components', link: '/guide/components' },
           { text: 'Template Syntax', link: '/guide/template-syntax' },
           { text: 'State', link: '/guide/state' },
@@ -67,6 +72,8 @@ export default defineConfig({
           { text: 'Middleware', link: '/guide/middleware' },
           { text: 'Server API', link: '/guide/server-api' },
           { text: 'Modules and Route Rules', link: '/guide/modules-route-rules' },
+          { text: 'Security and Caching', link: '/guide/security-caching' },
+          { text: 'Dev Server and Build Output', link: '/guide/dev-build-output' },
           { text: 'Vue Islands', link: '/guide/vue-islands' },
           { text: 'Deployment', link: '/guide/deployment' },
           { text: 'Troubleshooting', link: '/guide/troubleshooting' }

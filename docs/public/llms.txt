@@ -6,10 +6,17 @@ It uses Vue-like single-file components, pages routing, SSR, serialized state, l
 Important pages:
 
 - /guide/what-is-resux
+- /guide/core-concepts
 - /guide/getting-started
+- /guide/execution-contexts
+- /guide/rendering-lifecycle
+- /guide/resumability-handlers
+- /guide/app-shell-errors
 - /guide/template-syntax
 - /guide/async-data
 - /guide/routing
+- /guide/security-caching
+- /guide/dev-build-output
 - /reference/composables
 - /reference/cli
 - /reference/configuration

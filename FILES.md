@@ -18,8 +18,12 @@
 - `docs/examples/counter.md`
 - `docs/examples/docker.md`
 - `docs/guide/async-data.md`
+- `docs/guide/app-shell-errors.md`
 - `docs/guide/components.md`
+- `docs/guide/core-concepts.md`
 - `docs/guide/deployment.md`
+- `docs/guide/dev-build-output.md`
+- `docs/guide/execution-contexts.md`
 - `docs/guide/getting-started.md`
 - `docs/guide/head-seo.md`
 - `docs/guide/layouts.md`
@@ -28,8 +32,11 @@
 - `docs/guide/modules-route-rules.md`
 - `docs/guide/plugins.md`
 - `docs/guide/project-structure.md`
+- `docs/guide/rendering-lifecycle.md`
+- `docs/guide/resumability-handlers.md`
 - `docs/guide/routing.md`
 - `docs/guide/runtime-config.md`
+- `docs/guide/security-caching.md`
 - `docs/guide/server-api.md`
 - `docs/guide/state.md`
 - `docs/guide/template-syntax.md`

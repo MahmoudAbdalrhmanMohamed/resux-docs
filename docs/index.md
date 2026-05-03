@@ -71,7 +71,9 @@ The server renders the button as HTML. The browser receives the serialized `coun
 
 ## What should I read first?
 
-- New to Resux: start with [What is Resux?](/guide/what-is-resux) and [Getting Started](/guide/getting-started).
+- New to Resux: start with [What is Resux?](/guide/what-is-resux), [Core Concepts](/guide/core-concepts), and [Getting Started](/guide/getting-started).
+- Understanding the runtime: read [Rendering Lifecycle](/guide/rendering-lifecycle) and [Resumability and Handlers](/guide/resumability-handlers).
+- Understanding where code belongs: use [Execution Contexts](/guide/execution-contexts), [App Shell, Errors, and Public Files](/guide/app-shell-errors), and [Security and Caching](/guide/security-caching).
 - Building an app: read [Project Structure](/guide/project-structure), [Routing](/guide/routing), and [Async Data](/guide/async-data).
 - Looking for exact APIs: jump to [Composables and Globals](/reference/composables) and [CLI](/reference/cli).
 - Deploying: use [Deployment](/guide/deployment) and [Docker Deployment](/examples/docker).
