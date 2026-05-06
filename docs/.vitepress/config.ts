@@ -2,7 +2,7 @@ import { defineConfig } from 'vitepress'
 
 export default defineConfig({
   title: 'Resux',
-  description: 'Experimental resumable web framework with Vue-like SFCs and zero default hydration.',
+  description: 'Resumable web framework with a stable v1 core, Vue-like SFCs, and zero default hydration.',
   base: '/resux-docs/',
   cleanUrls: true,
   lastUpdated: true,
@@ -85,6 +85,7 @@ export default defineConfig({
         items: [
           { text: 'CLI', link: '/reference/cli' },
           { text: 'Composables and Globals', link: '/reference/composables' },
+          { text: 'Release and Publishing', link: '/reference/release' },
           { text: 'Configuration', link: '/reference/configuration' },
           { text: 'File Conventions', link: '/reference/file-conventions' },
           { text: 'Runtime Internals', link: '/reference/runtime' },
@@ -116,7 +117,7 @@ export default defineConfig({
       { icon: 'github', link: 'https://github.com/MahmoudAbdalrhmanMohamed/resux' }
     ],
     footer: {
-      message: 'Released as experimental MVP documentation for Resux.',
+      message: 'Stable v1 core docs for Resux, with experimental areas clearly marked.',
       copyright: 'Copyright (c) 2026 Resux contributors'
     },
     editLink: {

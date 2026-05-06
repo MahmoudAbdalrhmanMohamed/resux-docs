@@ -14,7 +14,7 @@ npm run dev
 ## Docs principles
 
 - Prefer exact examples over vague explanation.
-- Mark MVP limits clearly.
+- Mark stable core vs experimental limits clearly.
 - Keep terminology consistent: Resux component, resumable handler, Vue island, route payload, runtime config.
 - Add examples for every new feature.
 - Update reference pages when globals, CLI commands, or file conventions change.

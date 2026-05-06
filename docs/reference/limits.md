@@ -1,10 +1,22 @@
 # Current Limits
 
-Resux is an MVP. These limits are part of the current design and should be expected.
+Resux has a stable v1 core plus experimental edges. These limits are part of the current design and should be expected.
 
 ## Framework maturity
 
-Resux is experimental and not production-ready yet. Use it for prototypes, learning, and exploring resumability.
+Stable core:
+
+- Compiler + route manifest for the documented SFC subset.
+- SSR renderer and payload serialization.
+- Resume runtime and delegated event model.
+- Core CLI commands (`init`, `dev`, `build`, `preview`, `start`, `inspect`, `deploy`).
+- Resux-native reactivity/composable APIs documented in this site.
+
+Still experimental:
+
+- Vue runtime islands as an escape hatch.
+- Unsupported Vue SFC syntax outside the documented subset.
+- Nitro adapter scope and deployment behavior beyond documented presets.
 
 ## Vue runtime limit
 

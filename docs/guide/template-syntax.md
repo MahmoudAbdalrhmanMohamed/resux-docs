@@ -1,6 +1,6 @@
 # Template Syntax
 
-Resux templates look familiar, but they are compiled into a resumable DOM model. This page lists what the current MVP supports.
+Resux templates look familiar, but they are compiled into a resumable DOM model. This page lists the current stable compiler subset.
 
 ## Text and interpolation
 

@@ -1,9 +1,9 @@
 # What is Resux?
 
-Resux is an experimental web framework prototype with a custom resumable runtime. It uses familiar `.vue` files and `pages/` routing, but normal Resux components do not hydrate through the Vue runtime. Instead, the compiler reads a focused Vue-like SFC subset, renders HTML on the server, serializes state, and lets the browser resume only the scopes that are needed.
+Resux is a resumable web framework with a stable v1 core and a custom runtime. It uses familiar `.vue` files and `pages/` routing, but normal Resux components do not hydrate through the Vue runtime. Instead, the compiler reads a focused Vue-like SFC subset, renders HTML on the server, serializes state, and lets the browser resume only the scopes that are needed.
 
-::: warning MVP status
-Resux is currently an MVP and not yet a production-ready framework. The docs describe the current package behavior and current limits so you can build prototypes with clear expectations.
+::: tip v1 scope
+Resux has a stable v1 core: compiler subset, SSR renderer, resumable runtime, routing, and CLI workflow. Vue islands and unsupported Vue syntax outside the documented subset remain experimental.
 :::
 
 ## The core idea
@@ -19,7 +19,7 @@ Most frameworks send HTML and then hydrate the app, which means the browser re-r
 
 ## What Resux is good for today
 
-Resux is a good fit for experiments and prototypes that need:
+Resux is a good fit for production apps that align with the documented subset and resumability model:
 
 - HTML-first pages.
 - Simple `.vue`-style authoring.

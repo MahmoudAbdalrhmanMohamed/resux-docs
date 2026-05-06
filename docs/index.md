@@ -20,22 +20,22 @@ hero:
       link: /reference/composables
 
 features:
-  - icon: ⚡
+  - icon: HTML
     title: HTML first, JS on demand
     details: Resux renders HTML on the server, serializes route and component state, and imports handler modules only after an event is triggered.
-  - icon: 🧩
+  - icon: SFC
     title: Familiar .vue files
     details: Use a focused Vue-like SFC subset with template, script setup, pages routing, layouts, and components.
-  - icon: 🧠
+  - icon: RX
     title: Resumable state
     details: useState and useAsyncData data is serialized into the payload so scopes can resume without whole-app hydration.
-  - icon: 🛣️
+  - icon: ROUTE
     title: File routing
     details: Add pages, dynamic params, catch-all routes, layouts, route middleware, and client-side navigation.
-  - icon: 🖥️
+  - icon: API
     title: Server API included
     details: Build API routes and request middleware with h3-backed helpers such as readBody, getQuery, and setHeader.
-  - icon: 🏝️
+  - icon: ISLAND
     title: Vue islands when needed
     details: Keep Resux components zero-default-hydration, then opt into Vue runtime islands for complex client widgets.
 ---

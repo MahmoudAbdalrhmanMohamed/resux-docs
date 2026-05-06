@@ -17,6 +17,77 @@ count.value++
 - `factory`: optional initial value factory.
 - Value must be JSON-serializable.
 
+## Reactivity (Resux-native)
+
+Resux ships its own lightweight reactivity system for resumable components. It does not require Vue hydration runtime for normal Resux components.
+
+Use globals in app files, or import from `resuxjs` / `resuxjs/reactivity`.
+
+### `ref<T>(value)`
+
+```ts
+const count = ref(0)
+count.value++
+```
+
+### `reactive<T extends object>(value)`
+
+```ts
+const state = reactive({ count: 0 })
+state.count++
+```
+
+### `computed<T>(getter | { get, set? })`
+
+```ts
+const doubled = computed(() => count.value * 2)
+```
+
+### `watch(source, callback, options?)`
+
+```ts
+watch(count, (next, prev) => {
+  console.log(next, prev)
+})
+```
+
+### `watchEffect(effect, options?)`
+
+```ts
+watchEffect((onCleanup) => {
+  const id = setInterval(() => console.log(count.value), 1000)
+  onCleanup(() => clearInterval(id))
+})
+```
+
+### `readonly(value)`
+
+```ts
+const locked = readonly(state)
+```
+
+### `toRef(object, key, defaultValue?)` and `toRefs(object)`
+
+```ts
+const state = reactive({ a: 1, b: 2 })
+const a = toRef(state, 'a')
+const { b } = toRefs(state)
+```
+
+### `unref(value)`, `isRef(value)`, `isReactive(value)`, `isReadonly(value)`
+
+```ts
+if (isRef(count)) {
+  console.log(unref(count))
+}
+```
+
+### `nextTick(fn?)`
+
+```ts
+await nextTick()
+```
+
 ## Async data
 
 ### `useAsyncData<T>(key, handler?)`
