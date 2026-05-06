@@ -2,7 +2,7 @@
 
 Documentation site for [Resux](https://github.com/MahmoudAbdalrhmanMohamed/resux), the resumable web framework published as `resuxjs`.
 
-The docs describe a stable v1 core (compiler subset, SSR, resumable runtime, routing, CLI) and clearly mark experimental areas (Vue islands escape hatch and unsupported Vue syntax outside the documented subset).
+The docs track the current `resuxjs` `latest` line (`0.2.23` as of 2026-05-07), and clearly mark experimental boundaries (Vue islands escape hatch and unsupported Vue syntax outside the documented subset).
 
 ## Local development
 

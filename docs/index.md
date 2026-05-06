@@ -49,6 +49,8 @@ npm install
 npm run dev
 ```
 
+`@latest` currently resolves to `resuxjs@0.2.23` (checked on 2026-05-07).
+
 ## A tiny Resux component
 
 ```vue

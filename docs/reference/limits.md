@@ -1,10 +1,10 @@
 # Current Limits
 
-Resux has a stable v1 core plus experimental edges. These limits are part of the current design and should be expected.
+Resux is currently in the `0.2.x` release line. It has a stable working subset plus experimental edges, and these limits are part of the current design.
 
 ## Framework maturity
 
-Stable core:
+Stable working subset in `0.2.x`:
 
 - Compiler + route manifest for the documented SFC subset.
 - SSR renderer and payload serialization.

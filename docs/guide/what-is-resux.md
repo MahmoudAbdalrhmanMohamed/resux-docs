@@ -1,9 +1,9 @@
 # What is Resux?
 
-Resux is a resumable web framework with a stable v1 core and a custom runtime. It uses familiar `.vue` files and `pages/` routing, but normal Resux components do not hydrate through the Vue runtime. Instead, the compiler reads a focused Vue-like SFC subset, renders HTML on the server, serializes state, and lets the browser resume only the scopes that are needed.
+Resux is an experimental resumable web framework with a custom runtime. It uses familiar `.vue` files and `pages/` routing, but normal Resux components do not hydrate through the Vue runtime. Instead, the compiler reads a focused Vue-like SFC subset, renders HTML on the server, serializes state, and lets the browser resume only the scopes that are needed.
 
-::: tip v1 scope
-Resux has a stable v1 core: compiler subset, SSR renderer, resumable runtime, routing, and CLI workflow. Vue islands and unsupported Vue syntax outside the documented subset remain experimental.
+::: tip Current scope (0.2.x)
+Current `0.2.x` releases provide a stable working core for the compiler subset, SSR renderer, resumable runtime, routing, and CLI workflow. The framework is still experimental overall, and Vue islands plus unsupported Vue syntax outside the documented subset remain experimental.
 :::
 
 ## The core idea
@@ -54,5 +54,7 @@ Install and run Resux through the `resuxjs` package:
 npm i resuxjs
 npx resuxjs@latest init my-app
 ```
+
+`npm view resuxjs version` returns `0.2.23` (latest tag checked on 2026-05-07).
 
 The package exposes CLI binaries named `resuxjs`, `resux`, and `create-resux`.

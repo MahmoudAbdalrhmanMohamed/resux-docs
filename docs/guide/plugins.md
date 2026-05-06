@@ -7,7 +7,7 @@ Plugins run during app rendering and can provide values to the Resux app instanc
 ```ts
 // plugins/app.ts
 export default defineResuxPlugin((resuxApp) => {
-  resuxApp.provide('version', '1.0.0')
+  resuxApp.provide('version', '0.2.23')
 })
 ```
 

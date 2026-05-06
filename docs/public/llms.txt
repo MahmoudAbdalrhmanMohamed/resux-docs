@@ -23,5 +23,6 @@ Important pages:
 - /reference/limits
 
 Package: resuxjs
+Latest npm release (checked 2026-05-07): 0.2.23
 Source: https://github.com/MahmoudAbdalrhmanMohamed/resux
 Docs: https://github.com/MahmoudAbdalrhmanMohamed/resux-docs

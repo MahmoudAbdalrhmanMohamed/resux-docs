@@ -6,6 +6,8 @@ This page takes you from zero to a running Resux app.
 
 Resux requires Node `>=20.19.0` for the framework package. The docs site itself only needs Node 18+, but generated Resux apps should use the framework requirement.
 
+Current npm `latest` for `resuxjs` is `0.2.23` (checked on 2026-05-07).
+
 Check your version:
 
 ```sh

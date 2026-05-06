@@ -2,6 +2,8 @@
 
 Resux installs CLI binaries named `resuxjs`, `resux`, and `create-resux`.
 
+`npx resuxjs@latest` currently resolves to `0.2.23` (checked on 2026-05-07).
+
 ## Commands
 
 ```sh
