@@ -35,7 +35,8 @@
 
 .VPHero .image-src {
   filter: drop-shadow(0 32px 60px rgba(6, 182, 212, 0.22));
-  transform: scale(1.06);
+  transform: translate(-50%, -50%) scale(1.06);
+  transform-origin: center;
 }
 
 .VPHero .tagline {
@@ -69,8 +70,18 @@
 }
 
 .vp-doc table {
-  display: table;
+  display: block;
   width: 100%;
+  max-width: 100%;
+  border-collapse: collapse;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 639px) {
+  .VPHero .image-src {
+    transform: translate(-50%, -50%);
+  }
 }
 
 .vp-doc code {
