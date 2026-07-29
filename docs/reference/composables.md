@@ -311,3 +311,97 @@ return navigateTo('/login', { statusCode: 302 })
 ```ts
 return abortNavigation('Not allowed', { statusCode: 403 })
 ```
+
+## Internationalization (i18n)
+
+### `useI18n()`
+
+Provides access to translation methods and active locale state when `resux:i18n` is enabled.
+
+```ts
+const { locale, dir, locales, t, setLocale, localePath, switchLocalePath } = useI18n()
+```
+
+### `useLocalePath()` and `useSwitchLocalePath()`
+
+Helper functions for generating localized route URLs based on current or target locale code.
+
+```ts
+const localePath = useLocalePath()
+const switchLocalePath = useSwitchLocalePath()
+
+const arCart = localePath('/cart', 'ar')
+const arPage = switchLocalePath('ar')
+```
+
+### `$t(key, params?)` and `$tm(key)`
+
+Global template functions for string translation and raw message catalog access.
+
+```html
+<p>{{ $t('welcome.greeting', { name: user.name }) }}</p>
+```
+
+## Device Detection
+
+### `useDevice()` and `$device`
+
+SSR-safe device detection helper that inspects the request User-Agent.
+
+```ts
+const device = useDevice()
+if (device.isMobile) {
+  // Mobile rendering layout logic
+}
+```
+
+Properties returned:
+- `isMobile`: `boolean`
+- `isTablet`: `boolean`
+- `isDesktop`: `boolean`
+- `isIos`: `boolean`
+- `isAndroid`: `boolean`
+
+## Media & Image Builders
+
+### `useResuxImage()`
+
+Returns a URL builder function for Resux image provider optimization.
+
+```ts
+const img = useResuxImage()
+const src = img('/banner.png', { width: 800, quality: 80, format: 'webp' })
+```
+
+## Progressive Packages & Client Enhancements
+
+### `useLazyPackage<T>(name, options?)` and `useClientPackage<T>(name, options?)`
+
+Dynamically loads third-party packages or client scripts progressively on user interaction or mount.
+
+```ts
+const swiper = await useLazyPackage('swiper')
+```
+
+### `definePackageAdapter(definition)` & `defineClientEnhancement(name, setup)`
+
+Define custom progressive adapters and client DOM enhancements for client-only interactivity.
+
+```ts
+export const vCalendar = definePackageAdapter({
+  name: 'v-calendar',
+  packageName: 'v-calendar',
+  enhance(el, options) {
+    // Progressive DOM enhancement setup
+  }
+})
+```
+
+### `useClientEnhancement(name, options?)`
+
+Activates a registered client-side enhancement on demand.
+
+```ts
+const { ready, activate, dispose } = await useClientEnhancement('v-calendar')
+```
+

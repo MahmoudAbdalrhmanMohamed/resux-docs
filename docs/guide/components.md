@@ -115,3 +115,39 @@ onMounted(() => {
 ## Components are not Vue runtime components
 
 Normal Resux components do not use Vue hydration. For full Vue runtime behavior, use [Vue Islands](/guide/vue-islands).
+
+## Built-in Resux Elements
+
+Resux provides zero-hydration built-in elements for media, navigation, and UI primitives:
+
+### `<ResuxVideo>`
+High-performance resumable video component supporting lazy loading and deferred initial frame strategies:
+
+```vue
+<template>
+  <ResuxVideo
+    src="/hero.webm"
+    poster="/poster.webp"
+    load-strategy="page-ready"
+    autoplay
+    muted
+    loop
+    playsinline
+    controls-mode="none"
+  />
+</template>
+```
+
+- **`loadStrategy`**: `"eager"` | `"lazy"` | `"visible"` | `"page-ready"`. Under `"page-ready"`, Resux renders the initial poster frame immediately in SSR and emits ZERO video network requests until full document `window.load`, eliminating network congestion during critical page rendering.
+- **`controlsMode`**: `"custom"` | `"native"` | `"none"`.
+
+### `<ResuxImg>` & `<ResuxPicture>`
+Resumable responsive image elements with automatic placeholders, IntersectionObserver lazy loading, and error handling.
+
+### `<ResuxLink>`
+Route-aware resumable link element replacing native internal `<a>` tags for client-side SPA payload transitions.
+
+### UI & Motion Primitives
+For the complete suite of UI & Motion Primitives (`ResuxSelect`, `ResuxDatePicker`, `ResuxPopover`, `ResuxIcon`, `ResuxReveal`, `ResuxAutoAnimate`, `RxButton`, `RxCard`, `RxAvatar`, `RxAlert`, `RxAccordion`, `RxTooltip`, `RxDropdown`, `RxTabs`, `RxSwitch`, `RxSkeleton`, `RxDivider`, `RxKbd`), see the [UI & Motion Primitives (`resuxjs/ui`)](/guide/ui-animations) guide.
+
+
