@@ -1,39 +1,99 @@
-# Example: Auth Middleware
+# Authentication Middleware Example
 
-Protect pages with route middleware.
+Authentication must be enforced on the server. Client route middleware improves navigation UX but is not the security boundary.
 
-## Middleware file
+## Request middleware
+
+Request middleware can apply shared policy, but it must not treat the presence of an `Authorization` header as proof of identity.
+
+```ts
+// server/middleware/private-cache.ts
+export default defineServerMiddleware((event) => {
+  if (event.path.startsWith('/api/private')) {
+    setHeader(event, 'cache-control', 'private, no-store')
+  }
+})
+```
+
+## Signed-session verification
+
+Keep token verification in a server-only utility. `verifySignedSessionToken` below represents your session provider or cryptographic verifier; it must verify the signature and claims such as expiry, issuer, and audience.
+
+```ts
+// server/utils/auth.ts
+import { verifySignedSessionToken } from './session-provider'
+
+export async function requireSession(event) {
+  const authorization = event.node.req.headers?.authorization
+  const token = typeof authorization === 'string' && authorization.startsWith('Bearer ')
+    ? authorization.slice('Bearer '.length).trim()
+    : ''
+
+  const session = token
+    ? await verifySignedSessionToken(token)
+    : null
+
+  if (!session) {
+    return new Response('Unauthorized', { status: 401 })
+  }
+
+  return session
+}
+```
+
+Adapt request-header access to the concrete Node/h3 event type used in your application. Never decode a token without verifying its signature and required claims.
+
+## Protected API
+
+```ts
+// server/api/private/profile.ts
+export default defineEventHandler(async (event) => {
+  const session = await requireSession(event)
+
+  if (session instanceof Response) {
+    return session
+  }
+
+  return {
+    id: session.userId,
+    name: session.displayName
+  }
+})
+```
+
+Every protected handler must authorize the verified session for the requested operation. Authentication alone does not prove that a user may access every resource.
+
+## Page route middleware
 
 ```ts
 // middleware/auth.ts
 export default defineResuxRouteMiddleware((to) => {
-  const loggedIn = false
+  const app = useResuxApp()
+  const loggedIn = Boolean(app.provides.session)
 
-  if (!loggedIn && to.path.startsWith('/dashboard')) {
+  if (!loggedIn && to.path.startsWith('/account')) {
     return navigateTo('/login', { statusCode: 302 })
   }
 })
 ```
 
-## Protected page
-
-```vue
-<script setup lang="ts">
-definePageMeta({ middleware: 'auth', layout: 'dashboard' })
-</script>
-
-<template>
-  <h1>Dashboard</h1>
-</template>
+```ts
+// pages/account.vue
+definePageMeta({ middleware: ['auth'] })
 ```
 
-## Global middleware
+Route middleware is a navigation aid only. A client-visible session hint may be missing, stale, or manipulated, so private server operations still require verified credentials.
+
+## Route rules
 
 ```ts
-// middleware/log.global.ts
-export default defineResuxRouteMiddleware((to, from) => {
-  console.log(`${from.path} -> ${to.path}`)
-})
+routeRules: {
+  '/account/**': {
+    cache: false,
+    headers: { 'x-robots-tag': 'noindex' }
+  },
+  '/api/private/**': { cache: false }
+}
 ```
 
-For request-level auth that should run before APIs, static files, and pages, use `server/middleware` instead.
+Always authorize each private server operation even when page middleware already redirected unauthenticated users.

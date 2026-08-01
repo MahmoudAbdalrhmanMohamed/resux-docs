@@ -1,79 +1,122 @@
 # Troubleshooting
 
-## Failed to parse URL from /api/...
+## Run the standard diagnostic sequence
 
-Use `$fetch('/api/...')` or `apiURL('/api/...')` when code can run during SSR.
-
-```ts
-await $fetch('/api/test')
-await fetch(apiURL('/api/test'))
+```sh
+node --version
+npm install
+resux prepare
+resux check --json
+resux inspect build --json
+resux build --debug --trace-build
 ```
 
-## Skeleton never disappears
+Node must satisfy the framework engine requirement.
 
-Render `error` and guard success UI with `!pending && !error && data`.
+## Unsupported template or SFC syntax
 
-```vue
-<p v-if="pending">Loading</p>
-<p v-if="error">{{ error.message }}</p>
-<pre v-if="!pending && !error && data">{{ data }}</pre>
+Symptoms:
+
+- `ResuxCompileError`
+- unknown directive errors
+- unsupported style language/module/src errors
+- unsafe handler capture errors
+
+Actions:
+
+1. Compare the component with [Template Syntax](/guide/template-syntax).
+2. Move browser-library behavior into a client enhancement or Vue island.
+3. Keep normal component styles as plain CSS.
+4. Reduce handler captures to serializable or browser-safe values.
+
+## A handler works on SSR but not after clicking
+
+Run:
+
+```sh
+resux dev --trace-resume
+resux inspect bundles --json
 ```
 
-## Handler capture compile error
+Check that the handler is discoverable, its imports are browser-compatible, and the state it uses was serialized.
 
-Move non-serializable values out of resumable handlers or put resumable state in `useState`.
+## A package appears in the wrong bundle
+
+```sh
+resux inspect packages --json
+```
+
+Configure `packages.mode`, `clientOnly`, `serverOnly`, `external`, `noExternal`, aliases, or a progressive adapter.
+
+## Internal API fetch fails during SSR
+
+Set a public app origin or use `$fetch`:
 
 ```ts
-const count = useState('count', () => 0)
-
-function increment() {
-  count.value++
+runtimeConfig: {
+  public: { appOrigin: 'https://example.com' }
 }
 ```
 
-## Dev edits do not appear
+## `useFetch` access is incorrect
 
-Keep the dev server running:
+`useFetch` returns an async-data resource:
+
+```ts
+const result = await useFetch('/api/status')
+console.log(result.data.value)
+console.log(result.pending.value)
+console.log(result.error.value)
+```
+
+## Image transforms return 501
+
+Verify that `sharp` is installed and loadable in the server runtime. Check the requested format and source response.
+
+## Video transforms return 501
+
+Install `ffmpeg` or set:
 
 ```sh
-resux dev .
+export RESUX_FFMPEG_PATH=/absolute/path/to/ffmpeg
 ```
 
-The dev server uses Vite middleware and a dev update channel at:
+## Production start or deploy rejects the Halal report
 
-```txt
-/__resux/dev-events
-```
+Set `RESUX_HALAL_REPORT_SIGNING_SECRET` before the production build and use the same secret during production verification. Rebuild after changing the key.
 
-If the browser is not connected to that endpoint, reload manually.
+## Review-required project cannot build
 
-## Port already in use
-
-Pass another port:
+Generate the request:
 
 ```sh
-resux dev --port 4000
-resux preview --host 0.0.0.0 --port 4000
+resux halal submit-review
 ```
 
-## No pages found
-
-Add `.vue` files under `pages/` or `app/pages/`, then inspect:
+The current framework does not send it automatically. Obtain a valid signed approval file, place it at the project root, then run:
 
 ```sh
-resux inspect .
+resux halal verify-review
 ```
 
-## Route rule does not apply
-
-Check the build manifest:
+## Generated files are missing
 
 ```sh
-resux inspect . --json
+resux check --fix
+resux prepare
 ```
 
-Look for `routeRules` and confirm the path pattern matches the request path.
+Do not hand-edit `.resux` output.
 
-## Vue-only feature is unsupported
+## Dev changes are not visible
 
-Normal Resux components support a compiler-friendly subset. Move complex Vue runtime behavior into a Vue island.
+Check terminal build errors, then use `--trace-build`. Restart only after resolving syntax or watcher exclusions. Generated and dependency directories are intentionally ignored by the source watcher.
+
+## Route does not match
+
+```sh
+resux inspect routes
+resux dev --trace-routes
+```
+
+Verify file naming, dynamic segment placement, middleware result, localized route strategy, and route-rule redirects.

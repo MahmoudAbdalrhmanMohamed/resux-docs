@@ -1,151 +1,135 @@
 # Template Syntax
 
-Resux templates look familiar, but they are compiled into a resumable DOM model. This page lists the current stable compiler subset.
+Resux parses templates with Vue compiler packages and emits its own resumable template model. Only the documented subset should be considered supported.
 
 ## Text and interpolation
 
 ```vue
 <template>
-  <h1>Hello {{ name }}</h1>
+  <h1>Hello {{ user.name }}</h1>
 </template>
 ```
 
-Refs from `useState`, `useAsyncData`, `useFetch`, Vue `ref`, and `computed` are auto-unwrapped in templates. In script, keep using `.value`.
+Refs are auto-unwrapped in template expressions. Script code still uses `.value`.
 
-## Static attributes
+## Attributes
 
 ```vue
-<template>
-  <section class="card" id="hero">
-    Content
-  </section>
-</template>
+<button
+  id="save"
+  :disabled="pending"
+  :aria-label="label"
+  :class="['button', { active, loading: pending }]"
+  :style="{ opacity: pending ? 0.5 : 1 }"
+>
+  Save
+</button>
 ```
 
-## Dynamic attributes
-
-```vue
-<template>
-  <button :disabled="pending" :aria-label="label">
-    Submit
-  </button>
-</template>
-```
-
-Dynamic attributes are patched when the resumed scope changes.
-
-## Class and style bindings
-
-Dynamic class arrays/objects and style objects are supported:
-
-```vue
-<template>
-  <div :class="['card', { active, muted: pending }]" :style="{ opacity: pending ? 0.6 : 1 }">
-    Status
-  </div>
-</template>
-```
+Dynamic bindings become patch targets.
 
 ## Events
 
-Named handlers:
-
 ```vue
 <button @click="increment">Add</button>
-```
-
-Inline expressions:
-
-```vue
-<button @click="count.value++">Add</button>
+<button @click="count.value = 0">Reset</button>
+<form @submit.prevent="save">...</form>
+<input @keydown.enter.exact="search" />
 ```
 
 Supported modifier groups include:
 
-- Control modifiers: `.prevent`, `.stop`, `.self`, `.once`.
-- Accepted but delegated modifiers: `.capture`, `.passive`.
-- System modifiers: `.ctrl`, `.shift`, `.alt`, `.meta`, `.exact`.
-- Mouse modifiers: `.left`, `.middle`, `.right`.
-- Key filters: `.enter`, `.tab`, `.delete`, `.esc`, `.escape`, `.space`, `.up`, `.down`, `.left`, `.right`.
+- control: `prevent`, `stop`, `self`, `once`
+- delegated syntax: `capture`, `passive`
+- system: `ctrl`, `shift`, `alt`, `meta`, `exact`
+- mouse: `left`, `middle`, `right`
+- key filters: `enter`, `tab`, `delete`, `esc`, `escape`, `space`, `up`, `down`, `left`, `right`
+
+The browser runtime remains delegated even when capture/passive syntax is accepted.
+
+## Conditional chains
 
 ```vue
-<form @submit.prevent="save">
-  <button>Save</button>
-</form>
+<p v-if="status === 'loading'">Loading</p>
+<p v-else-if="status === 'error'">Failed</p>
+<p v-else>Ready</p>
 ```
 
-::: warning Delegated runtime
-Even when `.capture` or `.passive` is accepted by the compiler, the browser runtime still uses delegated resumable listeners.
-:::
+Adjacent `v-if`, `v-else-if`, and `v-else` branches are compiled as one conditional block.
 
-## Conditional rendering
+## `v-show`
 
 ```vue
-<p v-if="error">{{ error.message }}</p>
-<p v-if="!error">Ready</p>
+<section v-show="open">Panel</section>
 ```
 
-`v-show` maps to a dynamic hidden state:
-
-```vue
-<p v-show="open">Visible when open</p>
-```
-
-## Text and HTML directives
-
-```vue
-<p v-text="message" />
-<div v-html="safeHtml" />
-```
-
-`v-html` output is sanitized by Resux before rendering.
-
-## Form model
-
-Basic `v-model` is supported for assignable expressions.
-
-```vue
-<script setup lang="ts">
-const message = useState('message', () => '')
-const accepted = useState('accepted', () => false)
-</script>
-
-<template>
-  <input v-model="message" />
-  <input type="checkbox" v-model="accepted" />
-</template>
-```
-
-The compiler expects an assignable expression, such as `message`, `message.value`, `form.name`, or `form['name']`.
+Resux patches visibility without removing the element.
 
 ## Lists
 
 ```vue
-<ul>
-  <li v-for="item in items" :key="item.id">
-    {{ item.title }}
-  </li>
-</ul>
-```
-
-Index variables are supported:
-
-```vue
-<li v-for="(item, index) in items">
-  {{ index }} - {{ item.title }}
+<li v-for="(item, index) in items" :key="item.id">
+  {{ index }} — {{ item.title }}
 </li>
 ```
 
-## Built-in tags
+List locals are tracked so expressions and inline handlers can reference the item and index.
 
-| Tag | Purpose |
-| --- | --- |
-| `<ResuxPage />` | Renders the active page inside `app.vue`. |
-| `<ResuxLayout />` | Renders the selected layout. |
-| `<slot />` | Renders layout slot content. |
-| `<ResuxLink to="/path">` | Renders as `<a href="/path">` and is intercepted for client navigation. |
-| `<VueIsland />` | Mounts a Vue runtime island. |
+## Text and HTML
 
-## Unsupported syntax
+```vue
+<p v-text="message" />
+<div v-html="trustedHtml" />
+```
 
-Unsupported Vue directives and patterns should fail at compile time. Resux does this intentionally so the app does not silently switch to full hydration.
+Only use `v-html` with content you trust or sanitize. Do not rely on framework rendering as a substitute for application-specific HTML sanitization policy.
+
+## Form model
+
+```vue
+<input v-model="form.name" />
+<input type="checkbox" v-model="accepted" />
+```
+
+The model expression must be assignable, such as a ref, member expression, or indexed member expression.
+
+## Template refs
+
+Template ref bindings can be declared in setup and referenced from supported client work. Treat actual elements as browser-only values; do not put DOM nodes into resumable state.
+
+## Built-in application tags
+
+- `<ResuxPage />`
+- `<ResuxLayout />`
+- `<ResuxLink />`
+- `<ResuxImg />`
+- `<ResuxPicture />`
+- `<ResuxVideo />`
+- `<VueIsland />`
+- `<slot />`
+
+## Styles
+
+```vue
+<style scoped>
+.card { padding: 1rem; }
+</style>
+```
+
+Supported:
+
+- plain CSS
+- multiple style blocks
+- scoped styles
+
+Not supported for normal resumable components:
+
+- `<style module>`
+- `<style src>`
+- preprocessors through `lang` such as Sass/Less
+
+Use global CSS, Tailwind, modules that add CSS, or Vue islands when a different style pipeline is required.
+
+## Unsupported directives
+
+Unknown directives and unsupported SFC behavior should fail at compile time. This is intentional: Resux does not silently fall back to whole-component hydration.

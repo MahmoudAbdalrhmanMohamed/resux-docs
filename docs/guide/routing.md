@@ -1,6 +1,6 @@
 # Routing
 
-Resux uses file-based routing from `pages/`.
+Files under `pages/` and `app/pages/` become routes. The server route manifest remains the source of truth for SSR and client route-payload navigation.
 
 ## Basic routes
 
@@ -8,94 +8,123 @@ Resux uses file-based routing from `pages/`.
 pages/index.vue       -> /
 pages/about.vue       -> /about
 pages/blog/index.vue  -> /blog
-pages/blog/post.vue   -> /blog/post
 ```
 
-## Dynamic params
-
-Use square brackets:
+## Dynamic parameters
 
 ```txt
-pages/post/[id].vue -> /post/:id
+pages/users/[id].vue  -> /users/:id
 ```
-
-Read params with `useRoute()`:
-
-```vue
-<script setup lang="ts">
-const route = useRoute()
-</script>
-
-<template>
-  <h1>Post {{ route.params.id }}</h1>
-</template>
-```
-
-## Catch-all params
-
-```txt
-pages/docs/[...slug].vue -> /docs/:slug*
-```
-
-Catch-all params are exposed on `route.params`.
-
-## Query strings
 
 ```ts
 const route = useRoute()
-const search = route.query.search
+route.params.id
 ```
 
-Query values are strings or string arrays.
+## Catch-all parameters
+
+```txt
+pages/docs/[...slug].vue -> /docs/:slug(.*)
+```
+
+Catch-all values are exposed through route params according to the generated matcher.
+
+## Route context
+
+```ts
+const route = useRoute()
+
+route.path
+route.params
+route.query
+route.origin
+route.userAgent
+```
+
+Repeated query keys may become string arrays.
+
+## Page metadata
+
+```ts
+definePageMeta({
+  layout: 'dashboard',
+  middleware: ['auth', 'audit'],
+  title: 'Account',
+  meta: [{ name: 'robots', content: 'noindex' }]
+})
+```
+
+## Programmatic navigation
+
+```ts
+const router = useRouter()
+
+await router.push('/account')
+await router.replace('/login')
+router.back()
+router.forward()
+router.go(-2)
+```
 
 ## Links
 
-Use `<ResuxLink>` for internal navigation:
-
 ```vue
-<template>
-  <ResuxLink to="/about">About</ResuxLink>
-</template>
+<ResuxLink to="/about">About</ResuxLink>
 ```
 
-`ResuxLink` renders an anchor and is intercepted by the client runtime for same-origin navigation.
+Eligible same-origin links are intercepted. External links, downloads, modifier-clicks, unsupported targets, and links explicitly handled by the browser continue normally.
 
-## Router composable
+## Client navigation lifecycle
 
-```vue
-<script setup lang="ts">
-const router = useRouter()
+For an internal navigation, Resux:
 
-function goHome() {
-  router.push('/')
-}
-</script>
-```
+1. runs eligible client route middleware,
+2. requests a route payload from the server,
+3. lets server middleware and route middleware run,
+4. handles redirect or abort responses,
+5. updates document head and page content,
+6. installs the new payload,
+7. scans client enhancements,
+8. emits loading and page-finish hooks.
 
-Available methods:
+Route payload responses use `cache-control: no-store` by default.
+
+## Localized routes
+
+When i18n is enabled, the compiler expands or resolves routes according to `prefix_except_default`, `prefix`, or `no_prefix` strategy. Use `localePath` and `switchLocalePath` instead of constructing locale prefixes manually.
+
+## Route rules
 
 ```ts
-router.push('/path')
-router.replace('/path')
-router.back()
-router.forward()
-router.go(-1)
+export default defineResuxConfig({
+  routeRules: {
+    '/old': { redirect: { to: '/new', statusCode: 301 } },
+    '/admin/**': {
+      headers: { 'x-robots-tag': 'noindex' },
+      cache: false
+    }
+  }
+})
 ```
 
-On the server, router methods are no-ops. They become meaningful in the browser after resume.
+Exact patterns, single-segment wildcards, and recursive `/**` patterns are matched by specificity.
 
-## Client navigation model
+## Extending pages from a module
 
-For same-origin links, the browser runtime can:
+```ts
+import { defineResuxModule, extendPages } from 'resuxjs/kit'
 
-- Prefetch route payloads on hover or focus.
-- Fetch a fresh SSR route payload from `/__resux/route`.
-- Show the built-in transition progress shell.
-- Keep same-layout DOM in place.
-- Swap the page slot.
-- Update `<head>` and history.
-- Clear non-persistent resumed page scopes.
+export default defineResuxModule({
+  setup() {
+    extendPages((pages) => {
+      pages.push({
+        id: 'module-page',
+        path: '/module-page',
+        file: '/absolute/path/to/page.vue'
+      })
+    })
+  }
+})
+```
 
-## Route middleware
-
-Use [Middleware](/guide/middleware) to redirect or abort navigation before rendering a page.
+Prefer normal page files unless a module genuinely owns the route.

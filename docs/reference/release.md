@@ -1,70 +1,61 @@
 # Release and Publishing
 
-Resux uses a safe release flow:
+This page documents the framework repository's intended npm release process, not application deployment.
 
-- CI runs on every push and pull request.
-- npm publishing runs only for version tags (`vX.Y.Z`) or published GitHub Releases.
-- Normal pushes to `main` do not publish.
+## CI versus publishing
 
-At the time of this docs update (2026-05-07), npm `latest` for `resuxjs` is `0.2.23`.
+Normal pushes and pull requests run validation. They do not publish npm packages.
 
-## CI workflow
+A publish workflow should run only for an approved version tag or GitHub Release and should verify that the tag matches `package.json`.
 
-The CI workflow runs:
+## Required validation
+
+Before publishing:
 
 ```sh
 npm ci
-npm run lint --if-present
 npm run typecheck
 npm run build
 npm test
-npm run pack:check --if-present
+npm run pack:check
 ```
 
-## Release workflow
+Package validation should verify native optional bindings, generated declarations, bundled output, templates, and `npm pack --dry-run` contents.
 
-Before creating a release tag, run the local quality gate:
-
-```sh
-npm install
-npm run typecheck
-npm run build
-npm test
-npm pack --dry-run
-```
-
-Then publish through Git tags:
-
-1. Update version in `package.json` (for example `0.2.24`).
-2. Commit the release changes.
-3. Create tag `v0.2.24`.
-4. Push commit and tag.
-5. GitHub Actions validates the tag/version match and publishes to npm.
+## Version and tag
 
 ```sh
-npm version 0.2.24
+npm version 0.3.1
 git push origin main
-git push origin v0.2.24
+git push origin v0.3.1
 ```
 
-## npm auth and provenance
+Use the actual intended version. Do not copy the example blindly.
 
-The publish workflow expects:
+## Trusted Publishing
 
-- `NPM_TOKEN` in GitHub repository secrets.
-- `id-token: write` permission for npm provenance.
+The repository release workflow uses npm Trusted Publishing through GitHub OIDC with provenance rather than a long-lived `NPM_TOKEN`.
 
-Publishing uses:
+Configure the npm trusted publisher for:
 
-```sh
-npm publish --access public --provenance
-```
+- repository: `MahmoudAbdalrhmanMohamed/resux`
+- workflow: `npm-publish.yml`
+- the correct package scope/name and release environment
 
-## Safety checks in workflow
+## One-time passwords
 
-Publish job safeguards:
+Automation should not attempt interactive OTP publishing. An OTP error indicates the workflow is using token/interactive authentication rather than a correctly configured trusted publisher, or the trusted publisher configuration does not match the workflow.
 
-- Validates the tag format (`vX.Y.Z`).
-- Validates tag version equals `package.json` version.
-- Runs `npm ci` and `npm run pack:check`.
-- Skips publish if the package version already exists on npm.
+## Documentation coordination
+
+Framework documentation can describe source behavior before it reaches npm only when the PR clearly states the dependency. Merge/release source changes before publishing docs that present them as generally available.
+
+## Recovery
+
+If a release fails:
+
+1. inspect the exact workflow job and npm authentication mode,
+2. do not reuse or move an already published version,
+3. fix CI/configuration,
+4. create a new patch version when package contents changed,
+5. keep provenance and tag/package versions aligned.

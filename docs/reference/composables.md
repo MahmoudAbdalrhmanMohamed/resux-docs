@@ -1,106 +1,133 @@
 # Composables and Globals Reference
 
-Generated apps include types for `resuxjs/globals`, so Resux APIs can be used without imports in app files.
+Generated applications include `resuxjs/globals` types, so the APIs on this page can normally be used without imports inside Resux application files. Libraries and explicit modules can import from `resuxjs` or a focused subpath.
 
-## State
+## Reactivity
 
-### `useState<T>(key, factory?)`
-
-Create or read a resumable ref.
+Resux provides its own reactivity layer for normal resumable components.
 
 ```ts
-const count = useState<number>('count', () => 0)
-count.value++
+import {
+  ref,
+  reactive,
+  computed,
+  watch,
+  watchEffect,
+  readonly,
+  toRef,
+  toRefs,
+  unref,
+  isRef,
+  isReactive,
+  isReadonly,
+  nextTick
+} from 'resuxjs/reactivity'
 ```
 
-- `key`: stable state key.
-- `factory`: optional initial value factory.
-- Value must be JSON-serializable.
-
-## Reactivity (Resux-native)
-
-Resux ships its own lightweight reactivity system for resumable components. It does not require Vue hydration runtime for normal Resux components.
-
-Use globals in app files, or import from `resuxjs` / `resuxjs/reactivity`.
-
-### `ref<T>(value)`
+### `ref(value)`
 
 ```ts
 const count = ref(0)
 count.value++
 ```
 
-### `reactive<T extends object>(value)`
+### `reactive(object)`
 
 ```ts
-const state = reactive({ count: 0 })
+const state = reactive({ count: 0, user: { name: 'Mahmoud' } })
 state.count++
 ```
 
-### `computed<T>(getter | { get, set? })`
+Watching a reactive object is deep by default. Array index additions also invalidate length-dependent effects.
+
+### `computed(getter | { get, set })`
 
 ```ts
 const doubled = computed(() => count.value * 2)
 ```
 
+Writable form:
+
+```ts
+const fullName = computed({
+  get: () => `${first.value} ${last.value}`,
+  set: (value) => {
+    const [nextFirst, nextLast = ''] = value.split(' ')
+    first.value = nextFirst
+    last.value = nextLast
+  }
+})
+```
+
 ### `watch(source, callback, options?)`
 
 ```ts
-watch(count, (next, prev) => {
-  console.log(next, prev)
-})
+const stop = watch(
+  () => state.user.name,
+  (next, previous, onCleanup) => {
+    const controller = new AbortController()
+    onCleanup(() => controller.abort())
+    console.log({ next, previous })
+  },
+  { immediate: true }
+)
+
+stop()
 ```
+
+Watch cleanup runs before the watcher reruns and when it is stopped.
 
 ### `watchEffect(effect, options?)`
 
 ```ts
-watchEffect((onCleanup) => {
+const stop = watchEffect((onCleanup) => {
   const id = setInterval(() => console.log(count.value), 1000)
   onCleanup(() => clearInterval(id))
 })
 ```
 
-### `readonly(value)`
+### Utility helpers
 
 ```ts
 const locked = readonly(state)
-```
+const countRef = toRef(state, 'count')
+const allRefs = toRefs(state)
+const value = unref(countRef)
 
-### `toRef(object, key, defaultValue?)` and `toRefs(object)`
-
-```ts
-const state = reactive({ a: 1, b: 2 })
-const a = toRef(state, 'a')
-const { b } = toRefs(state)
-```
-
-### `unref(value)`, `isRef(value)`, `isReactive(value)`, `isReadonly(value)`
-
-```ts
-if (isRef(count)) {
-  console.log(unref(count))
-}
-```
-
-### `nextTick(fn?)`
-
-```ts
+isRef(countRef)
+isReactive(state)
+isReadonly(locked)
 await nextTick()
 ```
+
+These APIs are similar to familiar Vue APIs but are implemented by Resux. Do not assume undocumented Vue scheduler or devtools internals are identical.
+
+## Resumable state
+
+### `useState<T>(key, factory?)`
+
+Create or retrieve a scope state ref:
+
+```ts
+const cartCount = useState<number>('cart-count', () => 0)
+cartCount.value++
+```
+
+The key must be stable. Values that cross SSR/browser boundaries must be JSON-serializable.
 
 ## Async data
 
 ### `useAsyncData<T>(key, handler?)`
 
-Create a resumable async resource.
-
 ```ts
-const { data, pending, error } = await useAsyncData('stats', ({ signal }) => {
-  return $fetch('/api/stats', { signal })
+const resource = useAsyncData('dashboard-stats', async ({ signal }) => {
+  return $fetch<{ users: number }>('/api/stats', { signal })
 })
+
+const { data, value, pending, error } = await resource
 ```
 
-Return type:
+Return shape:
 
 ```ts
 type AsyncDataResource<T> = {
@@ -108,10 +135,48 @@ type AsyncDataResource<T> = {
   value: Ref<T | undefined>
   pending: Ref<boolean>
   error: Ref<{ name: string; message: string } | null>
+  then(...): PromiseLike<unknown>
 }
 ```
 
-The resource is thenable, so `await useAsyncData(...)` waits for server-side resolution.
+The resource is thenable. Awaiting it waits for the current server/client resolution and returns the refs, not the raw data value.
+
+## Fetching
+
+### `apiURL(path)`
+
+Resolve an internal API path safely during SSR:
+
+```ts
+const url = apiURL('/api/profile')
+```
+
+Resux can use route origin information or configured public origin keys such as `appOrigin`, `appURL`, `siteURL`, or `origin`.
+
+### `useFetch<T>(url, init?)`
+
+Fetch JSON through an async-data resource:
+
+```ts
+const request = useFetch<{ ok: boolean }>('/api/status')
+const { data, pending, error } = await request
+
+if (data.value?.ok) {
+  // ready
+}
+```
+
+`useFetch` returns the same resource style as `useAsyncData`; it does not return a plain ref or plain response body.
+
+### `$fetch<T>(url, init?)`
+
+Fetch and return the parsed value:
+
+```ts
+const profile = await $fetch<{ id: string; name: string }>('/api/profile')
+```
+
+Use `useFetch` when pending/error state and resumable payload behavior are useful. Use `$fetch` for direct request/response control.
 
 ## Routing
 
@@ -119,102 +184,43 @@ The resource is thenable, so `await useAsyncData(...)` waits for server-side res
 
 ```ts
 const route = useRoute()
+
 route.path
 route.params
 route.query
 route.origin
+route.userAgent
 ```
 
 ### `useRouter()`
 
 ```ts
 const router = useRouter()
-await router.push('/about')
-router.replace('/login')
+
+await router.push('/account')
+await router.replace('/login')
 router.back()
 router.forward()
-router.go(-1)
+router.go(-2)
 ```
 
-## Head
+Internal navigation can use route payloads rather than downloading and hydrating a full application bundle.
 
-### `useHead(input)`
+### `navigateTo(to, options?)`
+
+Use in middleware or server-aware navigation flows:
 
 ```ts
-useHead({
-  title: 'Page title',
-  meta: [{ name: 'description', content: 'Description' }],
-  link: [{ rel: 'canonical', href: 'https://example.com' }]
-})
+return navigateTo('/login', { statusCode: 302 })
 ```
 
-### `useSeoMeta(input)`
+### `abortNavigation(message?, options?)`
 
 ```ts
-useSeoMeta({
-  title: 'Docs',
-  description: 'Resux docs',
-  ogTitle: 'Docs',
-  twitterCard: 'summary_large_image'
-})
+return abortNavigation('Not allowed', { statusCode: 403 })
 ```
 
-## Config and app
-
-### `useRuntimeConfig()`
-
-```ts
-const config = useRuntimeConfig()
-config.public.appOrigin
-```
-
-### `useResuxApp()`
-
-```ts
-const app = useResuxApp()
-app.provides
-app.provide('key', 'value')
-```
-
-## Fetch helpers
-
-### `apiURL(path)`
-
-Resolve internal API URLs for SSR-safe native fetch calls.
-
-```ts
-const response = await fetch(apiURL('/api/stats'))
-```
-
-### `useFetch<T>(url, init?)`
-
-Fetch JSON and return a ref.
-
-```ts
-const data = await useFetch<{ ok: boolean }>('/api/status')
-```
-
-### `$fetch<T>(url, init?)`
-
-Fetch JSON and return the parsed value.
-
-```ts
-const stats = await $fetch<{ users: number }>('/api/stats')
-```
-
-## Lifecycle
-
-### `onMounted(callback)`
-
-Runs when the scope is first resumed in the browser.
-
-```ts
-onMounted(() => {
-  console.log('browser resumed')
-})
-```
-
-## Page meta
+## Page metadata and document head
 
 ### `definePageMeta(meta)`
 
@@ -227,49 +233,141 @@ definePageMeta({
 })
 ```
 
-## Config and extension factories
-
-### `defineResuxConfig(config)`
+### `useHead(input)`
 
 ```ts
-export default defineResuxConfig({
-  app: { head: { title: 'App' } },
-  runtimeConfig: { public: { appOrigin: 'https://example.com' } }
+useHead({
+  title: 'Account',
+  meta: [{ name: 'description', content: 'Manage your account' }],
+  link: [{ rel: 'canonical', href: 'https://example.com/account' }],
+  htmlAttrs: { lang: 'en' }
 })
 ```
 
-### `defineResuxPlugin(plugin)`
+### `useSeoMeta(input)`
 
 ```ts
-export default defineResuxPlugin((app) => {
-  app.provide('name', 'Resux')
+useSeoMeta({
+  title: 'Docs',
+  description: 'Resux documentation',
+  ogTitle: 'Resux Docs',
+  ogImage: '/social-card.png',
+  twitterCard: 'summary_large_image'
 })
 ```
 
-### `defineResuxRouteMiddleware(middleware)`
+SEO fields include common description, robots, author, theme, Open Graph, Facebook, and Twitter metadata.
+
+## Runtime configuration
+
+### `useRuntimeConfig()`
 
 ```ts
-export default defineResuxRouteMiddleware((to) => {
-  if (to.path === '/admin') return navigateTo('/login')
+const config = useRuntimeConfig()
+console.log(config.public.apiBase)
+```
+
+Only public runtime config is available in browser-resumed code. Keep private keys and server URLs outside `public`.
+
+## Application instance and injection
+
+### `useResuxApp()`
+
+```ts
+const app = useResuxApp()
+app.provide('analytics', analyticsClient)
+
+const route = app.route
+const payload = app.payload
+const config = app.$config
+const injections = app.provides
+```
+
+Plugins receive the same application-style object.
+
+## Error handling
+
+### `createError(input)`
+
+```ts
+const error = createError({
+  statusCode: 404,
+  message: 'Product not found',
+  fatal: false,
+  data: { productId }
 })
 ```
 
-### `defineResuxModule(module)`
+### `showError(input)`
+
+Set/throw the current application error and stop the active flow:
 
 ```ts
-export default defineResuxModule({
-  setup(options, resux) {
-    resux.addCss('/module.css')
-  }
+showError({
+  statusCode: 403,
+  message: 'Access denied'
 })
 ```
 
-## Server helpers
+### `useError()` and `clearError()`
+
+```ts
+const currentError = useError()
+
+if (currentError.value) {
+  clearError()
+}
+```
+
+Use the app error component and [App Shell and Errors](/guide/app-shell-errors) for user-facing behavior.
+
+## Lifecycle
+
+### `onMounted(callback)`
+
+Runs browser-only mounted work when the scope resumes:
+
+```ts
+onMounted(() => {
+  const controller = new AbortController()
+  window.addEventListener('resize', updateLayout, {
+    signal: controller.signal
+  })
+
+  return () => controller.abort()
+})
+```
+
+Do not access `window` or `document` outside a browser-safe context.
+
+## SFC setup macros
+
+The Resux compiler provides setup-context equivalents for familiar macros:
+
+```ts
+const props = defineProps<{ title: string }>()
+const emit = defineEmits<{ save: [id: string] }>()
+const slots = defineSlots()
+const model = defineModel<string>()
+
+defineExpose({ focus })
+defineOptions({ name: 'AccountForm' })
+```
+
+`emit(...)` is also available in setup context. Only the syntax documented by the compiler subset is supported.
+
+## Server handlers
 
 ### `defineEventHandler(handler)` and `eventHandler(handler)`
 
 ```ts
-export default defineEventHandler(() => ({ ok: true }))
+export default defineEventHandler(async (event) => {
+  const body = await readBody<{ name: string }>(event)
+  const query = getQuery(event)
+  setHeader(event, 'cache-control', 'no-store')
+
+  return { body, query }
+})
 ```
 
 ### `defineServerMiddleware(middleware)`
@@ -280,128 +378,222 @@ export default defineServerMiddleware((event) => {
 })
 ```
 
-### `readBody<T>(event)`
+### Server helper signatures
 
 ```ts
-const body = await readBody<{ name: string }>(event)
-```
-
-### `getQuery(event)`
-
-```ts
+const body = await readBody<T>(event)
 const query = getQuery(event)
+setHeader(event, name, value)
 ```
 
-### `setHeader(event, name, value)`
+Handlers can return JSON-compatible values, strings, `Response` objects, redirects, abort results, or `false` for a forbidden result where supported.
+
+## Framework factories
+
+### `defineResuxConfig(config)`
 
 ```ts
-setHeader(event, 'cache-control', 'no-store')
+export default defineResuxConfig({
+  runtimeConfig: {
+    public: { appOrigin: 'https://example.com' }
+  }
+})
 ```
 
-## Navigation helpers
-
-### `navigateTo(to, options?)`
+### `defineResuxPlugin(plugin)`
 
 ```ts
-return navigateTo('/login', { statusCode: 302 })
+export default defineResuxPlugin(async (app) => {
+  app.provide('buildLabel', 'production')
+})
 ```
 
-### `abortNavigation(message?, options?)`
+### `defineResuxRouteMiddleware(middleware)`
 
 ```ts
-return abortNavigation('Not allowed', { statusCode: 403 })
+export default defineResuxRouteMiddleware((to) => {
+  if (to.path.startsWith('/admin')) {
+    return navigateTo('/login')
+  }
+})
 ```
 
-## Internationalization (i18n)
-
-### `useI18n()`
-
-Provides access to translation methods and active locale state when `resux:i18n` is enabled.
+### `defineResuxModule(module)`
 
 ```ts
-const { locale, dir, locales, t, setLocale, localePath, switchLocalePath } = useI18n()
+export default defineResuxModule({
+  defaults: { enabled: true },
+  setup(options, resux) {
+    if (options.enabled) {
+      resux.addCss('/module.css')
+    }
+  }
+})
 ```
 
-### `useLocalePath()` and `useSwitchLocalePath()`
+See [Modules and Route Rules](/guide/modules-route-rules) for the complete module context.
 
-Helper functions for generating localized route URLs based on current or target locale code.
+## Internationalization
+
+When i18n is enabled:
+
+```ts
+const {
+  locale,
+  dir,
+  locales,
+  t,
+  tm,
+  setLocale,
+  localePath,
+  switchLocalePath
+} = useI18n()
+```
+
+Focused helpers:
 
 ```ts
 const localePath = useLocalePath()
 const switchLocalePath = useSwitchLocalePath()
 
-const arCart = localePath('/cart', 'ar')
-const arPage = switchLocalePath('ar')
+localePath('/cart', 'ar')
+switchLocalePath('ar')
 ```
 
-### `$t(key, params?)` and `$tm(key)`
+Templates can use:
 
-Global template functions for string translation and raw message catalog access.
-
-```html
+```vue
 <p>{{ $t('welcome.greeting', { name: user.name }) }}</p>
 ```
 
-## Device Detection
+`$tm(key)` returns raw message catalog data. Nested message lookup uses own properties and blocks unsafe prototype keys.
 
-### `useDevice()` and `$device`
-
-SSR-safe device detection helper that inspects the request User-Agent.
+## Device detection
 
 ```ts
 const device = useDevice()
+
 if (device.isMobile) {
-  // Mobile rendering layout logic
+  // server-safe branch based on request user agent
 }
 ```
 
-Properties returned:
-- `isMobile`: `boolean`
-- `isTablet`: `boolean`
-- `isDesktop`: `boolean`
-- `isIos`: `boolean`
-- `isAndroid`: `boolean`
+Available properties include:
 
-## Media & Image Builders
+- `isMobile`
+- `isTablet`
+- `isDesktop`
+- `isIos`
+- `isAndroid`
 
-### `useResuxImage()`
+The same value is available as `$device` in supported contexts.
 
-Returns a URL builder function for Resux image provider optimization.
-
-```ts
-const img = useResuxImage()
-const src = img('/banner.png', { width: 800, quality: 80, format: 'webp' })
-```
-
-## Progressive Packages & Client Enhancements
-
-### `useLazyPackage<T>(name, options?)` and `useClientPackage<T>(name, options?)`
-
-Dynamically loads third-party packages or client scripts progressively on user interaction or mount.
+## Image URL generation
 
 ```ts
-const swiper = await useLazyPackage('swiper')
-```
+const image = useResuxImage()
 
-### `definePackageAdapter(definition)` & `defineClientEnhancement(name, setup)`
-
-Define custom progressive adapters and client DOM enhancements for client-only interactivity.
-
-```ts
-export const vCalendar = definePackageAdapter({
-  name: 'v-calendar',
-  packageName: 'v-calendar',
-  enhance(el, options) {
-    // Progressive DOM enhancement setup
-  }
+const src = image('/hero.jpg', {
+  width: 1200,
+  height: 675,
+  quality: 82,
+  format: 'webp',
+  fit: 'cover',
+  cache: '7d'
 })
+```
+
+See [Media and Optimization](/guide/media).
+
+## Lazy packages
+
+### `useLazyPackage(name, options?)`
+
+```ts
+const packageModule = await useLazyPackage('swiper', {
+  mode: 'progressive',
+  css: ['swiper/css']
+})
+```
+
+### `useClientPackage(name, options?)`
+
+```ts
+const chart = await useClientPackage('chart.js')
+```
+
+### Reusable loaders
+
+```ts
+const loadEditor = defineLazyPackage('editor-package', {
+  mode: 'progressive'
+})
+
+const loadBrowserEditor = defineClientOnlyPackage('editor-package')
+```
+
+### `usePackageReady(name)`
+
+```ts
+const ready = usePackageReady('editor-package')
+```
+
+## Client enhancements and package adapters
+
+### `defineClientEnhancement(name, setup)`
+
+```ts
+export const tooltip = defineClientEnhancement(
+  'tooltip',
+  async (target, context) => {
+    const instance = await mountTooltip(target, context.options)
+    return () => instance.destroy()
+  }
+)
 ```
 
 ### `useClientEnhancement(name, options?)`
 
-Activates a registered client-side enhancement on demand.
-
 ```ts
-const { ready, activate, dispose } = await useClientEnhancement('v-calendar')
+const enhancement = await useClientEnhancement('tooltip', {
+  target: '#help',
+  trigger: 'interaction',
+  options: { placement: 'bottom' }
+})
+
+await enhancement.activate()
+await enhancement.dispose()
 ```
 
+Triggers:
+
+```ts
+'visible' | 'interaction' | 'idle' | 'immediate' | 'manual' | 'page-load'
+```
+
+### `definePackageAdapter(definition)`
+
+```ts
+export const carousel = definePackageAdapter({
+  name: 'carousel',
+  packageName: 'swiper',
+  mode: 'progressive',
+  css: ['swiper/css'],
+  defaults: { slidesPerView: 1 },
+  async enhance(target, options) {
+    const { default: Swiper } = await import('swiper')
+    const instance = new Swiper(target, options)
+    return () => instance.destroy(true, true)
+  }
+})
+```
+
+Read [Third-party Package Integration](/guide/package-integration) for execution modes, bundle controls, and cleanup requirements.
+
+## Serialization and context rules
+
+- State and async data crossing SSR/browser boundaries must be JSON-serializable.
+- Private runtime config and server objects must remain server-only.
+- Browser-only APIs belong in mounted work, client packages, client enhancements, or islands.
+- Node/compiler APIs must not be imported into client handlers.
+- Cleanup timers, listeners, observers, requests, and package instances whenever an API provides a cleanup hook.

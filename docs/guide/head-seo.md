@@ -1,8 +1,8 @@
 # Head and SEO
 
-Resux can render head tags from global config, page meta, and runtime composables.
+Resux composes global configuration, module contributions, page metadata, component head calls, and i18n alternate links into the rendered document head.
 
-## App head in config
+## Global head
 
 ```ts
 export default defineResuxConfig({
@@ -10,80 +10,86 @@ export default defineResuxConfig({
     head: {
       title: 'My App',
       meta: [
-        { name: 'description', content: 'A Resux app' }
+        { name: 'description', content: 'A Resux application' },
+        { name: 'theme-color', content: '#111827' }
       ],
-      link: [
-        { rel: 'icon', href: '/favicon.svg' }
-      ]
+      link: [{ rel: 'icon', href: '/favicon.svg' }],
+      htmlAttrs: { lang: 'en' },
+      bodyAttrs: { class: 'app-body' }
     }
   }
 })
 ```
 
-## Page meta
+Global/module head composition supports arrays such as `meta`, `link`, `script`, `style`, and `noscript`, plus merged HTML/body attributes.
 
-```vue
-<script setup lang="ts">
-definePageMeta({
-  title: 'Docs',
-  meta: [
-    { name: 'robots', content: 'index,follow' }
-  ]
-})
-</script>
-```
-
-## useHead
+## `useHead`
 
 ```ts
 useHead({
-  title: 'Profile',
-  meta: [
-    { name: 'description', content: 'User profile' }
-  ],
-  link: [
-    { rel: 'canonical', href: 'https://example.com/profile' }
-  ]
+  title: 'Pricing',
+  meta: [{ name: 'description', content: 'Pricing options' }],
+  link: [{ rel: 'canonical', href: 'https://example.com/pricing' }],
+  htmlAttrs: { lang: 'en' }
 })
 ```
 
-## useSeoMeta
+Use structured entries rather than interpolating untrusted HTML into head fields.
 
-`useSeoMeta` maps common SEO keys to meta tags.
+## `useSeoMeta`
 
 ```ts
 useSeoMeta({
-  title: 'Resux Blog',
-  description: 'Articles about resumability',
-  ogTitle: 'Resux Blog',
-  ogDescription: 'Articles about resumability',
-  ogImage: '/og.png',
-  twitterCard: 'summary_large_image'
+  title: 'Product',
+  description: 'Product details',
+  robots: 'index,follow',
+  ogTitle: 'Product',
+  ogDescription: 'Product details',
+  ogImage: 'https://example.com/og.png',
+  twitterCard: 'summary_large_image',
+  twitterImage: 'https://example.com/og.png'
 })
 ```
 
-Common fields include:
+The helper maps common keys to name/property meta entries.
 
-- `title`
-- `description`
-- `keywords`
-- `robots`
-- `author`
-- `themeColor`
-- `colorScheme`
-- `applicationName`
-- `referrer`
-- `generator`
-- `ogTitle`, `ogDescription`, `ogImage`, `ogUrl`, `ogType`, `ogSiteName`, `ogLocale`
-- `twitterCard`, `twitterTitle`, `twitterDescription`, `twitterImage`, `twitterSite`, `twitterCreator`
+## Page metadata
 
-## Merge order
+```ts
+definePageMeta({
+  title: 'Dashboard',
+  meta: [{ name: 'robots', content: 'noindex' }]
+})
+```
 
-Think of head entries as layers:
+For dynamic SEO, use `useHead` or `useSeoMeta` in setup.
 
-1. App default head from config.
-2. Page meta from `definePageMeta`.
-3. Runtime entries from `useHead` and `useSeoMeta`.
-4. Document defaults such as charset and viewport.
+## Image preload priority
 
-Use page-level APIs for route-specific metadata and config for site-wide defaults.
+The renderer can prioritize relevant head image preloads so critical images are discovered early. Use responsive media attributes and avoid preloading every image.
+
+## i18n SEO
+
+When enabled, i18n can add canonical and alternate `hreflang` links. Configure:
+
+```ts
+i18n: {
+  seo: { hreflang: true }
+}
+```
+
+## Inspect SEO
+
+```sh
+resux inspect seo
+resux inspect seo --json
+```
+
+The SEO target checks route metadata and reports diagnostics such as missing canonical information in applicable test routes.
+
+## Safety notes
+
+- Escape or validate user-derived titles and URLs.
+- Do not inject arbitrary scripts from user input.
+- Keep canonical and Open Graph URLs absolute in production.
+- Keep private runtime config out of head output.

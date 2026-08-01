@@ -1,87 +1,106 @@
-# State
+# State and Reactivity
 
-Resux state is explicit and resumable. Use `useState` for values that should be available after the HTML response reaches the browser.
+Resux includes a native reactivity layer used by resumable components and exposed through `resuxjs` and `resuxjs/reactivity`.
 
-## Basic state
-
-```vue
-<script setup lang="ts">
-const count = useState('count', () => 0)
-
-function increment() {
-  count.value++
-}
-</script>
-
-<template>
-  <button @click="increment">{{ count }}</button>
-</template>
-```
-
-## Keys matter
-
-`useState` takes a key. Use stable keys that describe the state.
+## Local refs
 
 ```ts
-const sidebarOpen = useState('layout:sidebar-open', () => false)
-const draftTitle = useState('post:draft-title', () => '')
+const count = ref(0)
+const doubled = computed(() => count.value * 2)
 ```
 
-## JSON serializable only
+A plain `ref` participates in reactive rendering. Use `useState` when the value must be serialized and restored as named application state.
 
-State values must be JSON-serializable.
-
-Good:
+## Resumable state
 
 ```ts
-useState('settings', () => ({ theme: 'dark', compact: true }))
+const cart = useState('cart', () => ({ items: [] as string[] }))
 ```
 
-Avoid:
+Keys should be stable and unique for the intended scope/application behavior.
+
+## Reactive objects
 
 ```ts
-useState('socket', () => new WebSocket('wss://example.com'))
-useState('map', () => new Map())
+const form = reactive({
+  name: '',
+  tags: [] as string[]
+})
 ```
 
-## Template auto-unwrapping
+Array index changes and length-dependent effects are tracked. Mutating an array can trigger both the changed index and relevant length dependencies.
 
-Templates read refs without `.value`:
-
-```vue
-<template>
-  <p>{{ count }}</p>
-</template>
-```
-
-Script uses `.value`:
+## Computed values
 
 ```ts
-count.value++
+const fullName = computed(() => `${form.name} (${form.tags.length})`)
 ```
 
-## State and handlers
-
-Handlers can safely capture state refs created by `useState`:
+Writable form:
 
 ```ts
-const message = useState('message', () => 'hello')
-
-function shout() {
-  message.value = message.value.toUpperCase()
-}
+const normalized = computed({
+  get: () => form.name.trim(),
+  set: value => { form.name = value }
+})
 ```
 
-The compiler validates resumability captures so unsupported patterns fail early.
+## `watch`
 
-## State vs async data
+```ts
+const stop = watch(
+  () => form.name,
+  (next, previous, onCleanup) => {
+    const controller = new AbortController()
+    validateName(next, controller.signal)
+    onCleanup(() => controller.abort())
+  },
+  { immediate: true }
+)
+```
 
-Use `useState` for local interactive state. Use `useAsyncData` for data loaded from a server or expensive async source.
+Watching a reactive object is deep by default. Options include `immediate`, `deep`, `flush`, and `once` where supported by the current API.
 
-| Need | Use |
-| --- | --- |
-| Button counter | `useState` |
-| UI open/closed flag | `useState` |
-| API response | `useAsyncData` |
-| SSR-fetched page data | `await useAsyncData` |
-| Client skeleton that resolves after resume | non-awaited `useAsyncData` |
+## `watchEffect`
+
+```ts
+const stop = watchEffect((onCleanup) => {
+  const id = setInterval(() => console.log(form.name), 1000)
+  onCleanup(() => clearInterval(id))
+})
+```
+
+Dependencies from stale conditional branches are removed before the next run.
+
+## Readonly and conversion helpers
+
+```ts
+const readonlyForm = readonly(form)
+const name = toRef(form, 'name')
+const fields = toRefs(form)
+
+isRef(name)
+isReactive(form)
+isReadonly(readonlyForm)
+unref(name)
+toRaw(form)
+```
+
+## Scheduler
+
+```ts
+form.name = 'Mahmoud'
+await nextTick()
+```
+
+`nextTick` waits for queued reactive work to flush.
+
+## Low-level reactivity
+
+The focused `resuxjs/reactivity` entry also exports lower-level APIs such as `effect`, `stop`, and `isComputed`. Application components normally need the higher-level APIs documented above.
+
+## Serialization rules
+
+State included in the Resux payload must be JSON-compatible. Keep runtime-only objects outside `useState` and resolved async-data values.
+
+For private or complex server state, store an identifier and retrieve the actual resource through a server endpoint.

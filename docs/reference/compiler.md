@@ -1,90 +1,73 @@
-# Compiler Internals
+# Compiler Reference
 
-Resux compiles `.vue` files into server modules, client handler modules, and build manifests.
+The compiler turns the Resux SFC subset and file conventions into server modules, browser modules, route records, manifests, diagnostics, and generated types.
 
-## Build pipeline
-
-`buildProject(appRoot, outDir, options)` does the following:
-
-1. Cleans generated output.
-2. Reads runtime config and creates route rules.
-3. Discovers components, pages, layouts, app shell, error page, plugins, middleware, server middleware, server handlers, and Vue islands.
-4. Compiles each `.vue` file.
-5. Writes server component modules.
-6. Writes client handler modules.
-7. Builds client assets with Vite for production or writes Vite dev entries.
-8. Writes `manifest.mjs` and `manifest.json`.
-9. Optionally builds a server bundle.
-
-## Build options
+## Main entry points
 
 ```ts
-type BuildOptions = {
-  vite?: 'build' | 'dev'
-  server?: 'bundle' | 'modules'
-}
+import {
+  buildProject,
+  compileVueFile,
+  compileVueSource,
+  createRouteManifest,
+  ResuxCompileError
+} from 'resuxjs/compiler'
 ```
 
-Default server mode is `modules` during dev and `bundle` during production builds.
-
-## Compile errors
-
-Resux throws compile errors for unsupported or unsafe patterns. Examples:
-
-- Missing `<template>` block.
-- Dynamic binding without argument or expression.
-- Event without argument or expression.
-- `v-if`, `v-for`, `v-show`, `v-text`, `v-html`, or `v-model` without expression.
-- `v-model` expression that cannot be assigned to.
-- Unsupported directives.
-- Unsupported event modifiers.
-- Handler captures that are not resumability-safe.
-
-## Template compilation
-
-The compiler maps supported template syntax into a small template tree:
-
-- Text nodes.
-- Interpolation nodes.
-- Element nodes.
-- Static and dynamic attributes.
-- Event records.
-- `v-if` blocks.
-- `v-for` blocks.
-- `v-html` bindings.
-
-## Auto-unwrapping refs
-
-Template expressions are analyzed so known ref bindings can be auto-unwrapped. This allows:
-
-```vue
-<template>{{ count }}</template>
-```
-
-while keeping script mutation explicit:
+## `buildProject`
 
 ```ts
-count.value++
+const result = await buildProject(appRoot, outDir, {
+  vite: 'build',
+  server: 'bundle',
+  traceBuild: false
+})
 ```
 
-## Route manifest
+Build options:
 
-Route files are converted into route records with path, params, file, component id, and static page meta.
+- `vite`: `build` or `dev`
+- `server`: `bundle` or `modules`
+- `hooks`: custom `ResuxHooks`
+- `changedPath`: incremental development hint
+- `traceBuild`: detailed diagnostics
 
-```txt
-pages/index.vue -> /
-pages/post/[id].vue -> /post/:id
-pages/docs/[...slug].vue -> /docs/:slug*
-```
+The result includes routes, components, layouts, plugins, client enhancements, middleware, server middleware, server handlers, islands, route rules, and optional app/error components.
 
-## Vite integration
+## Component output
 
-Resux uses Vite for:
+A compiled component records:
 
-- Dev middleware.
-- Production client bundling.
-- Handler chunks.
-- Vue island bundling.
-- Server bundling in production mode.
+- id, name, and file
+- server and client source
+- template nodes
+- handlers
+- styles and scope id
+- page metadata
+- expression transformation diagnostics
 
-The dev server writes generated client modules into `.resux/vite-client` and serves them through Vite middleware.
+## Compile validation
+
+The compiler rejects unsupported or unsafe input, including examples such as:
+
+- missing template blocks,
+- unsupported style languages,
+- style modules and style `src`,
+- unsupported directives,
+- invalid conditional/list syntax,
+- unsafe browser handler captures,
+- and incompatible package usage.
+
+`ResuxCompileError` can include file, line, and column information.
+
+## Discovery
+
+The build includes application conventions, module contributions, auto-import directories, client enhancements, server plugins/utilities, and package diagnostics.
+
+## Generated outputs
+
+Generated output includes server modules, Vite client entries, bundled client assets, manifests, diagnostics JSON, templates, and `.d.ts` files.
+
+## Tooling guidance
+
+Compiler APIs are intended for builders, tests, adapters, and framework tooling. Ordinary applications should use CLI commands rather than calling `buildProject` directly.

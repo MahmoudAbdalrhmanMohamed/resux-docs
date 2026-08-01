@@ -1,28 +1,13 @@
 # App Shell, Errors, and Public Files
 
-Resux apps can define a small set of top-level files that shape every rendered page: the app shell, layouts, the error page, and static public assets.
+## `app.vue`
 
-## App shell
-
-`app.vue` is the outer component for page rendering. It is optional, but most apps use it for global structure such as skip links, providers, global navigation, and layout placement.
-
-```vue
-<template>
-  <ResuxLayout>
-    <ResuxPage />
-  </ResuxLayout>
-</template>
-```
-
-`<ResuxPage />` renders the matched page component. `<ResuxLayout />` renders the selected layout and passes the page into the layout slot.
-
-## Layout placement
-
-Use the app shell when every page should pass through the same layout pipeline:
+`app.vue` is the optional outer application component. A common shell renders navigation, layout selection, the active page, and global UI.
 
 ```vue
 <template>
   <div class="app-shell">
+    <header>My App</header>
     <ResuxLayout>
       <ResuxPage />
     </ResuxLayout>
@@ -30,78 +15,74 @@ Use the app shell when every page should pass through the same layout pipeline:
 </template>
 ```
 
-Use page meta to choose a layout:
+Resux also checks `app/app.vue` when a root file is absent.
 
-```ts
-definePageMeta({ layout: 'dashboard' })
-```
+## Layout and page placeholders
 
-Set `layout: false` for a page that should render without a layout.
+- `<ResuxPage />` renders the matched page.
+- `<ResuxLayout />` renders the layout selected by page metadata.
+- `<slot />` renders page content inside a layout.
 
-## Layout slots
+Avoid rendering the page twice by placing both `<ResuxPage />` and a layout that already contains the page placeholder incorrectly.
 
-Layouts live in `layouts/` and render their page content with `<slot />`.
+## `error.vue`
 
-```vue
-<!-- layouts/default.vue -->
-<template>
-  <main>
-    <slot />
-  </main>
-</template>
-```
-
-Layouts are still Resux components. Keep their state serializable and use Vue islands for complex browser-only layout widgets.
-
-## Error page
-
-`error.vue` or `app/error.vue` customizes 404 and 500 rendering. Use it for branded error pages and recovery links.
+`error.vue` can render not-found and server errors. It may read the current error through `useError()`.
 
 ```vue
 <script setup lang="ts">
-defineProps<{
-  statusCode?: number
-  message?: string
-}>()
+const error = useError()
+
+function recover() {
+  clearError()
+}
 </script>
 
 <template>
   <main>
-    <h1>{{ statusCode || 500 }}</h1>
-    <p>{{ message || 'Something went wrong.' }}</p>
-    <ResuxLink to="/">Go home</ResuxLink>
+    <h1>{{ error?.statusCode ?? 500 }}</h1>
+    <p>{{ error?.message ?? 'Unexpected error' }}</p>
+    <button @click="recover">Try again</button>
   </main>
 </template>
 ```
 
-Keep the error page defensive. It may render when normal page data, route middleware, or server handlers have failed.
+Related APIs:
+
+- `createError(input)` creates a structured error.
+- `showError(input)` stores and throws a fatal render error.
+- `useError()` returns the current error ref.
+- `clearError()` clears it and emits the error-cleared hook.
+
+## Server error responses
+
+Server handlers may return a `Response`, a string, JSON-compatible data, `false`, a redirect result, or an abort result. Unhandled errors produce development diagnostics and a safer production response.
 
 ## Public files
 
-Files under `public/` are served from the web root.
+Files under `public/` are served from `/`:
 
 ```txt
-public/favicon.svg -> /favicon.svg
-public/robots.txt  -> /robots.txt
-public/images/card.png -> /images/card.png
+public/favicon.svg  -> /favicon.svg
+public/robots.txt   -> /robots.txt
 ```
 
-Use `public/` for static files that do not need compilation. Use normal component imports or CSS references for assets that should be processed by the app toolchain.
+The server applies path-boundary checks to prevent traversal.
 
-## Nested app directory
+## Source assets
 
-The compiler also checks nested app conventions:
+Resux also serves `/assets/*` from the app's `assets/` directory because compiled imports and configured CSS may resolve there.
 
-```txt
-app/pages/
-app/app.vue
-app/error.vue
-```
+For optimized images and video, prefer [Media and Optimization](/guide/media).
 
-This is useful when an app wants repository files at the root and application source under `app/`.
+## Loading hooks and UI
 
-## Related pages
+The core hook system includes:
 
-- [Project Structure](/guide/project-structure)
-- [Layouts](/guide/layouts)
-- [File Conventions](/reference/file-conventions)
+- `page:loading:start`
+- `page:loading:end`
+- `page:finish`
+- `app:error`
+- `app:error:cleared`
+
+Modules or advanced integrations can use these hooks to implement loading indicators and centralized error reporting.

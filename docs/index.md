@@ -3,8 +3,8 @@ layout: home
 
 hero:
   name: Resux
-  text: Resumable web framework for Vue-like apps
-  tagline: Build server-rendered pages that ship HTML first, serialize state, and load client handler code only when users interact.
+  text: HTML-first resumable framework
+  tagline: Compile Vue-like SFCs into server-rendered HTML, serialized state, and interaction-loaded browser modules—with routing, server APIs, modules, deployment, and optional Vue islands.
   image:
     src: /logo.svg
     alt: Resux logo
@@ -13,69 +13,57 @@ hero:
       text: Get Started
       link: /guide/getting-started
     - theme: alt
-      text: Learn the Runtime
-      link: /guide/mental-model
+      text: Framework Tour
+      link: /guide/framework-tour
     - theme: alt
-      text: API Reference
-      link: /reference/composables
+      text: API Index
+      link: /reference/api-index
 
 features:
-  - icon: HTML
-    title: HTML first, JS on demand
-    details: Resux renders HTML on the server, serializes route and component state, and imports handler modules only after an event is triggered.
-  - icon: SFC
-    title: Familiar .vue files
-    details: Use a focused Vue-like SFC subset with template, script setup, pages routing, layouts, and components.
-  - icon: RX
-    title: Resumable state
-    details: useState and useAsyncData data is serialized into the payload so scopes can resume without whole-app hydration.
+  - icon: SSR
+    title: Server HTML first
+    details: Render app shells, layouts, pages, head metadata, state, and async data on the server.
+  - icon: RESUME
+    title: Resume on interaction
+    details: Import generated handler code only when an event or progressive enhancement needs it.
   - icon: ROUTE
-    title: File routing
-    details: Add pages, dynamic params, catch-all routes, layouts, route middleware, and client-side navigation.
-  - icon: API
-    title: Server API included
-    details: Build API routes and request middleware with h3-backed helpers such as readBody, getQuery, and setHeader.
-  - icon: ISLAND
-    title: Vue islands when needed
-    details: Keep Resux components zero-default-hydration, then opt into Vue runtime islands for complex client widgets.
+    title: Full application platform
+    details: File routes, middleware, APIs, plugins, modules, hooks, route rules, and Nitro deployment are integrated.
+  - icon: PACKAGE
+    title: Controlled package compatibility
+    details: Declare SSR, client-only, server-only, or progressive third-party package behavior and inspect diagnostics.
+  - icon: MEDIA
+    title: Optimized media
+    details: Responsive images, persistent generated variants, video deferral, sharp transforms, and ffmpeg support.
+  - icon: SAFE
+    title: Explicit boundaries
+    details: Compiler errors, serializable state, production report integrity, security defaults, and documented experimental limits.
 ---
 
-## Install in one command
+## Create a project
 
 ```sh
-npx resuxjs@latest init my-app
+npx create-resuxjs@latest my-app
 cd my-app
 npm install
 npm run dev
 ```
 
-`@latest` currently resolves to `resuxjs@0.2.23` (checked on 2026-05-07).
+Node.js `>=20.19.0` is required by the current framework source.
 
-## A tiny Resux component
+## Learn by area
 
-```vue
-<script setup lang="ts">
-const count = useState('count', () => 0)
+| Goal | Read |
+| --- | --- |
+| Understand the architecture | [Framework Tour](/guide/framework-tour) and [Mental Model](/guide/mental-model) |
+| Build components and routes | [Components](/guide/components), [Template Syntax](/guide/template-syntax), [Routing](/guide/routing) |
+| Load data and manage state | [State](/guide/state), [Async Data](/guide/async-data) |
+| Build APIs and middleware | [Server API](/guide/server-api), [Middleware](/guide/middleware) |
+| Integrate libraries | [Third-party Packages](/guide/package-integration), [Vue Islands](/guide/vue-islands) |
+| Extend the framework | [Modules](/guide/modules-route-rules), [Hooks](/reference/hooks), [API Index](/reference/api-index) |
+| Optimize assets | [Media](/guide/media), [Fonts](/guide/fonts), [Icons](/guide/icons), [CSS/Tailwind](/guide/css-tailwind) |
+| Deploy safely | [Deployment](/guide/deployment), [Security](/guide/security-caching), [Halal Core](/guide/halal-core) |
 
-function increment() {
-  count.value++
-}
-</script>
+## Important release note
 
-<template>
-  <button @click="increment">
-    Count: {{ count }}
-  </button>
-</template>
-```
-
-The server renders the button as HTML. The browser receives the serialized `count` state and a small delegated runtime. The handler chunk is loaded only when the button is clicked.
-
-## What should I read first?
-
-- New to Resux: start with [What is Resux?](/guide/what-is-resux), [Core Concepts](/guide/core-concepts), and [Getting Started](/guide/getting-started).
-- Understanding the runtime: read [Rendering Lifecycle](/guide/rendering-lifecycle) and [Resumability and Handlers](/guide/resumability-handlers).
-- Understanding where code belongs: use [Execution Contexts](/guide/execution-contexts), [App Shell, Errors, and Public Files](/guide/app-shell-errors), and [Security and Caching](/guide/security-caching).
-- Building an app: read [Project Structure](/guide/project-structure), [Routing](/guide/routing), and [Async Data](/guide/async-data).
-- Looking for exact APIs: jump to [Composables and Globals](/reference/composables) and [CLI](/reference/cli).
-- Deploying: use [Deployment](/guide/deployment) and [Docker Deployment](/examples/docker).
+The documentation follows the current source work referenced by its pull request. The npm `latest` tag may temporarily expose an older feature set. Check `npm view resuxjs version` and the framework release notes before relying on a source-only capability.

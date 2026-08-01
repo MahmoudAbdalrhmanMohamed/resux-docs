@@ -1,80 +1,118 @@
-# Icons Module (`resuxjs/icons`)
+# Icons (`resuxjs/icons`)
 
-The `resuxjs/icons` module provides high-performance icon resolution, dynamic SVG fetching, and viewport visibility lazy loading for Resux applications.
+The icons package provides a build-time module and a Vue runtime icon component backed by a local registry and optional Iconify-compatible HTTP provider.
 
-## Overview
+::: warning Runtime boundary
+`Icon` and `ResuxIcon` are Vue components. Use them inside a Vue island or another Vue/client runtime context. Registering the module can expose configuration and a named component, but it does not turn normal Resux components into hydrated Vue components.
+:::
 
-- **Zero-hydration icon rendering**: Icons are rendered as native `<svg>` elements on the server during SSR and patched efficiently in the client DOM.
-- **Dynamic Iconify API Integration**: Supports resolution of 150,000+ icons from open icon sets via `https://api.iconify.design/{prefix}/{name}.svg`.
-- **Pre-populated Icon Registry**: Common UI icons are bundled directly in memory for zero-latency initial renders.
-- **Viewport IntersectionObserver Lazy Loading**: Off-screen icons can defer dynamic vector fetching until scrolled into view.
-
-## Quick Start
-
-Enable the icons module in `resux.config.ts`:
+## Module configuration
 
 ```ts
 export default defineResuxConfig({
   modules: [
-    ["resuxjs/icons", {
-      component: "Icon",
-      mode: "svg",
-      collections: [
-        "material-symbols",
-        "mdi",
-        "mingcute",
-        "cib",
-        "uil",
-        "line-md",
-        "solar",
-        "ph",
-        "gg"
-      ],
+    ['resuxjs/icons', {
+      component: 'Icon',
+      mode: 'svg',
+      apiProvider: 'https://api.iconify.design',
+      collections: ['material-symbols', 'mdi', 'ph'],
       lazy: true
     }]
   ]
 })
 ```
 
-## Built-in `<Icon>` and `<ResuxIcon>` Component
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `collections` | `string[]` | built-in/default list | Collections intended for the app. |
+| `component` | `string` | `Icon` | Registered component name. |
+| `mode` | `'css' \| 'svg'` | `'svg'` | Rendering mode metadata. Current component renders SVG. |
+| `apiProvider` | `string` | Iconify API | Base URL used for dynamic icon fetching. |
+| `lazy` | `boolean` | `true` | Defer fetching until the icon becomes visible where supported. |
 
-Use `<Icon>` or `<ResuxIcon>` directly in Vue SFC templates without manual imports:
+The normalized provider is stored in public runtime config so client instances use the same endpoint.
+
+## Use in a Vue island
 
 ```vue
+<script setup lang="ts">
+import { ResuxIcon } from 'resuxjs/icons'
+</script>
+
 <template>
-  <div class="flex items-center gap-2">
-    <!-- Eager / Pre-registered Icon -->
-    <Icon name="material-symbols:call" size="1.5rem" class="text-blue-500" />
-    
-    <!-- Dynamic Iconify Icon -->
-    <Icon name="ph:check-circle-thin" size="2rem" />
-    
-    <!-- Viewport Visibility Lazy Loaded Icon -->
-    <Icon name="solar:leaf-outline" size="2rem" lazy />
-  </div>
+  <ResuxIcon
+    name="ph:check-circle"
+    size="1.5rem"
+    color="currentColor"
+    lazy
+  />
 </template>
 ```
 
-## Component Props
+## Local registry
 
-| Prop | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `name` | `string` | **Required** | Icon name specifier in `{prefix}:{name}` or short format (e.g. `material-symbols:call`, `ph:check-circle-thin`). |
-| `size` | `string \| number` | `"1.25rem"` | Width and height of the SVG element (number values are converted to `px`). |
-| `mode` | `"svg" \| "css"` | `"svg"` | Rendering mode. |
-| `lazy` | `boolean` | `false` | When `true`, defers fetching dynamic SVG paths until element enters viewport. |
-| `loading` | `"eager" \| "lazy"` | `"eager"` | Loading priority strategy. |
-| `class` | `string` | `""` | Utility CSS classes forwarded to the SVG element. |
-
-## Dynamic Fetching
-
-When an icon name is requested that is not yet in the in-memory `iconRegistry`, `resuxjs/icons` invokes `fetchIconifyIcon(name)`:
+Frequently used icons are available from `iconRegistry`. Registry records can contain one path or multiple paths with optional opacity and a custom `viewBox`.
 
 ```ts
-import { fetchIconifyIcon } from "resuxjs/icons"
+import { iconRegistry } from 'resuxjs/icons'
 
-// Fetch SVG icon definition dynamically
-const iconData = await fetchIconifyIcon("ph:flower-lotus-thin")
+iconRegistry['company:logo'] = {
+  viewBox: '0 0 32 32',
+  paths: [
+    { d: '...', opacity: '0.7' },
+    { d: '...' }
+  ]
+}
 ```
 
-Fetches are deduped globally so duplicate requests across components share a single inflight request.
+Use a stable application initialization point when extending the registry.
+
+## Dynamic fetching
+
+```ts
+import { fetchIconifyIcon } from 'resuxjs/icons'
+
+const data = await fetchIconifyIcon(
+  'ph:check-circle',
+  'https://api.iconify.design'
+)
+```
+
+Dynamic behavior includes:
+
+- provider URL normalization,
+- cache keys that include provider and icon name,
+- concurrent request deduplication,
+- multi-path SVG parsing,
+- safe fallback when a request fails,
+- and stale-request protection when the component's name/provider changes before a request finishes.
+
+## Lazy loading
+
+When lazy mode is enabled and `IntersectionObserver` exists, the component waits until it approaches the viewport. Without observer support it loads immediately.
+
+## Custom providers
+
+Use HTTPS for public providers. Only configure a provider you trust because the client requests SVG data from it. Apply CSP and network allow-lists appropriate to your application.
+
+```ts
+['resuxjs/icons', {
+  apiProvider: 'https://icons.example.com'
+}]
+```
+
+## Helper
+
+```ts
+import { defineIconCollections } from 'resuxjs/icons'
+
+const options = defineIconCollections(['mdi', 'ph'])
+```
+
+## Troubleshooting
+
+- Confirm the icon name uses `collection:name` format.
+- Confirm the provider returns Iconify-compatible JSON/SVG data.
+- Check CSP `connect-src`.
+- Check the element actually intersects the viewport when `lazy` is active.
+- Use a local registry entry for critical icons that must not depend on a remote service.

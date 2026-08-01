@@ -1,77 +1,114 @@
 # Getting Started
 
-This page takes you from zero to a running Resux app.
+This guide creates a Resux app, explains the generated project, and prepares it for development and production.
 
 ## Requirements
 
-Resux requires Node `>=20.19.0` for the framework package. The docs site itself only needs Node 18+, but generated Resux apps should use the framework requirement.
-
-Current npm `latest` for `resuxjs` is `0.2.23` (checked on 2026-05-07).
-
-Check your version:
+- Node.js `>=20.19.0`
+- npm, pnpm, yarn, or Bun
+- a modern browser for the resumable client runtime
 
 ```sh
 node --version
 ```
 
-## Create a new app
+## Create an application
+
+Use either the full CLI or the create wrapper:
 
 ```sh
 npx resuxjs@latest init my-app
+# or
+npx create-resuxjs@latest my-app
+```
+
+Then:
+
+```sh
 cd my-app
 npm install
 npm run dev
 ```
 
-Open the local URL printed by the command.
-
-## Create options
-
-Create in a named directory:
+## Starter templates
 
 ```sh
-npx resuxjs@latest init my-app
+npx create-resuxjs@latest my-app --template default
 ```
 
-Skip install:
+Available templates:
+
+| Template | Intended use |
+| --- | --- |
+| `minimal` | Smallest app shell and page |
+| `default` | General starter with common conventions |
+| `full` | Broad feature demonstration |
+| `i18n` | Localized routes and messages |
+| `pwa` | Progressive web app starter files |
+| `media` | Images, pictures, and video examples |
+| `package-compatibility` | Third-party package modes and diagnostics |
+| `dashboard` | Dashboard-oriented structure and UI |
+
+## Optional features
+
+Features can be selected independently or combined:
 
 ```sh
-npx resuxjs@latest init my-app --no-install
+npx create-resuxjs@latest my-app \
+  --features seo,i18n,media,tailwind,server-api,tests
 ```
 
-Choose a package manager for the generated next steps:
+Supported feature names:
+
+- `seo`
+- `i18n`
+- `media`
+- `pwa`
+- `tailwind`
+- `package-compatibility`
+- `server-api`
+- `tests`
+
+For i18n starters:
 
 ```sh
-npx resuxjs@latest init my-app --package-manager pnpm
-npx resuxjs@latest init my-app --pm bun
+npx create-resuxjs@latest my-app --features i18n --hreflang
 ```
 
-Overwrite a non-empty target directory:
+## Other create options
 
 ```sh
-npx resuxjs@latest init my-app --force
+npx create-resuxjs@latest my-app --no-install
+npx create-resuxjs@latest my-app --package-manager pnpm
+npx create-resuxjs@latest my-app --yes
 ```
 
-Accept defaults without prompts:
+`--force` empties a non-empty target, but Resux refuses to apply it to protected locations such as the filesystem root, home directory, current working directory, or an ancestor of the working directory.
 
-```sh
-npx resuxjs@latest init my-app --yes
-```
+## Generated scripts
 
-## Generated package scripts
-
-A generated app uses a single dependency on `resuxjs` and scripts like these:
+A generated app contains scripts similar to:
 
 ```json
 {
   "scripts": {
-    "dev": "resux dev .",
-    "build": "resux build .",
-    "preview": "resux preview .",
-    "start": "node .output/server/index.mjs",
-    "inspect": "resux inspect ."
+    "prepare": "resux prepare",
+    "dev": "resux dev",
+    "build": "resux build",
+    "preview": "resux preview",
+    "start": "resux start",
+    "inspect": "resux inspect",
+    "typecheck": "vue-tsc --noEmit"
   }
 }
+```
+
+Run preparation and validation after changing framework versions or generated conventions:
+
+```sh
+npm run prepare
+npx resux check
+npx resux check --fix
 ```
 
 ## Your first page
@@ -82,10 +119,10 @@ Create `pages/index.vue`:
 <script setup lang="ts">
 useSeoMeta({
   title: 'Home',
-  description: 'My first Resux app'
+  description: 'My first Resux application'
 })
 
-const count = useState('count', () => 0)
+const count = useState('home-count', () => 0)
 
 function increment() {
   count.value++
@@ -100,22 +137,64 @@ function increment() {
 </template>
 ```
 
-The template can read `count` directly because templates auto-unwrap Resux refs. In script, mutate refs through `.value`.
+Templates auto-unwrap Resux refs. Script code uses `.value`.
 
-## Build for production
+## Add an API route
+
+Create `server/api/status.ts`:
+
+```ts
+export default defineEventHandler(() => ({
+  ok: true,
+  framework: 'resux'
+}))
+```
+
+Request it from a page:
+
+```ts
+const status = await useFetch<{ ok: boolean }>('/api/status')
+```
+
+`useFetch` returns an async-data resource with `data`, `value`, `pending`, and `error` refs.
+
+## Inspect the project
+
+```sh
+npx resux inspect
+npx resux inspect routes
+npx resux inspect packages --json
+npx resux inspect seo --json
+```
+
+Inspect targets include routes, plugins, enhancements, middleware, imports, components, build, images, server, packages, templates, bundles, and SEO.
+
+## Production build
+
+For production report authentication, configure a secret of at least 32 characters:
+
+```sh
+export RESUX_HALAL_REPORT_SIGNING_SECRET='replace-with-a-private-random-secret'
+```
+
+Then:
 
 ```sh
 npm run build
 npm run start
 ```
 
-`resux build` writes lower-level Resux output to `.resux` and a Nitro production server to `.output`.
+Build output normally includes:
 
-## Inspect a build
-
-```sh
-npm run inspect
-npm run inspect -- --json
+```txt
+.resux/   Resux compiler/runtime output
+.output/  Nitro production output
 ```
 
-Use inspect output to debug discovered routes, components, layouts, plugins, middleware, server handlers, route rules, features, and diagnostics.
+## Recommended reading
+
+- [Framework Tour](/guide/framework-tour)
+- [Project Structure](/guide/project-structure)
+- [Rendering Lifecycle](/guide/rendering-lifecycle)
+- [Template Syntax](/guide/template-syntax)
+- [Deployment](/guide/deployment)

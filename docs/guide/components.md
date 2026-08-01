@@ -1,153 +1,135 @@
 # Components
 
-Resux components use `.vue` files with a focused single-file component subset.
+Resux components use a compiler-supported `.vue` SFC subset and render without default Vue hydration.
 
-## Basic shape
-
-```vue
-<script setup lang="ts">
-const props = defineProps<{ label: string }>()
-const clicked = useState('clicked', () => false)
-
-function markClicked() {
-  clicked.value = true
-}
-</script>
-
-<template>
-  <button @click="markClicked">
-    {{ props.label }}
-    <span v-if="clicked">done</span>
-  </button>
-</template>
-```
-
-A component needs a `<template>` block. The `<script setup lang="ts">` block can define state, handlers, props, meta, and helper values.
-
-## Pages
-
-Files in `pages/` become routes. A page is still a component, but it can also use `definePageMeta`.
+## Basic component
 
 ```vue
 <script setup lang="ts">
-definePageMeta({
-  layout: 'marketing',
-  title: 'Pricing'
-})
-</script>
-
-<template>
-  <section>
-    <h1>Pricing</h1>
-  </section>
-</template>
-```
-
-## Components directory
-
-Files in `components/` are discovered and can be used as PascalCase tags.
-
-```txt
-components/AppButton.vue
-```
-
-```vue
-<template>
-  <AppButton label="Save" />
-</template>
-```
-
-## Props
-
-Use `defineProps()` inside script setup:
-
-```vue
-<script setup lang="ts">
-const props = defineProps<{
-  title: string
-  count?: number
-}>()
-</script>
-
-<template>
-  <article>
-    <h2>{{ props.title }}</h2>
-    <p>{{ props.count ?? 0 }}</p>
-  </article>
-</template>
-```
-
-Props should be JSON-serializable when they need to be resumed.
-
-## Events
-
-Use named handlers or resumability-safe inline expressions.
-
-```vue
-<script setup lang="ts">
-const count = useState('count', () => 0)
+const props = defineProps<{ label: string; step?: number }>()
+const emit = defineEmits<{ changed: [value: number] }>()
+const count = ref(0)
 
 function increment() {
-  count.value++
+  count.value += props.step ?? 1
+  emit('changed', count.value)
 }
 </script>
 
 <template>
-  <button @click="increment">{{ count }}</button>
-  <button @click="count.value = 0">Reset</button>
+  <button @click="increment">
+    {{ props.label }}: {{ count }}
+  </button>
 </template>
+
+<style scoped>
+button { font: inherit; }
+</style>
 ```
 
-Handlers must only capture resumable values such as refs returned from `useState` or data that can be recreated safely.
+A Resux component requires a `<template>` block. Plain CSS and scoped CSS are supported. Style modules, style `src`, and non-CSS style languages are rejected for resumable components.
 
-## Lifecycle
+## Setup macros
 
-`onMounted()` runs when a component scope is first resumed in the browser, not during the first server render.
+The setup context provides compiler-compatible helpers including:
 
-```vue
-<script setup lang="ts">
-onMounted(() => {
-  console.log('scope resumed in the browser')
+- `defineProps`
+- `defineEmits`
+- `defineExpose`
+- `defineSlots`
+- `defineOptions`
+- `defineModel`
+- `definePageMeta`
+
+Use only the behavior documented for Resux; these helpers do not imply complete Vue SFC compatibility.
+
+## Auto-discovery
+
+Components are discovered from:
+
+- `components/`
+- `app/components/`
+- module-added component files
+- module-added component directories
+
+Generated component declarations are written under `.resux/types` and made available during preparation.
+
+## Pages and layouts are components
+
+Pages may define route metadata:
+
+```ts
+definePageMeta({
+  layout: 'dashboard',
+  middleware: ['auth'],
+  title: 'Dashboard',
+  meta: [{ name: 'robots', content: 'noindex' }]
 })
-</script>
 ```
 
-## Components are not Vue runtime components
+Layouts use `<slot />` to render the page.
 
-Normal Resux components do not use Vue hydration. For full Vue runtime behavior, use [Vue Islands](/guide/vue-islands).
+## Built-in tags
 
-## Built-in Resux Elements
+| Tag | Purpose |
+| --- | --- |
+| `<ResuxPage />` | Active page placeholder |
+| `<ResuxLayout />` | Selected layout wrapper |
+| `<ResuxLink>` | Same-origin navigation-aware link |
+| `<ResuxImg>` | Responsive optimized image |
+| `<ResuxPicture>` | Art-direction picture sources |
+| `<ResuxVideo>` | Deferred/optimized video with controls modes |
+| `<VueIsland>` | Full Vue runtime boundary |
 
-Resux provides zero-hydration built-in elements for media, navigation, and UI primitives:
+## Resumable events
 
-### `<ResuxVideo>`
-High-performance resumable video component supporting lazy loading and deferred initial frame strategies:
+Named handlers and supported inline expressions are compiled into client handler modules.
 
 ```vue
-<template>
-  <ResuxVideo
-    src="/hero.webm"
-    poster="/poster.webp"
-    load-strategy="page-ready"
-    autoplay
-    muted
-    loop
-    playsinline
-    controls-mode="none"
-  />
-</template>
+<button @click="count.value++">Increment</button>
 ```
 
-- **`loadStrategy`**: `"eager"` | `"lazy"` | `"visible"` | `"page-ready"`. Under `"page-ready"`, Resux renders the initial poster frame immediately in SSR and emits ZERO video network requests until full document `window.load`, eliminating network congestion during critical page rendering.
-- **`controlsMode`**: `"custom"` | `"native"` | `"none"`.
+Prefer named handlers for complex logic and clearer compile errors.
 
-### `<ResuxImg>` & `<ResuxPicture>`
-Resumable responsive image elements with automatic placeholders, IntersectionObserver lazy loading, and error handling.
+## Browser-only component work
 
-### `<ResuxLink>`
-Route-aware resumable link element replacing native internal `<a>` tags for client-side SPA payload transitions.
+`onMounted()` runs on the first browser resume of that scope. It queues browser work, but a cleanup function returned from its callback is not registered for disposal. Use a client enhancement when work owns observers, event listeners, or external instances.
 
-### UI & Motion Primitives
-For the complete suite of UI & Motion Primitives (`ResuxSelect`, `ResuxDatePicker`, `ResuxPopover`, `ResuxIcon`, `ResuxReveal`, `ResuxAutoAnimate`, `RxButton`, `RxCard`, `RxAvatar`, `RxAlert`, `RxAccordion`, `RxTooltip`, `RxDropdown`, `RxTabs`, `RxSwitch`, `RxSkeleton`, `RxDivider`, `RxKbd`), see the [UI & Motion Primitives (`resuxjs/ui`)](/guide/ui-animations) guide.
+```ts
+// enhancements/body-resize-observer.ts
+export const bodyResizeObserver = defineClientEnhancement(
+  'body-resize-observer',
+  (target) => {
+    const observer = new ResizeObserver(() => {
+      console.log(target.getBoundingClientRect().width)
+    })
 
+    observer.observe(target)
+    return () => observer.disconnect()
+  }
+)
+```
 
+```ts
+onMounted(async () => {
+  const enhancement = await useClientEnhancement('body-resize-observer', {
+    target: 'body',
+    trigger: 'immediate'
+  })
+
+  await enhancement.activate()
+})
+```
+
+For library-driven DOM behavior, a [client enhancement](/guide/package-integration#client-enhancements) is often a better boundary. For complete Vue lifecycle and rendering behavior, use [Vue Islands](/guide/vue-islands).
+
+## UI package components
+
+`resuxjs/ui` exports both `Rx*` and `Resux*` names for primitives including:
+
+- Button, Input, Textarea, Select, DatePicker
+- Card, Badge, Avatar, Alert, Divider, Skeleton, Kbd
+- Accordion, Tabs, Switch, Dropdown, Popover, Tooltip, Modal
+- Motion, Reveal, and AutoAnimate
+
+These are Vue runtime components from the optional UI subpath; use them in an appropriate Vue/client context and read [UI & Motion Primitives](/guide/ui-animations).

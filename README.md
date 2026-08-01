@@ -1,36 +1,38 @@
-# Resux Docs
+# Resux Documentation
 
-Documentation site for [Resux](https://github.com/MahmoudAbdalrhmanMohamed/resux), the resumable web framework published as `resuxjs`.
+VitePress documentation for the complete Resux framework surface.
 
-The docs track the current `resuxjs` `latest` line (`0.2.23` as of 2026-05-07), and clearly mark experimental boundaries (Vue islands escape hatch and unsupported Vue syntax outside the documented subset).
+The site covers:
+
+- architecture, compiler, SSR, resumability, routing, layouts, state, async data, and errors,
+- plugins, middleware, server APIs, modules, Kit, hooks, generated templates/types, and route rules,
+- third-party package modes, client enhancements, Vue islands, UI, icons, fonts, i18n, media, CSS, and Tailwind,
+- create templates/features, CLI commands, targeted inspection, diagnostics, testing, deployment, release automation, security, and Halal Core,
+- examples for counters, routes, APIs, authentication, progressive packages, media, and Docker.
+
+## Source alignment
+
+Documentation changes must identify the framework source or release used as the source of truth. The current global audit is aligned with `MahmoudAbdalrhmanMohamed/resux` branch `audit/full-history-correctness` at commit `35f00b0ddb68b098cb1def4c59356f722c5db72b`.
+
+The complete source-alignment refresh was validated with a clean dependency installation and a successful VitePress production build.
+
+Some documented changes depend on the corresponding framework pull request being merged and released.
 
 ## Local development
 
 ```sh
-npm install
+npm ci
 npm run dev
 ```
 
-## Production build
+## Validate
 
 ```sh
 npm run build
-npm run preview
 ```
 
-The site is built with VitePress and is configured for GitHub Pages at `/resux-docs/`.
+The repository includes Documentation CI for pushes and pull requests.
 
-## What is inside
+## Deployment
 
-- Full getting-started flow for `npx resuxjs@latest init`
-- Core concept map for Resux components, payloads, scopes, route payloads, handlers, plugins, modules, route rules, and islands
-- Rendering lifecycle guide from compile time through browser interaction
-- Resumability and handler guide for safe state, captures, patches, modifiers, and mounted work
-- Execution context, app shell/error, dev/build output, and security/caching concept guides
-- Resux component language guide
-- CLI reference
-- Global composables reference
-- Release and publishing reference (CI + tag-based npm publish flow)
-- Routing, layouts, middleware, plugins, modules, server API, deployment, and troubleshooting docs
-- Brand page with logo usage and color palette
-- GitHub Actions workflow for publishing to Pages
+The VitePress site is configured for GitHub Pages under `/resux-docs/`.

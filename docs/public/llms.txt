@@ -1,28 +1,75 @@
-# Resux Documentation
+# Resux Documentation Index
 
-Resux is an experimental web framework prototype with a custom resumable runtime.
-It uses Vue-like single-file components, pages routing, SSR, serialized state, lazy event handler loading, and optional Vue runtime islands.
+Resux is an HTML-first experimental web framework with a custom Vue-like SFC compiler, SSR renderer, serialized resumable state, delegated event runtime, route payload navigation, server APIs, modules, hooks, package modes, media optimization, deployment adapters, optional Vue islands, and a local safety/integrity subsystem.
 
-Important pages:
+Framework source: https://github.com/MahmoudAbdalrhmanMohamed/resux
+Documentation source: https://github.com/MahmoudAbdalrhmanMohamed/resux-docs
+Package: resuxjs
+Node requirement in current source: >=20.19.0
 
+Do not assume the npm latest version permanently matches the source documentation. Check the package version and release notes.
+
+Start:
+- /guide/framework-tour
 - /guide/what-is-resux
-- /guide/core-concepts
 - /guide/getting-started
-- /guide/execution-contexts
+- /guide/project-structure
+- /guide/mental-model
+
+Core:
 - /guide/rendering-lifecycle
 - /guide/resumability-handlers
-- /guide/app-shell-errors
+- /guide/components
 - /guide/template-syntax
+- /guide/state
 - /guide/async-data
 - /guide/routing
+- /guide/layouts
+- /guide/head-seo
+- /guide/runtime-config
+
+Platform:
+- /guide/plugins
+- /guide/middleware
+- /guide/server-api
+- /guide/modules-route-rules
+- /guide/package-integration
+- /guide/css-tailwind
+- /guide/typescript-generated-types
+- /guide/testing-quality
+
+Features:
+- /guide/media
+- /guide/icons
+- /guide/fonts
+- /guide/i18n
+- /guide/ui-animations
+- /guide/vue-islands
+
+Operations and safety:
 - /guide/security-caching
+- /guide/halal-core
 - /guide/dev-build-output
-- /reference/composables
+- /guide/deployment
+- /guide/troubleshooting
+
+Reference:
+- /reference/packages
+- /reference/api-index
 - /reference/cli
+- /reference/composables
 - /reference/configuration
+- /reference/file-conventions
+- /reference/hooks
+- /reference/runtime
+- /reference/compiler
+- /reference/release
 - /reference/limits
 
-Package: resuxjs
-Latest npm release (checked 2026-05-07): 0.2.23
-Source: https://github.com/MahmoudAbdalrhmanMohamed/resux
-Docs: https://github.com/MahmoudAbdalrhmanMohamed/resux-docs
+Important facts:
+- Normal Resux components do not hydrate through Vue.
+- resuxjs/ui and resuxjs/icons export Vue runtime components; use them in appropriate Vue/client contexts.
+- useFetch returns an AsyncDataResource with data/value/pending/error refs.
+- review_required creates a local manual review bundle; it is not automatically emailed or uploaded.
+- production server/deployment report verification requires RESUX_HALAL_REPORT_SIGNING_SECRET.
+- image transforms require sharp; video transforms require ffmpeg.

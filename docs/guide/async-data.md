@@ -1,96 +1,100 @@
-# Async Data
+# Async Data and Fetching
 
-`useAsyncData` gives Resux a Nuxt-like async resource with resumable `data`, `pending`, and `error` refs.
+Resux async resources expose reactive values while remaining serializable across SSR and browser resume.
 
-## Return shape
-
-```ts
-const resource = useAsyncData('key', async ({ signal }) => {
-  return { ok: true }
-})
-
-resource.data
-resource.value
-resource.pending
-resource.error
-```
-
-`data` and `value` point at the same ref. `value` exists as a compatibility alias.
-
-## SSR-first data
-
-Await `useAsyncData` when you want data to be resolved during server rendering.
-
-```vue
-<script setup lang="ts">
-type Stats = { response: string }
-
-const { data, pending, error } = await useAsyncData('stats', ({ signal }) => {
-  return $fetch<Stats>('/api/stats', { signal })
-})
-</script>
-
-<template>
-  <p v-if="pending">Loading</p>
-  <p v-if="error">{{ error.message }}</p>
-  <strong v-if="data">{{ data.response }}</strong>
-</template>
-```
-
-## Skeleton-first data
-
-Do not await when you intentionally want the server to render a skeleton and let the browser resume the pending scope.
-
-```vue
-<script setup lang="ts">
-type Stats = { response: string }
-
-const { data, pending, error } = useAsyncData('stats', ({ signal }) => {
-  return $fetch<Stats>('/api/stats', { signal })
-})
-</script>
-
-<template>
-  <div v-if="pending" class="skeleton">Loading...</div>
-  <p v-if="error">{{ error.message }}</p>
-  <strong v-if="!pending && !error && data">{{ data.response }}</strong>
-</template>
-```
-
-## Abort signal
-
-The handler receives an optional `signal`. Pass it to `$fetch` or native `fetch` so pending browser requests can be aborted if the user leaves the route.
+## `useAsyncData`
 
 ```ts
-const { data } = useAsyncData('profile', ({ signal }) => {
-  return $fetch('/api/profile', { signal })
+const users = await useAsyncData('users', async ({ signal }) => {
+  return $fetch<Array<{ id: number; name: string }>>('/api/users', { signal })
 })
 ```
 
-## Error handling
-
-`error` is a ref with a normalized shape:
+The resource contains:
 
 ```ts
-type AsyncDataError = {
-  name: string
-  message: string
+type AsyncDataResource<T> = {
+  data: Ref<T | undefined>
+  value: Ref<T | undefined>
+  pending: Ref<boolean>
+  error: Ref<{ name: string; message: string } | null>
 }
 ```
 
-Always render errors while prototyping. It makes skeleton problems obvious:
+The resource is thenable. Awaiting it waits for the initial server-side resolution and returns the same ref-based shape.
 
-```vue
-<p v-if="error" role="alert">{{ error.message }}</p>
-```
-
-## Internal API URLs
-
-During SSR, native `fetch('/api/test')` can fail because Node needs an absolute URL. Resux provides two helpers:
+## `useFetch`
 
 ```ts
-await $fetch('/api/test')
-await fetch(apiURL('/api/test'))
+const status = await useFetch<{ ok: boolean }>('/api/status')
+
+if (status.error.value) {
+  console.error(status.error.value.message)
+}
 ```
 
-On the server, Resux resolves internal `/api/...` paths against the current request origin, configured public origins, or `http://localhost:3000`. In the browser, internal URLs stay relative.
+`useFetch` returns an async-data resource, not a plain ref.
+
+## `$fetch`
+
+```ts
+const result = await $fetch<{ saved: boolean }>('/api/items', {
+  method: 'POST',
+  body: { title: 'Example' }
+})
+```
+
+`$fetch` resolves internal URLs correctly during SSR and returns parsed data directly.
+
+## Native `fetch` and `apiURL`
+
+```ts
+const response = await fetch(apiURL('/api/status'))
+```
+
+Use `apiURL` when native `fetch` may execute during SSR. Resux resolves an absolute application origin from the route or public runtime config.
+
+## Public origin configuration
+
+```ts
+export default defineResuxConfig({
+  runtimeConfig: {
+    public: {
+      appOrigin: 'https://example.com'
+    }
+  }
+})
+```
+
+Recognized public origin keys include `appOrigin`, `appURL`, `siteURL`, and `origin`.
+
+## Cancellation and cleanup
+
+The async-data handler receives an optional `AbortSignal`. Pass it to fetch operations so obsolete or disposed work can be cancelled.
+
+```ts
+const route = useRoute()
+const record = await useAsyncData(`record:${route.params.id}`, ({ signal }) =>
+  $fetch(`/api/records/${route.params.id}`, { signal })
+)
+```
+
+## Error behavior
+
+Errors are serialized into a minimal `{ name, message }` shape. Do not depend on server stacks or private error properties reaching the browser.
+
+For fatal page errors:
+
+```ts
+if (!record.data.value) {
+  throw createError({ statusCode: 404, message: 'Record not found' })
+}
+```
+
+## Key design
+
+Use stable keys that represent the data identity. Avoid using one key for unrelated resources, because the state belongs to the rendered/resumed scope.
+
+## Avoid duplicate fetching
+
+Await the resource during SSR when the page needs the data to render. The resolved value is serialized, so the browser can resume without repeating the initial request.
