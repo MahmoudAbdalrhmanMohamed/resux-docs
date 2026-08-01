@@ -98,7 +98,7 @@ Generated output should be ignored by Git and regenerated with `resux prepare`, 
 
 ## Naming suffixes
 
-Support TypeScript files understand suffixes such as:
+TypeScript files support suffixes such as:
 
 ```txt
 plugins/analytics.client.ts
