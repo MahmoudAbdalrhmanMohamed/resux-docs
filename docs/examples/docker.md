@@ -10,24 +10,37 @@ Review the generated `Dockerfile`, `.dockerignore`, and `DEPLOYMENT.md` before d
 
 ## Build
 
+Provide the report signing secret to BuildKit from your CI secret store or shell environment. Do not pass it through `ARG` or `--build-arg`.
+
 ```sh
-export RESUX_HALAL_REPORT_SIGNING_SECRET='private-random-secret-at-least-32-characters'
-docker build \
-  --build-arg RESUX_HALAL_REPORT_SIGNING_SECRET="$RESUX_HALAL_REPORT_SIGNING_SECRET" \
+DOCKER_BUILDKIT=1 docker build \
+  --secret id=resux_halal_report_signing_secret,env=RESUX_HALAL_REPORT_SIGNING_SECRET \
   -t resux-app .
 ```
 
-Avoid baking long-lived secrets into image layers. Prefer your CI platform's secret mounts/build secrets and pass the same report verification secret securely at runtime when required by the generated production guard.
+Consume the secret only in the build step that needs it:
+
+```dockerfile
+RUN --mount=type=secret,id=resux_halal_report_signing_secret \
+  RESUX_HALAL_REPORT_SIGNING_SECRET="$(cat /run/secrets/resux_halal_report_signing_secret)" \
+  npm run build
+```
+
+BuildKit mounts the value temporarily for that `RUN` instruction instead of storing it as a Docker build argument or image environment variable. Do not copy the mounted secret into the image filesystem.
 
 ## Run
+
+The generated production guard also needs the same secret at runtime. Inject it through your platform's runtime secret manager or environment configuration:
 
 ```sh
 docker run --rm \
   -p 3000:3000 \
   -e PORT=3000 \
-  -e RESUX_HALAL_REPORT_SIGNING_SECRET="$RESUX_HALAL_REPORT_SIGNING_SECRET" \
+  -e RESUX_HALAL_REPORT_SIGNING_SECRET \
   resux-app
 ```
+
+The final `-e` reads the value from the host environment without placing a literal secret in the command.
 
 ## Health check
 
