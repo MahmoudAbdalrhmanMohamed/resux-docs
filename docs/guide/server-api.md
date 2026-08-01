@@ -43,14 +43,36 @@ type EventHandlerEvent = {
 
 ```ts
 export default defineEventHandler(async (event) => {
+  if (event.method !== 'POST') {
+    return new Response('Method not allowed', { status: 405 })
+  }
+
   const query = getQuery(event)
-  const body = await readBody<{ title: string }>(event)
+
+  let body: unknown
+  try {
+    body = await readBody(event)
+  } catch {
+    return new Response('Invalid request body', { status: 400 })
+  }
+
+  if (
+    !body ||
+    typeof body !== 'object' ||
+    Array.isArray(body) ||
+    !('title' in body) ||
+    typeof body.title !== 'string' ||
+    !body.title.trim()
+  ) {
+    return new Response('Title is required', { status: 400 })
+  }
+
   setHeader(event, 'cache-control', 'no-store')
-  return { query, title: body.title }
+  return { query, title: body.title.trim() }
 })
 ```
 
-The helpers delegate to h3 where appropriate.
+The helpers delegate to h3 where appropriate. TypeScript annotations do not validate network input, so validate parsed bodies at runtime before reading their fields.
 
 ## Response forms
 
