@@ -42,16 +42,40 @@ export const tokens = defineUiTokens({
 
 ## Animation helper
 
-```ts
+Call `useAnimate` after the Vue island has mounted and the template ref contains a browser element.
+
+```vue
+<script setup lang="ts">
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useAnimate } from 'resuxjs/ui'
 
-const animation = useAnimate(element, {
-  type: 'fade-up',
-  duration: 400,
-  delay: 100,
-  easing: 'ease-out',
-  fill: 'forwards'
+const element = ref<HTMLElement | null>(null)
+let animation: Animation | null = null
+
+onMounted(() => {
+  if (!element.value) return
+
+  animation = useAnimate(element.value, {
+    type: 'fade-up',
+    duration: 400,
+    delay: 100,
+    easing: 'ease-out',
+    fill: 'forwards'
+  })
+
+  if (!animation) {
+    return
+  }
 })
+
+onBeforeUnmount(() => {
+  animation?.cancel()
+})
+</script>
+
+<template>
+  <div ref="element">Animated content</div>
+</template>
 ```
 
 Built-in presets:
