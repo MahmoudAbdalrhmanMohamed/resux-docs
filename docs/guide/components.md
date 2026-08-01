@@ -8,7 +8,7 @@ Resux components use a compiler-supported `.vue` SFC subset and render without d
 <script setup lang="ts">
 const props = defineProps<{ label: string; step?: number }>()
 const emit = defineEmits<{ changed: [value: number] }>()
-const count = useState('button-count', () => 0)
+const count = ref(0)
 
 function increment() {
   count.value += props.step ?? 1
@@ -93,13 +93,31 @@ Prefer named handlers for complex logic and clearer compile errors.
 
 ## Browser-only component work
 
-`onMounted()` runs on the first browser resume of that scope.
+`onMounted()` runs on the first browser resume of that scope. It queues browser work, but a cleanup function returned from its callback is not registered for disposal. Use a client enhancement when work owns observers, event listeners, or external instances.
 
 ```ts
-onMounted(() => {
-  const observer = new ResizeObserver(updateSize)
-  observer.observe(document.body)
-  return () => observer.disconnect()
+// enhancements/body-resize-observer.ts
+export const bodyResizeObserver = defineClientEnhancement(
+  'body-resize-observer',
+  (target) => {
+    const observer = new ResizeObserver(() => {
+      console.log(target.getBoundingClientRect().width)
+    })
+
+    observer.observe(target)
+    return () => observer.disconnect()
+  }
+)
+```
+
+```ts
+onMounted(async () => {
+  const enhancement = await useClientEnhancement('body-resize-observer', {
+    target: 'body',
+    trigger: 'immediate'
+  })
+
+  await enhancement.activate()
 })
 ```
 
