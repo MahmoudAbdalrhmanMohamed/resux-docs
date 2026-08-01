@@ -19,7 +19,9 @@ Do not use islands by default for simple counters, forms, links, or server-rende
 <!-- islands/vue/CounterIsland.vue -->
 <script setup lang="ts">
 import { ref } from 'vue'
-const count = ref(0)
+
+const props = defineProps<{ initial?: number }>()
+const count = ref(props.initial ?? 0)
 </script>
 
 <template>
@@ -31,11 +33,38 @@ Resux discovers islands and creates separate Vite client entries.
 
 ## Render an island
 
-Use the island name through the supported island component convention in your Resux template. The surrounding page remains a Resux-rendered component; only the island subtree is mounted by Vue.
+Render the discovered filename through the built-in `<VueIsland>` tag:
+
+```vue
+<template>
+  <section>
+    <h2>Interactive counter</h2>
+    <VueIsland
+      name="CounterIsland"
+      :props="{ initial: 3 }"
+    />
+  </section>
+</template>
+```
+
+The surrounding page remains a Resux-rendered component; only the island container is mounted by Vue. See the [built-in application tags](/guide/template-syntax#built-in-application-tags) reference for the template boundary.
 
 ## Props
 
-Pass JSON-compatible props so they can be represented safely in SSR output and client initialization.
+The `props` binding must evaluate to an object whose values are JSON-compatible. Resux serializes that object into the SSR island container and passes it to the Vue component during mounting.
+
+```vue
+<VueIsland
+  name="CounterIsland"
+  :props="{
+    initial: 3,
+    labels: ['Increase', 'Reset'],
+    preferences: { compact: true }
+  }"
+/>
+```
+
+Do not pass functions, class instances, DOM nodes, open connections, or private server objects through island props.
 
 ## Boundaries
 
