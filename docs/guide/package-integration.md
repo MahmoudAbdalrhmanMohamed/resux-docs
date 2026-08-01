@@ -160,7 +160,8 @@ export const carouselAdapter = definePackageAdapter({
     slidesPerView: 1
   },
   validateOptions(options) {
-    if (Number(options.slidesPerView) < 1) {
+    const slidesPerView = Number(options.slidesPerView)
+    if (!Number.isFinite(slidesPerView) || slidesPerView < 1) {
       throw new Error('slidesPerView must be at least 1')
     }
   },
