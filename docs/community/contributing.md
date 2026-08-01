@@ -1,34 +1,46 @@
-# Contributing to Docs
+# Contributing to the Documentation
 
-Resux is moving quickly, so docs should stay close to the source.
+Documentation changes should be checked against the actual Resux source, package export map, tests, generated templates, and CLI help.
 
-## Edit locally
+## Local setup
 
 ```sh
-git clone https://github.com/MahmoudAbdalrhmanMohamed/resux-docs.git
-cd resux-docs
-npm install
+npm ci
 npm run dev
 ```
 
-## Docs principles
+## Validate
 
-- Prefer exact examples over vague explanation.
-- Mark stable core vs experimental limits clearly.
-- Keep terminology consistent: Resux component, resumable handler, Vue island, route payload, runtime config.
-- Add examples for every new feature.
-- Update reference pages when globals, CLI commands, or file conventions change.
+```sh
+npm run build
+```
 
-## Page checklist
+The VitePress build validates rendering and internal links.
 
-Before merging a docs change:
+## Source-of-truth order
 
-- Does it show a complete code example?
-- Does it explain server vs browser behavior?
-- Does it mention serialization rules if state is involved?
-- Does it link to related guide and reference pages?
-- Does `npm run build` pass?
+1. Current framework source and public export map.
+2. Tests that assert behavior.
+3. Generated starter templates and CLI help.
+4. Released package behavior for release-specific claims.
+5. Existing documentation only after comparison with the above.
 
-## Publish
+## Writing rules
 
-Push to `main`. The GitHub Actions workflow builds VitePress and deploys to GitHub Pages.
+- Do not hard-code npm `latest` as permanent.
+- Distinguish source-branch behavior from published behavior.
+- State whether an API is server, browser, Vue, build-time, or resumable.
+- Use complete runnable examples with correct return shapes.
+- Document security and cleanup boundaries.
+- Do not claim automatic email/upload/review behavior that does not exist.
+- Prefer links to dedicated guides over duplicating long explanations.
+
+## Pull requests
+
+Include:
+
+- the framework source/ref used,
+- pages changed,
+- behavior corrected or added,
+- validation commands and results,
+- and any dependency on an unmerged framework PR.

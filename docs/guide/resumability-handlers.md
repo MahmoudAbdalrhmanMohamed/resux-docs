@@ -1,118 +1,117 @@
 # Resumability and Handlers
 
-Resux resumability is centered on explicit serializable state and event handlers that can be safely resumed later in the browser.
+Resumability lets the browser continue from server-rendered output without hydrating the full component tree.
 
-## Resumable scope
+## What is serialized
 
-Each rendered component instance gets a scope. A scope can contain:
+A scope may contain:
 
-- Props that can be serialized.
-- `useState()` refs.
-- `useAsyncData()` resources.
-- Handler references.
-- Template binding ids used for client patches.
+- component/module id,
+- serializable props,
+- `useState` values,
+- resolved async data,
+- pending and error state,
+- and references to generated browser modules.
 
-The scope is serialized during SSR and restored only when the browser needs it.
+Only values representable by the Resux JSON payload should cross the server/browser boundary.
 
 ## Safe state
 
-Use `useState()` for local interactive values:
+```ts
+const count = useState('counter', () => 0)
+const filters = useState('filters', () => ({ query: '', active: true }))
+```
 
-```vue
-<script setup lang="ts">
-const count = useState('count', () => 0)
+Good values include strings, numbers, booleans, `null`, arrays, and plain objects made from those values.
+
+Avoid functions, class instances, DOM nodes, streams, sockets, `Map`, `Set`, and private server clients.
+
+## Safe handler captures
+
+```ts
+const count = useState('counter', () => 0)
+const step = 2
 
 function increment() {
-  count.value++
+  count.value += step
 }
-</script>
-
-<template>
-  <button @click="increment">Count: {{ count }}</button>
-</template>
 ```
 
-State values must be JSON-serializable. Strings, numbers, booleans, arrays, plain objects, and `null` are safe. Sockets, class instances, DOM nodes, functions, `Map`, and `Set` are not safe state values.
+The compiler analyzes handlers and rejects captures it cannot safely reproduce. Imports intended for browser execution must be compatible with the configured package mode.
 
-## Handler captures
-
-Handlers may capture resumable values such as refs from `useState()` and `useAsyncData()`.
-
-Good:
+Move private or server-only work behind an API:
 
 ```ts
-const message = useState('message', () => 'hello')
-
-function shout() {
-  message.value = message.value.toUpperCase()
+async function save() {
+  await $fetch('/api/save', {
+    method: 'POST',
+    body: { value: count.value }
+  })
 }
 ```
 
-Risky:
+## Delegated events
 
-```ts
-const socket = new WebSocket('wss://example.com')
-
-function send() {
-  socket.send('hello')
-}
-```
-
-The risky example depends on a browser-only, non-serializable object. Move that work into `onMounted()`, a Vue island, or a server API depending on the feature.
-
-## Inline events
-
-Inline event expressions are supported when they only use resumable values:
+Resux installs shared event listeners and finds handler metadata in the event path. Named and supported inline handlers compile to browser modules.
 
 ```vue
-<button @click="count.value++">Add</button>
+<button @click="increment">Add</button>
+<form @submit.prevent="save">...</form>
+<input @keydown.enter="search" />
 ```
 
-Named handlers are easier to test and explain, especially when the handler performs more than one mutation.
+Supported modifier groups include control, system, mouse, and key filters. `.capture` and `.passive` are accepted syntax but still participate in the delegated runtime model.
 
-## Event modifiers
+## Reactive patches
 
-Resux supports common event modifiers such as `.prevent`, `.stop`, `.self`, `.once`, key filters, mouse filters, and system modifiers.
+The compiler records dynamic text, attributes, class, style, visibility, and HTML bindings. After a handler mutates a dependency, the resumed effect evaluates the relevant expressions and updates the matching DOM nodes.
 
 ```vue
-<form @submit.prevent="save">
-  <button>Save</button>
-</form>
+<p :class="{ active: count > 0 }">{{ count }}</p>
 ```
 
-`.capture` and `.passive` are accepted by the compiler, but the browser runtime still uses delegated resumable listeners.
-
-## Client patches
-
-After a resumed handler runs, Resux computes patches for marked template bindings:
-
-- Text interpolation.
-- Dynamic attributes.
-- `v-html`.
-- Conditional blocks.
-- List blocks.
-
-Keep templates simple and compiler-friendly. If a widget needs complex browser-managed state, use a Vue island.
-
-## Mounted work
-
-`onMounted()` runs when a component scope is first resumed in the browser. It does not run during the initial server render.
+## Watch cleanup
 
 ```ts
-onMounted(() => {
-  console.log('scope resumed in the browser')
+watchEffect((onCleanup) => {
+  const timer = setInterval(refresh, 5000)
+  onCleanup(() => clearInterval(timer))
 })
 ```
 
-Use it for browser-only APIs that belong to a resumable Resux component. Use a Vue island when the feature needs full Vue lifecycle behavior.
+Watch dependencies are cleaned before re-running, which prevents stale branches from continuing to trigger effects.
 
-## Choosing the right place
+## Mounted cleanup
 
-| Need | Use |
-| --- | --- |
-| Counter, menu state, filters | `useState()` |
-| SSR data or skeleton data | `useAsyncData()` |
-| Internal API calls in SSR-capable code | `$fetch()` or `apiURL()` |
-| Browser-only initialization after resume | `onMounted()` |
-| Full Vue runtime behavior | Vue island |
-| Secrets or private server work | Server API or server route |
+```ts
+onMounted(() => {
+  const controller = new AbortController()
+  window.addEventListener('resize', handleResize, { signal: controller.signal })
+  return () => controller.abort()
+})
+```
+
+Mounted work runs when the scope first resumes in the browser, not during SSR.
+
+## Client enhancements
+
+Enhancement setup receives a target and context and may return a cleanup function:
+
+```ts
+export default defineClientEnhancement('tooltip', (target, context) => {
+  const instance = createTooltip(target, context.options)
+  return () => instance.destroy()
+})
+```
+
+Use `useClientEnhancement` for manual control and `disposeClientEnhancements` for explicit global disposal in advanced integration code.
+
+## Debugging
+
+```sh
+resux dev --trace-resume
+resux inspect enhancements --json
+resux inspect bundles --json
+```
+
+If a handler fails compilation, reduce captures, move work to a server endpoint, configure the package mode, or use a client enhancement/Vue island.

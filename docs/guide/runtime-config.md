@@ -1,16 +1,18 @@
 # Runtime Config
 
-Runtime config stores values that should be available to the server runtime and optionally exposed to the browser.
+Runtime config separates server-only values from browser-visible public values.
 
-## Define config
+## Configuration
 
 ```ts
 export default defineResuxConfig({
   runtimeConfig: {
-    apiSecret: process.env.API_SECRET,
+    databaseURL: process.env.DATABASE_URL,
+    signingKey: process.env.SIGNING_KEY,
     public: {
       appOrigin: process.env.APP_ORIGIN,
-      apiBase: '/api'
+      apiBase: '/api',
+      environment: process.env.NODE_ENV ?? 'development'
     }
   }
 })
@@ -18,34 +20,48 @@ export default defineResuxConfig({
 
 ## Read config
 
-```vue
-<script setup lang="ts">
+```ts
 const config = useRuntimeConfig()
-</script>
-
-<template>
-  <p>API base: {{ config.public.apiBase }}</p>
-</template>
+config.public.apiBase
 ```
 
-## Public config
+Server handlers and server-mode plugins can read private values. Only `public` is serialized to the browser payload.
 
-Only `runtimeConfig.public` is serialized to the browser payload. Keep secrets outside `public`.
+## Internal API origin
+
+SSR URL resolution checks public keys such as:
+
+- `appOrigin`
+- `appURL`
+- `siteURL`
+- `origin`
+
+Set an accurate production origin when internal native `fetch` calls depend on it.
+
+## Module extension
 
 ```ts
-// Safe in browser
-config.public.appOrigin
-
-// Server-only by convention
-config.apiSecret
+resux.extendRuntimeConfig({
+  public: {
+    featureEnabled: true
+  }
+})
 ```
 
-## API URL resolution
+Nested config is merged. Resux blocks dangerous prototype keys such as `__proto__`, `prototype`, and `constructor` during deep merging.
 
-For internal `/api/...` URLs during SSR, `$fetch` and `apiURL` use this origin priority:
+## Environment strategy
 
-1. Current request origin.
-2. Public runtime origins such as `appOrigin`, `appURL`, `siteURL`, or `origin`.
-3. Fallback `http://localhost:3000`.
+Use environment variables for deployment-specific secrets and values. Keep a non-secret `.env.example` with names only.
 
-Set `runtimeConfig.public.appOrigin` for predictable production SSR fetches behind proxies.
+```txt
+DATABASE_URL=
+APP_ORIGIN=
+RESUX_HALAL_REPORT_SIGNING_SECRET=
+```
+
+Never commit actual keys.
+
+## Serialization limits
+
+Public config must be JSON-compatible. Functions, classes, symbols, open connections, and server clients cannot be serialized safely.

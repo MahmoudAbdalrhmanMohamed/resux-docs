@@ -1,52 +1,88 @@
 # Plugins
 
-Plugins run during app rendering and can provide values to the Resux app instance.
+Plugins extend the application context. They can run on the server, browser, or both depending on mode.
 
-## Create a plugin
+## Basic plugin
 
 ```ts
-// plugins/app.ts
-export default defineResuxPlugin((resuxApp) => {
-  resuxApp.provide('version', '0.2.23')
+// plugins/01.app.ts
+export default defineResuxPlugin((app) => {
+  app.provide('appName', 'Resux App')
 })
 ```
 
-## Read the app instance
-
-```vue
-<script setup lang="ts">
-const app = useResuxApp()
-const version = app.provides.version
-</script>
-
-<template>
-  <small>Version: {{ version }}</small>
-</template>
-```
-
-## Plugin context
-
-A plugin receives a `ResuxAppLike` object:
+Read provided values through the app context:
 
 ```ts
-type ResuxAppLike = {
-  route: RouteContext
-  payload: ResuxPayload
-  $config: RuntimeConfig
-  provides: Record<string, unknown>
-  provide(key: string, value: unknown): void
-}
+const app = useResuxApp()
+const appName = app.provides.appName
 ```
 
-## Plugin modes
+For stronger typing, augment `ResuxAppInjections` in an application declaration file.
 
-The compiler recognizes plugins from `plugins/`. The build manifest records a plugin mode of `all`, `server`, or `client`. Keep plugin side effects explicit and test them with `resux inspect --json`.
+## Execution modes
 
-## Good plugin use cases
+Filename suffixes:
 
-- Provide simple app-wide values.
-- Initialize serializable services.
-- Read public runtime config.
-- Add tiny helpers that pages can access through `useResuxApp()`.
+```txt
+plugins/analytics.client.ts
+plugins/database.server.ts
+plugins/shared.ts
+```
 
-Avoid hiding large client-only runtime behavior in plugins. Use Vue islands for complex browser widgets.
+Module-registered plugins can set `mode: 'client' | 'server' | 'all'` explicitly.
+
+- `server`: emitted only for SSR/server setup.
+- `client`: emitted only for browser runtime.
+- `all`: participates in both where supported.
+
+## Ordering
+
+Plugins are sorted deterministically by normalized file path. Numeric prefixes are a useful way to make order obvious:
+
+```txt
+plugins/01.config.ts
+plugins/02.analytics.client.ts
+```
+
+## Client enhancements
+
+Files under `enhancements/`, `client-enhancements/`, and their `app/` equivalents are discovered as client-mode plugins and registered in the enhancement manifest.
+
+```ts
+export default defineClientEnhancement('chart', async (target, context) => {
+  const chart = await createChart(target, context.options)
+  return () => chart.destroy()
+})
+```
+
+Use:
+
+```ts
+const enhancement = await useClientEnhancement('chart', {
+  target: '#sales-chart',
+  trigger: 'visible',
+  options: { type: 'bar' }
+})
+```
+
+## Server plugins
+
+`server/plugins/` is reserved for server-only setup and package analysis. Use it for infrastructure initialization that should not become a browser plugin.
+
+## Module-added plugins
+
+```ts
+resux.addPlugin({
+  src: './runtime/plugin.ts',
+  mode: 'client'
+})
+```
+
+## Rules
+
+- Never put server secrets in a client or all-mode plugin.
+- Keep plugin setup deterministic.
+- Return/attach cleanup for browser resources through enhancement APIs.
+- Prefer server middleware for request-specific behavior.
+- Prefer modules for build-time configuration and generated files.

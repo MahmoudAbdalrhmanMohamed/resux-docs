@@ -1,63 +1,102 @@
-# Fonts Module (`resuxjs/fonts`)
+# Fonts (`resuxjs/fonts`)
 
-The `resuxjs/fonts` module manages web font optimization, Google Fonts URL normalization, preconnect headers, and deferred font loading after page load for maximum Core Web Vitals performance.
-
-## Overview
-
-- **Automatic Preconnect Optimization**: Injects `<link rel="preconnect">` for Google Fonts domains.
-- **Configurable Priority Strategies**: Choose between `eager`, `preload`, or `lazy` font loading globally or per font family.
-- **Per-Font Granular Control**: Load critical primary fonts as fast as possible (`eager` or `preload`) while lazy-loading non-critical secondary fonts post page load.
-- **Post-PageLoad Font Deferral**: Defer non-critical font stylesheets until after `window.onload` or `requestIdleCallback` to improve initial First Contentful Paint (FCP) and Largest Contentful Paint (LCP).
+The fonts module generates Google Fonts links, optional preconnects, and eager, preload, or page-load-deferred stylesheet behavior.
 
 ## Configuration
-
-Add font families to `resux.config.ts`. You can specify global defaults and optionally override loading strategies per font:
 
 ```ts
 export default defineResuxConfig({
   modules: [
-    ["resuxjs/fonts", {
+    ['resuxjs/fonts', {
       preconnect: true,
-      strategy: "lazy",
-      deferUntilPageLoad: true,
+      strategy: 'eager',
       google: [
-        // Critical font: loads eagerly as fast as possible without page-load deferral
-        { name: "Inter", weights: [400, 500, 600, 700, 800], display: "swap", strategy: "eager" },
-        // Secondary font: inherits module default (lazy / deferred until window load)
-        { name: "Alexandria", weights: [300, 400, 500, 600, 700], display: "swap" }
+        {
+          name: 'Inter',
+          weights: [400, 500, 600, 700],
+          display: 'swap',
+          strategy: 'preload'
+        },
+        {
+          name: 'Alexandria',
+          weights: [300, 400, 500, 600, 700],
+          display: 'swap',
+          strategy: 'lazy',
+          deferUntilPageLoad: true
+        }
       ]
     }]
   ]
 })
 ```
 
-## Options Reference
+## Module options
 
-### Module Options
+| Option | Type | Default |
+| --- | --- | --- |
+| `google` | `ResuxFontFamilyInput[]` | `[]` |
+| `preconnect` | `boolean` | `true` |
+| `strategy` | `'eager' | 'preload' | 'lazy'` | `'eager'` |
+| `deferUntilPageLoad` | `boolean` | `false` |
 
-| Option | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `google` | `ResuxFontFamilyInput[]` | `[]` | Array of Google Font family descriptors (`name`, `weights`, `display`, `strategy`, `deferUntilPageLoad`). |
-| `preconnect` | `boolean` | `true` | Injects preconnect hints for `https://fonts.googleapis.com` and `https://fonts.gstatic.com`. |
-| `strategy` | `"eager" \| "preload" \| "lazy"` | `"eager"` | Default loading strategy for stylesheet loading. |
-| `deferUntilPageLoad` | `boolean` | `false` | Default flag deferring font stylesheet injection until window load on the client. |
+## Family options
 
-### Per-Font Options (`ResuxFontFamilyInput`)
+| Property | Type | Behavior |
+| --- | --- | --- |
+| `name` | `string` | Required family name. Control characters are removed and URL encoding is applied. |
+| `weights` | `(number | string)[]` | Values from 1–1000 or ranges such as `'100..900'`. Invalid entries are ignored. |
+| `display` | Google font-display value | Invalid values fall back to `swap`. |
+| `strategy` | eager/preload/lazy | Overrides the module default for the family. |
+| `deferUntilPageLoad` | `boolean` | Explicitly controls deferred loading. |
 
-| Property | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `name` | `string` | *(Required)* | Name of the Google Font family (e.g. `"Inter"`). |
-| `weights` | `(number \| string)[]` | `[]` | Font weight variants to request (e.g. `[400, 700]`). |
-| `display` | `"auto" \| "block" \| "swap" \| "fallback" \| "optional"` | `"swap"` | `font-display` CSS descriptor. |
-| `strategy` | `"eager" \| "preload" \| "lazy"` | Inherited | Per-font override for loading strategy. |
-| `deferUntilPageLoad` | `boolean` | Inherited | Per-font override for post-load deferral. |
+## Strategies
 
-## How Per-Font Loading & Deferral Work
+### Eager
 
-When mixing eager and lazy font configurations:
+Adds a stylesheet link immediately.
 
-1. **Font Grouping**: Resux automatically partitions configured fonts into **eager/critical** and **lazy/deferred** groups.
-2. **Eager Group (Fastest Load)**: Fonts configured with `strategy: "eager"` or `strategy: "preload"` generate an immediate `<link rel="stylesheet">` or `<link rel="preload">` in `<head>` so the browser downloads critical text fonts immediately during page render.
-3. **Lazy Group (Deferred Load)**: Deferred fonts receive a non-blocking `<link rel="preload" as="style">` in `<head>` and a lightweight inline controller script attaches full `<link rel="stylesheet">` after window load (`window.onload`).
-4. **Preconnect Reuse**: Single shared `<link rel="preconnect">` hints are attached once, serving both eager and lazy font groups without duplicate HTTP handshakes.
+### Preload
 
+Adds a stylesheet preload and the stylesheet link. Preload does not replace the stylesheet.
+
+### Lazy/page-load deferred
+
+Adds a style preload and a small inline script that appends the stylesheet after `window.load`, or immediately if the document is already complete.
+
+## Grouping
+
+Families are partitioned into eager and lazy groups. Each group receives one Google Fonts CSS URL containing its normalized families.
+
+## Public runtime metadata
+
+The module exposes non-secret family configuration under `runtimeConfig.public.fonts`, including provider, names, strategy, and whether each family is deferred.
+
+## Helper
+
+```ts
+import { googleFont } from 'resuxjs/fonts'
+
+const inter = googleFont({
+  name: 'Inter',
+  weights: ['100..900'],
+  display: 'swap'
+})
+```
+
+## CSP
+
+Google-hosted fonts usually require policy entries similar to:
+
+```txt
+style-src https://fonts.googleapis.com
+font-src https://fonts.gstatic.com
+```
+
+The deferred mode uses an inline script, so a strict CSP may require a nonce/hash or a different loading strategy. Do not weaken CSP globally just to support one font loader.
+
+## Performance guidance
+
+- Use eager/preload only for genuinely critical families.
+- Avoid downloading weights that are not used.
+- Prefer `swap` or `optional` based on your typography requirements.
+- Consider self-hosting when privacy, CSP, reliability, or regional performance requires it.

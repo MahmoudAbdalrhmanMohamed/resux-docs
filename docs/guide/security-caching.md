@@ -1,115 +1,88 @@
 # Security and Caching
 
-Resux has two layers for response behavior: production server defaults and route rules. Use them together with server middleware when you need request-specific logic.
+Resux provides secure defaults and extension points, but application authorization, validation, dependency review, and infrastructure security remain the developer's responsibility.
 
-## Production security headers
+## Production headers
 
-Production serving enables default hardening headers. They are intended to make generated apps safer by default.
-
-Common defaults include:
+The production Node server enables hardening headers including examples such as:
 
 - `x-content-type-options`
 - `referrer-policy`
 - `x-frame-options`
 - `cross-origin-opener-policy`
-- `permissions-policy`
+- restrictive `permissions-policy`
 
-Disable them only when a host or reverse proxy owns those headers:
+Disable them only when a trusted host or reverse proxy owns the complete policy:
 
 ```sh
-resux start . --no-security-headers
+resux start --no-security-headers
 ```
 
 ## Route rules
 
-Route rules are path-based response rules in `resux.config.ts`.
-
 ```ts
-export default defineResuxConfig({
-  routeRules: {
-    '/old': { redirect: { to: '/', statusCode: 301 } },
-    '/admin/**': { headers: { 'x-robots-tag': 'noindex' } },
-    '/api/**': { cache: false },
-    '/assets/**': { cache: { maxAge: 31536000 } }
-  }
-})
-```
-
-Use route rules for behavior that can be decided from the path. Use server middleware when the decision depends on cookies, auth, headers, or request body data.
-
-## Cache behavior
-
-Resux route payloads and SSR pages usually need fresh data, so they are good candidates for `no-store` behavior. Build-stable runtime and handler assets can use long immutable caching.
-
-The `resux:performance` module can add cache rules for built runtime assets and route payloads:
-
-```ts
-export default defineResuxConfig({
-  modules: ['resux:performance']
-})
-```
-
-When adding cache rules manually, avoid caching user-specific HTML or route payload responses unless you control the personalization boundary.
-
-## CORS
-
-Route rules support CORS headers for path groups. Keep CORS narrow:
-
-```ts
-export default defineResuxConfig({
-  routeRules: {
-    '/api/public/**': {
-      cors: {
-        origin: 'https://example.com',
-        methods: ['GET']
-      }
+routeRules: {
+  '/account/**': {
+    cache: false,
+    headers: { 'x-robots-tag': 'noindex' }
+  },
+  '/public-api/**': {
+    cors: {
+      origin: 'https://example.com',
+      methods: ['GET'],
+      headers: ['content-type']
     }
+  },
+  '/__resux/assets/**': {
+    cache: { maxAge: 31536000 }
   }
-})
+}
 ```
 
-Use server middleware when CORS behavior needs request-specific origin checks.
+`cache: false` produces `no-store`. String values are passed as cache-control. Object values support `maxAge` and `swr`.
 
-## Security module
+## Default cache model
 
-`resux:security` adds default production hardening behavior and can extend route rules with headers or CSP-like policy entries.
+- route payloads and dynamic SSR data should not be cached accidentally,
+- build-stable runtime/handler assets may use immutable caching,
+- transformed media can use long-lived or configured persistent caching,
+- user-specific APIs should normally use `no-store` unless carefully varied.
 
-```ts
-export default defineResuxConfig({
-  modules: ['resux:security']
-})
-```
+## Runtime config
 
-Use the module for app-wide security defaults. Use route rules for path-specific policy.
+Only `runtimeConfig.public` reaches the browser. Private keys belong in server-only config and files.
 
-## Server middleware for request-specific policy
+Deep config merging blocks prototype-pollution keys.
 
-Server middleware is the right place for policies that depend on request state.
+## Public files and traversal
 
-```ts
-export default defineServerMiddleware((event) => {
-  if (event.path.startsWith('/private')) {
-    setHeader(event, 'cache-control', 'no-store')
-  }
-})
-```
+Public, asset, generated media, and framework asset handlers resolve paths against explicit roots and reject paths outside those roots.
 
-Middleware runs before handlers, public files, and page rendering.
+## Remote media
 
-## Deployment checks
+The media pipeline accepts HTTP(S) sources. Treat remote-source support as a network boundary:
 
-After building, check:
+- restrict sources at your application or proxy layer,
+- avoid exposing unrestricted private-network fetching,
+- limit payload sizes and timeouts at infrastructure level,
+- and monitor transformation CPU usage.
+
+## HTML and user content
+
+Do not treat `v-html` as an authorization or sanitization system. Sanitize user-controlled HTML with a dedicated, well-maintained policy appropriate to your application.
+
+## Halal Core
+
+Halal Core scans policy categories and protects production reports with authenticated integrity when a signing secret is configured. It is an additional policy layer, not a replacement for application security review.
+
+## Dependencies
+
+Use package diagnostics and ordinary supply-chain tools:
 
 ```sh
-resux inspect . --json
-curl http://localhost:3000/__resux/health
+resux inspect packages --json
+npm audit
+npm outdated
 ```
 
-Use inspect output to confirm route rules and diagnostics. Use the health endpoint to confirm the deployed server is responding.
-
-## Related pages
-
-- [Modules and Route Rules](/guide/modules-route-rules)
-- [Middleware](/guide/middleware)
-- [Deployment](/guide/deployment)
-- [Configuration Reference](/reference/configuration)
+Pin and review sensitive server dependencies, and configure package modes so server-only code cannot leak into browser bundles.

@@ -1,60 +1,83 @@
 # What is Resux?
 
-Resux is an experimental resumable web framework with a custom runtime. It uses familiar `.vue` files and `pages/` routing, but normal Resux components do not hydrate through the Vue runtime. Instead, the compiler reads a focused Vue-like SFC subset, renders HTML on the server, serializes state, and lets the browser resume only the scopes that are needed.
+Resux is an experimental, HTML-first web framework with a custom compiler, server renderer, resumable browser runtime, file-based routing, server APIs, build-time modules, deployment adapters, and optional Vue runtime islands.
 
-::: tip Current scope (0.2.x)
-Current `0.2.x` releases provide a stable working core for the compiler subset, SSR renderer, resumable runtime, routing, and CLI workflow. The framework is still experimental overall, and Vue islands plus unsupported Vue syntax outside the documented subset remain experimental.
+Normal Resux components are written as `.vue` files, but they are **not hydrated by Vue**. Resux compiles a focused Vue-like SFC subset into:
+
+- server-renderable component modules,
+- serializable route and component state,
+- small browser handler modules,
+- DOM binding metadata,
+- and a route payload used for client navigation.
+
+The browser starts from server HTML and resumes only the scope required by an interaction or client enhancement.
+
+::: info Documentation target
+These docs track the current framework source and its public `resuxjs/*` package surface. The source package may be ahead of the version currently published under npm's `latest` tag. Check the release you install with `npm view resuxjs version` and review its release notes.
 :::
 
-## The core idea
+## The request-to-interaction flow
 
-Most frameworks send HTML and then hydrate the app, which means the browser re-runs a large part of the component tree. Resux tries a different flow:
+1. Resux discovers pages, layouts, components, plugins, middleware, server handlers, islands, and module contributions.
+2. The compiler validates the supported SFC subset and resumability rules.
+3. The server renders the active app shell, layout, and page to HTML.
+4. State, async data, route metadata, module identifiers, client plugins, middleware, and public runtime config are serialized into the payload.
+5. The browser installs a delegated runtime instead of hydrating the component tree.
+6. Same-origin navigation requests a new Resux route payload.
+7. Event or enhancement code is imported only when it is needed.
+8. The resumed scope updates marked DOM bindings and can later be disposed cleanly.
 
-1. Compile `.vue` files into server modules and small client handler modules.
-2. Render the requested route to HTML on the server.
-3. Serialize route data, state refs, async data, and module references into the page payload.
-4. In the browser, install a tiny delegated event runtime.
-5. Load a handler chunk only when the user interacts with an element that needs it.
-6. Resume the component scope from serialized data and patch only marked DOM bindings.
+## What Resux includes
 
-## What Resux is good for today
+| Area | Included capabilities |
+| --- | --- |
+| Application model | `app.vue`, `error.vue`, pages, layouts, components, plugins, route middleware, server middleware, server plugins |
+| Rendering | SSR HTML, payload serialization, route payload navigation, scoped styles, head composition |
+| Reactivity | `ref`, `reactive`, `computed`, `watch`, `watchEffect`, `readonly`, `toRef`, `toRefs`, `nextTick` |
+| Data | `useState`, `useAsyncData`, `useFetch`, `$fetch`, runtime config, error APIs |
+| Server | API routes, custom server routes, middleware, h3-backed helpers, Node handler export |
+| Extension | modules, hooks, Resux Kit helpers, Vite/Nitro extension, generated templates and types |
+| Packages | SSR, client-only, server-only, and progressive third-party package modes |
+| Built-ins | links, app/page/layout rendering, responsive images, pictures, videos, icons, fonts, i18n, UI primitives |
+| Tooling | create templates, prepare, check, inspect targets, build, preview, deployment generation |
+| Deployment | Node, Docker, Nitro, Vercel, Netlify, Cloudflare, and static target resolution |
+| Safety | local policy scanner, reports, signed production integrity, manual review workflow |
 
-Resux is a good fit for production apps that align with the documented subset and resumability model:
+## Best fits
 
-- HTML-first pages.
-- Simple `.vue`-style authoring.
-- File-based routing.
-- Server APIs in the same project.
-- Explicit, serializable state.
-- Lazy event handler loading.
-- A way to add full Vue widgets through islands only where needed.
+Resux is strongest when an app benefits from:
 
-## What Resux is not yet
+- server HTML and SEO,
+- explicit serializable state,
+- limited client JavaScript,
+- interaction-triggered code loading,
+- file conventions and integrated server APIs,
+- progressive enhancement,
+- and selective Vue islands for complex widgets.
 
-Resux is not a full Vue replacement. It intentionally supports a small compiler-friendly subset. Unsupported patterns should fail at compile time instead of silently falling back to hydration.
+## Important boundaries
 
-Use [Current Limits](/reference/limits) before starting a large app.
+Resux is not a drop-in replacement for the complete Vue runtime and SFC feature set. Unsupported syntax should fail during compilation rather than silently enabling hydration.
 
-## Resux vs hydration frameworks
+Key boundaries include:
 
-| Area | Hydration framework | Resux |
-| --- | --- | --- |
-| First response | Server HTML | Server HTML |
-| Browser boot | Hydrate component tree | Install small resume runtime |
-| Event code | Usually bundled with page/app | Loaded on first interaction |
-| Component model | Full framework runtime | Compiler-supported SFC subset |
-| Escape hatch | Normal client component | Vue island |
-| State model | Runtime reactive graph | Serialized resumable refs |
+- resumable state must be serializable,
+- handler captures must be safe to reconstruct,
+- normal Resux components do not run full Vue lifecycle semantics,
+- browser-only libraries need a client enhancement, progressive package adapter, or Vue island,
+- video transformation requires `ffmpeg`,
+- image transformation requires `sharp`,
+- and production Halal report verification requires a private HMAC key.
 
-## Package name
+Read [Current Limits](/reference/limits) before choosing Resux for a large production system.
 
-Install and run Resux through the `resuxjs` package:
+## Install and create
 
 ```sh
-npm i resuxjs
-npx resuxjs@latest init my-app
+npx create-resuxjs@latest my-app
+cd my-app
+npm install
+npm run dev
 ```
 
-`npm view resuxjs version` returns `0.2.23` (latest tag checked on 2026-05-07).
-
-The package exposes CLI binaries named `resuxjs`, `resux`, and `create-resux`.
+The main package is `resuxjs`. Public entry points are documented in [Package Exports](/reference/packages) and [API Index](/reference/api-index).

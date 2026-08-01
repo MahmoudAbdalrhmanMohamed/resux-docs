@@ -1,113 +1,84 @@
-# File Conventions
+# File Conventions Reference
 
-## Routes
+## Resux components
 
-```txt
-pages/index.vue       -> /
-pages/about.vue       -> /about
-pages/post/[id].vue   -> /post/:id
-pages/docs/[...slug].vue -> /docs/:slug*
-```
+| Path | Meaning |
+| --- | --- |
+| `app.vue` or `app/app.vue` | app shell |
+| `error.vue` or `app/error.vue` | error component |
+| `pages/**/*.vue` or `app/pages/**/*.vue` | routes |
+| `layouts/**/*.vue` or `app/layouts/**/*.vue` | layouts |
+| `components/**/*.vue` or `app/components/**/*.vue` | components |
+| `islands/vue/**/*.vue` | Vue runtime islands |
 
-## Components
+## Support files
 
-```txt
-components/AppButton.vue -> <AppButton />
-```
+| Path | Meaning |
+| --- | --- |
+| `plugins/**/*.ts` | app plugins |
+| `app/plugins/**/*.ts` | nested app plugins |
+| `middleware/**/*.ts` | route middleware |
+| `app/middleware/**/*.ts` | nested route middleware |
+| `enhancements/**/*.ts` | client enhancements |
+| `client-enhancements/**/*.ts` | client enhancements |
+| `server/middleware/**/*.ts` | request middleware |
+| `server/plugins/**/*.ts` | server plugins |
+| `server/api/**/*.ts` | `/api` handlers |
+| `server/routes/**/*.ts` | custom handlers |
 
-Component names are inferred from filenames and paths.
+## Auto-import directories
 
-## Layouts
+- `composables/`
+- `utils/`
+- `shared/`
+- `server/utils/`
+- module-added import directories
 
-```txt
-layouts/default.vue
-layouts/dashboard.vue
-```
+Exports from these directories contribute to generated import declarations and package analysis.
 
-Use from pages:
+## Mode suffixes
 
-```ts
-definePageMeta({ layout: 'dashboard' })
-```
+- `.client.ts`
+- `.server.ts`
+- no suffix for all mode
+- `.global.ts` for global route middleware
 
-## App shell
+Suffixes can be combined according to the support-file parser.
 
-```txt
-app.vue
-app/app.vue
-```
-
-Use `<ResuxPage />` and `<ResuxLayout />` inside the app shell.
-
-## Error page
-
-```txt
-error.vue
-app/error.vue
-```
-
-Use for custom 404/500 rendering.
-
-## Middleware
+## Route filenames
 
 ```txt
-middleware/auth.ts
-middleware/analytics.global.ts
+index.vue          index route
+about.vue          static route
+[id].vue           dynamic segment
+[...slug].vue      catch-all segment
 ```
 
-- Normal files run when referenced by page meta.
-- `.global.ts` files run for every route.
+The same bracket rules apply to server handler discovery.
 
-## Plugins
+## Configuration and types
 
-```txt
-plugins/app.ts
-```
+| File | Meaning |
+| --- | --- |
+| `resux.config.ts` | main app config |
+| `resux.halal.config.ts` | safety policy |
+| `nitro.config.ts` | Nitro configuration |
+| `env.d.ts` | app/global type entry |
+| `types/**/*.d.ts` | app augmentation |
+| `.env.example` | environment variable names |
 
-Export `defineResuxPlugin`.
+## Assets
 
-## Server handlers
+- `public/` maps directly to root URLs.
+- `assets/` contains source CSS/media and is served through a protected `/assets` mapping where needed.
+- `assets/css/tailwind.css` activates the managed Tailwind pipeline when dependencies are available.
 
-```txt
-server/api/stats.ts
-server/routes/robots.txt.ts
-```
+## Generated paths
 
-- `server/api` maps under `/api`.
-- `server/routes` maps from the root.
+- `.resux/`
+- `.resux-nitro/`
+- `.nitro/`
+- `.output/`
+- `.resux-generated/`
 
-## Request middleware
-
-```txt
-server/middleware/headers.ts
-```
-
-Runs before server handlers, public files, and page rendering.
-
-## Vue islands
-
-```txt
-islands/vue/CounterIsland.vue
-```
-
-Use with:
-
-```vue
-<VueIsland name="CounterIsland" :props="{ start: 1 }" />
-```
-
-## Static public files
-
-```txt
-public/favicon.svg -> /favicon.svg
-public/robots.txt  -> /robots.txt
-```
-
-## Build output
-
-```txt
-.resux/
-.output/
-```
-
-Do not commit these unless you intentionally deploy generated output.
+Do not commit or edit generated output unless a specific deployment workflow requires an artifact outside source control.

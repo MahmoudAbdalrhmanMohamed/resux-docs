@@ -1,13 +1,10 @@
 # Middleware
 
-Resux has two middleware layers:
-
-1. Route middleware from `middleware/`, used for page navigation.
-2. Request middleware from `server/middleware/`, used for every HTTP request before handlers, public files, and pages.
+Resux has route middleware for page navigation and server middleware for HTTP requests.
 
 ## Route middleware
 
-Create a route middleware file:
+Create a named file:
 
 ```ts
 // middleware/auth.ts
@@ -20,72 +17,78 @@ export default defineResuxRouteMiddleware((to, from) => {
 
 Attach it to a page:
 
-```vue
-<script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
-</script>
+```ts
+definePageMeta({ middleware: ['auth'] })
 ```
 
-Use more than one:
+## Global middleware
 
-```ts
-definePageMeta({ middleware: ['auth', 'analytics'] })
+```txt
+middleware/log.global.ts
 ```
 
-## Global route middleware
+Global middleware runs for every page navigation.
 
-Files ending in `.global.ts` run globally.
+## Route middleware modes
 
-```ts
-// middleware/analytics.global.ts
-export default defineResuxRouteMiddleware((to) => {
-  console.log('visiting', to.path)
-})
+Suffixes and module registration can produce server, client, or all-mode route middleware.
+
+```txt
+middleware/auth.server.ts
+middleware/analytics.client.ts
 ```
 
-## Route middleware results
+## Return values
 
-A route middleware can:
+A route middleware can return:
 
-| Return | Meaning |
-| --- | --- |
-| nothing | Continue navigation. |
-| string | Redirect to that path. |
-| `false` | Abort with forbidden behavior. |
-| `navigateTo('/path')` | Redirect. |
-| `abortNavigation('message')` | Abort navigation. |
+- nothing to continue,
+- a string destination,
+- `false` to abort,
+- `navigateTo(...)`,
+- `abortNavigation(...)`,
+- `{ redirect: ... }`,
+- `{ type: 'redirect', to, statusCode }`,
+- `{ type: 'abort', message, statusCode }`.
 
-## Request middleware
-
-Request middleware runs before server handlers, static files, and pages.
+## Server middleware
 
 ```ts
-// server/middleware/security.ts
+// server/middleware/headers.ts
 export default defineServerMiddleware((event) => {
   setHeader(event, 'x-app', 'resux')
-
-  if (event.path.startsWith('/private')) {
-    return { type: 'redirect', to: '/login', statusCode: 302 }
-  }
 })
 ```
 
-Request middleware can:
+Request middleware runs before APIs, custom routes, public files, generated media, and page rendering.
 
-- Continue by returning nothing.
-- Use helpers such as `setHeader(event, name, value)`.
-- End the Node response directly when necessary.
-- Return a `Response`.
-- Return a JSON-serializable value.
-- Return `false` for `403`.
-- Return redirect or abort objects.
+Use it for:
 
-## When to use which
+- request logging,
+- authentication checks,
+- request-scoped headers,
+- rate-limit integration,
+- and early response handling.
 
-| Need | Middleware type |
-| --- | --- |
-| Protect a page route | Route middleware |
-| Redirect before rendering page | Route middleware |
-| Add headers to all responses | Request middleware |
-| Short-circuit API/page/public requests | Request middleware |
-| Inspect raw request/response | Request middleware |
+## Route rules versus middleware
+
+Use route rules for static path-based behavior such as cache, CORS, headers, redirects, and status codes. Use middleware when logic depends on request data or external state.
+
+## Module registration
+
+```ts
+resux.addRouteMiddleware({
+  name: 'module-auth',
+  src: './runtime/auth.ts',
+  global: true,
+  mode: 'all'
+})
+```
+
+## Debugging
+
+```sh
+resux inspect middleware
+resux inspect middleware --json
+resux dev --trace-routes
+```

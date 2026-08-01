@@ -1,65 +1,72 @@
 # Mental Model
 
-Resux apps feel like small Vue/Nuxt-style apps, but the runtime model is different.
+Think of Resux as a compiler and server framework that leaves a structured continuation inside the HTML response.
 
-## Compile time
+## Not hydration
 
-The compiler reads `.vue` files and turns them into two kinds of modules:
+Hydration commonly downloads component code and re-executes a client component tree to attach behavior. Resux instead serializes the minimum information needed to continue a rendered scope later.
 
-- Server modules that render HTML and create the serialized payload.
-- Client handler modules that can be imported later when an event happens.
+The browser receives:
 
-It also creates a manifest with:
+- finished HTML,
+- scope identifiers,
+- serializable state and async data,
+- binding metadata already present in the DOM,
+- module URLs,
+- route and page metadata,
+- public config,
+- and client plugin/middleware manifests.
 
-- Routes from `pages/`.
-- Components from `components/`.
-- Layouts from `layouts/`.
-- Plugins and middleware.
-- Server handlers and request middleware.
-- Vue island entries.
-- Runtime config and route rules.
+## A component becomes two concerns
 
-## Request time
+For a resumable component, the compiler emits:
 
-When a request arrives:
+1. **Server behavior** that runs setup and renders HTML.
+2. **Client handler behavior** that resumes state and runs interaction code.
 
-1. Resux applies security headers and route-rule headers.
-2. Request middleware may continue, redirect, abort, return a `Response`, return JSON, or write directly to the Node response.
-3. Server API and server routes are matched before page rendering.
-4. Route middleware can redirect or abort page navigation.
-5. The page and layout tree renders to HTML.
-6. Head entries are merged.
-7. The payload is serialized into `window.__RESUX__`.
+This split explains several framework rules:
 
-## Browser time
+- event handlers cannot capture arbitrary server objects,
+- state crossing the boundary must be serializable,
+- direct browser APIs belong in mounted or client-only contexts,
+- and unsupported template behavior is rejected instead of hydrated.
 
-The browser starts with HTML and a tiny runtime.
+## Navigation is another server render
 
-- Links can be prefetched on hover or focus.
-- Same-origin links are intercepted for client-side navigation.
-- Route payloads are fetched from `/__resux/route`.
-- Matching layouts can stay in place while the page slot swaps.
-- Resumed page scopes are cleared when no longer needed.
-- Component handlers are imported only when the user interacts.
+Same-origin navigation does not reconstruct a full client router component tree. The runtime requests a route payload, lets route middleware run, receives rendered output and metadata, updates the page region and head, then activates the new payload.
 
-## State is explicit
+The server remains the source of truth for route matching and SSR output.
 
-Only resumable, serializable data should live in `useState` and `useAsyncData`. Non-serializable values should stay outside resumable handlers or inside Vue islands.
+## Reactivity updates marked DOM
 
-Good:
+Resux reactivity tracks dependencies inside resumed scopes. When state changes, the runtime evaluates compiler-recorded expressions and patches only affected bindings.
 
-```ts
-const count = useState('count', () => 0)
-```
+This is why the supported expression and directive subset matters: the compiler must understand what can change.
 
-Risky:
+## Progressive behavior is separate from component hydration
 
-```ts
-const socket = new WebSocket('wss://example.com')
+Some behavior is better represented as a DOM enhancement than a component runtime. Resux supports named enhancements with triggers:
 
-function send() {
-  socket.send('hello')
-}
-```
+- `visible`
+- `interaction`
+- `idle`
+- `immediate`
+- `manual`
+- `page-load`
 
-If a handler captures values that cannot be resumed safely, Resux should fail during compilation.
+Enhancements can return cleanup functions and are disposed when needed.
+
+## Vue islands are explicit
+
+A Vue island creates a separate Vue runtime boundary for a widget that genuinely needs Vue component semantics or a Vue-specific library. It does not convert surrounding Resux components into hydrated Vue components.
+
+## Rules that follow from the model
+
+1. Prefer server work for data access and secrets.
+2. Store only serializable values in resumable state.
+3. Keep handlers small and capture reconstructable values.
+4. Use route rules for HTTP policy.
+5. Use modules for build-time extension.
+6. Use progressive enhancements for DOM libraries.
+7. Use Vue islands only where full Vue is necessary.
+8. Treat generated output as disposable build artifacts.

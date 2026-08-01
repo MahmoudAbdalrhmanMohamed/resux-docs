@@ -1,17 +1,14 @@
-# Example: Counter
+# Counter Example
 
-A minimal interactive Resux component.
+A counter demonstrates SSR state, resumable events, computed values, and reactive DOM patches.
 
 ```vue
 <script setup lang="ts">
-const count = useState('count', () => 0)
+const count = useState('example-counter', () => 0)
+const doubled = computed(() => count.value * 2)
 
 function increment() {
   count.value++
-}
-
-function decrement() {
-  count.value--
 }
 
 function reset() {
@@ -20,21 +17,16 @@ function reset() {
 </script>
 
 <template>
-  <section class="counter">
+  <section>
     <h1>Counter</h1>
-    <p>Current value: {{ count }}</p>
-
-    <button @click="decrement">-</button>
-    <button @click="increment">+</button>
-    <button @click="reset">Reset</button>
+    <p>Count: {{ count }}</p>
+    <p>Double: {{ doubled }}</p>
+    <button @click="increment">Increment</button>
+    <button @click="reset" :disabled="count === 0">Reset</button>
   </section>
 </template>
 ```
 
-What happens:
+The server renders the initial values. The browser imports the generated handler module after the first relevant click, reconstructs the state, and patches the three dynamic bindings.
 
-1. The server renders the counter HTML.
-2. `count` is serialized in the payload.
-3. The browser installs the resume runtime.
-4. The first button click loads the handler module.
-5. The scope resumes and only marked bindings update.
+Use a stable state key and keep its value serializable.

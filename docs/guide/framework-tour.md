@@ -1,104 +1,72 @@
-# Resux Framework Tour
+# Framework Tour
 
-This page is the map of the complete Resux framework. Use it to understand what each subsystem does, where code runs, and which guide to read next.
+This tour maps the complete Resux framework surface and where to learn each part.
 
-## The framework in one sentence
+## 1. Create and validate
 
-Resux compiles a focused Vue-like single-file component format into server-rendered HTML, serialized state, and small event-handler modules that the browser imports only when interaction requires them.
+The create system offers eight templates and composable feature flags. Generated projects use `prepare`, `check`, TypeScript declarations, Nitro output, deployment files, and optional tests/Tailwind/media/i18n examples.
 
-Normal Resux components do **not** hydrate through the Vue runtime. Vue is available as an explicit island escape hatch for widgets that need full Vue behavior.
+Start with [Getting Started](/guide/getting-started) and [Project Structure](/guide/project-structure).
 
-## End-to-end request lifecycle
+## 2. Compiler and SFC subset
 
-1. The compiler discovers pages, layouts, components, plugins, middleware, server handlers, modules, and route rules.
-2. `.vue` files are parsed into Resux component definitions and resumable handlers.
-3. The server matches the request route and runs server middleware, route middleware, plugins, page setup, async data, layouts, and rendering.
-4. The response contains HTML plus a serialized Resux payload describing route state, component scopes, async data, runtime config, plugins, middleware, and handler modules.
-5. A small delegated browser runtime observes navigation and events.
-6. When a user interacts, Resux imports only the required handler module, restores the associated scope, executes the handler, and patches the affected DOM.
+The compiler discovers application conventions, parses `.vue` files, validates resumability, emits server modules and browser handlers, analyzes package usage, and generates manifests/types.
 
-Read [Rendering Lifecycle](/guide/rendering-lifecycle) and [Resumability and Handlers](/guide/resumability-handlers) for the detailed sequence.
+Read [Components](/guide/components), [Template Syntax](/guide/template-syntax), and [Compiler Reference](/reference/compiler).
 
-## Framework subsystems
+## 3. SSR and resumability
 
-| Subsystem | Responsibility | Main documentation |
-| --- | --- | --- |
-| Compiler | Parses the supported SFC subset, discovers routes, emits manifests and handler modules | [Compiler Internals](/reference/compiler) |
-| SSR runtime | Executes page setup, plugins, middleware, layouts, async data, and document rendering | [Runtime Internals](/reference/runtime) |
-| Resume runtime | Restores serialized scopes and loads handlers on demand | [Resumability](/guide/resumability-handlers) |
-| Reactivity | `ref`, `reactive`, `computed`, `watch`, `watchEffect`, readonly helpers, and scheduling | [Composables](/reference/composables) |
-| Router | File routing, dynamic params, catch-all routes, route payload navigation, and middleware | [Routing](/guide/routing) |
-| Server | API routes, request middleware, H3-compatible helpers, health checks, images, and videos | [Server API](/guide/server-api) |
-| Modules | Build-time extensions for CSS, head entries, routes, imports, components, Vite, and Nitro | [Modules](/guide/modules-route-rules) |
-| Package integration | SSR/client-only/progressive package modes and client enhancements | [Third-party Packages](/guide/package-integration) |
-| Media | Responsive images, image transforms, cacheable generated assets, and video transforms | [Media](/guide/media) |
-| Optional modules | i18n, icons, fonts, UI tokens, motion, security, and performance | [Package Exports](/reference/packages) |
-| Deployment | Node server, Docker, Nitro output, Vercel, Netlify, Cloudflare, and static target selection | [Deployment](/guide/deployment) |
-| Halal Core | Local policy scanning, reports, review approvals, integrity verification, and production guards | [Halal Core](/guide/halal-core) |
-| CLI | Project creation, preparation, development, build, checks, inspection, deployment, and Halal commands | [CLI Reference](/reference/cli) |
+The server renders HTML and serializes route/scope data. The browser resumes handlers and patches compiler-marked bindings instead of hydrating the whole app.
 
-## Public package entry points
+Read [Rendering Lifecycle](/guide/rendering-lifecycle), [Mental Model](/guide/mental-model), and [Resumability and Handlers](/guide/resumability-handlers).
 
-The npm package is `resuxjs`. It exposes focused entry points so browser code does not accidentally import compiler or Node-only code:
+## 4. Routing and data
 
-```ts
-import { ref, useState, useFetch } from 'resuxjs'
-import { createResuxNodeHandler } from 'resuxjs/node'
-import { renderApp } from 'resuxjs/runtime'
-import { ref as runtimeRef } from 'resuxjs/reactivity'
-import { defineResuxModule } from 'resuxjs/kit'
-```
+Pages become routes; layouts wrap pages; route middleware can redirect or abort; route payloads power same-origin navigation. State and async resources are serialized for browser continuation.
 
-See [Package Exports](/reference/packages) for every published subpath and when to use it.
+Read [Routing](/guide/routing), [State](/guide/state), [Async Data](/guide/async-data), and [Head and SEO](/guide/head-seo).
 
-## Application directories
+## 5. Server platform
 
-A complete application can use these conventions:
+Resux includes request middleware, APIs, custom routes, server utilities/plugins, route rules, security headers, media endpoints, and a Node handler/Nitro integration.
 
-```txt
-app.vue                 optional application shell
-error.vue               optional error page
-pages/                  file-system routes
-layouts/                named page layouts
-components/             reusable Resux components
-plugins/                app plugins; .client and .server modes supported
-middleware/             route middleware; .global, .client, and .server supported
-server/api/             API routes
-server/routes/          explicit server routes
-server/middleware/      request middleware
-modules/                local build-time modules
-assets/                 source CSS and application assets
-public/                 files served at the site root
-locales/                optional i18n catalogs
-resux.config.ts         framework configuration
-resux.halal.config.ts   optional Halal Core project policy
-```
+Read [Server API](/guide/server-api), [Middleware](/guide/middleware), [Security and Caching](/guide/security-caching), and [Deployment](/guide/deployment).
 
-Generated directories such as `.resux`, `.resux-nitro`, `.nitro`, and `.output` must not be edited manually.
+## 6. Modules, hooks, and Kit
 
-## Execution contexts
+Modules can contribute components, imports, plugins, middleware, server handlers, templates, types, route rules, prerender routes, Vite plugins, and Nitro config. Core hooks expose configuration, build, Vite, Nitro, loading, and error lifecycles.
 
-Resux code can run in several different environments:
+Read [Modules and Route Rules](/guide/modules-route-rules), [Lifecycle Hooks](/reference/hooks), and [Package Exports](/reference/packages).
 
-- **Build time:** compiler, module setup, templates, Vite and Nitro extension hooks.
-- **Server request:** plugins, server middleware, route middleware, page setup, async data, SSR, and API handlers.
-- **Browser resume:** delegated events, route payload navigation, client plugins and middleware, `onMounted`, and resumed handlers.
-- **Vue island:** full Vue client runtime for an explicitly isolated widget.
+## 7. Progressive client behavior
 
-Do not access `window` or `document` during SSR. Put browser-only work in `onMounted`, a client enhancement, a `.client` plugin, or a Vue island.
+Third-party packages can be SSR, client-only, server-only, or progressive. Named client enhancements support visibility, interaction, idle, page-load, immediate, and manual triggers with cleanup.
 
-## Stable core and experimental boundaries
+Read [Third-party Packages](/guide/package-integration) and [Progressive Package Example](/examples/progressive-package).
 
-The documented compiler subset, SSR pipeline, payload format, resume model, routing conventions, native reactivity APIs, and core CLI workflow are the intended framework core.
+## 8. Optional feature packages
 
-Areas that require extra testing include broad Vue syntax compatibility, complex third-party browser libraries, provider-specific Nitro behavior, and Vue islands. Unsupported syntax should fail visibly rather than silently switching the entire application to hydration.
+- [Media and Optimization](/guide/media)
+- [Icons](/guide/icons)
+- [Fonts](/guide/fonts)
+- [i18n](/guide/i18n)
+- [UI and Motion](/guide/ui-animations)
+- [CSS and Tailwind](/guide/css-tailwind)
 
-## Recommended reading order
+## 9. Vue islands
 
-1. [Getting Started](/guide/getting-started)
-2. [Core Concepts](/guide/core-concepts)
-3. [Rendering Lifecycle](/guide/rendering-lifecycle)
-4. [Components](/guide/components) and [Template Syntax](/guide/template-syntax)
-5. [State](/guide/state), [Async Data](/guide/async-data), and [Routing](/guide/routing)
-6. [Configuration](/reference/configuration) and [Composables](/reference/composables)
-7. The specialized guide for modules, packages, media, deployment, or Halal Core
+Use a Vue island where a widget needs full Vue behavior. The rest of the app remains server-rendered and resumable.
+
+Read [Vue Islands](/guide/vue-islands).
+
+## 10. Safety and integrity
+
+Halal Core performs local policy scanning, writes human/machine reports, supports optional remote classification with redaction, and requires authenticated production reports. Review submission is currently manual.
+
+Read [Halal Core](/guide/halal-core).
+
+## 11. Operations
+
+`prepare`, `check`, targeted `inspect`, trace flags, build output, health checks, and deployment generators support development and CI.
+
+Read [Dev Server and Build Output](/guide/dev-build-output), [CLI Reference](/reference/cli), [Testing and Quality](/guide/testing-quality), and [Troubleshooting](/guide/troubleshooting).

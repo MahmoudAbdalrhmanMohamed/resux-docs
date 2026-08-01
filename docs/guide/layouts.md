@@ -1,49 +1,47 @@
 # Layouts
 
-Layouts wrap pages. They live in `layouts/` and use `<slot />` for page content.
+Layouts wrap pages without adding whole-app hydration.
 
 ## Default layout
 
-Create `layouts/default.vue`:
-
 ```vue
+<!-- layouts/default.vue -->
 <template>
   <div class="layout">
-    <header>
-      <ResuxLink to="/">Home</ResuxLink>
-      <ResuxLink to="/about">About</ResuxLink>
-    </header>
-
-    <main>
-      <slot />
-    </main>
+    <header>Site header</header>
+    <main><slot /></main>
+    <footer>Site footer</footer>
   </div>
 </template>
 ```
 
-## Select a layout
+Select it from a page:
 
-```vue
-<script setup lang="ts">
-definePageMeta({ layout: 'marketing' })
-</script>
-
-<template>
-  <h1>Landing page</h1>
-</template>
+```ts
+definePageMeta({ layout: 'default' })
 ```
 
-This uses `layouts/marketing.vue`.
+## Named layout
 
-## Disable layouts
+```txt
+layouts/dashboard.vue
+```
+
+```ts
+definePageMeta({ layout: 'dashboard' })
+```
+
+Layout names come from their file paths and are normalized by the compiler.
+
+## Disable a layout
 
 ```ts
 definePageMeta({ layout: false })
 ```
 
-## App shell
+## App shell relationship
 
-`app.vue` can wrap the active page:
+A common `app.vue` structure is:
 
 ```vue
 <template>
@@ -53,8 +51,20 @@ definePageMeta({ layout: false })
 </template>
 ```
 
-For very simple apps, you can omit `app.vue` and let pages render directly.
+The app shell is global. A layout is page-selectable. The page is the matched route component.
 
-## Same-layout navigation
+## Layout state
 
-The client runtime can keep the active layout DOM when the next route uses the same layout name, then swap only the page slot. This keeps persistent layout UI stable across route changes.
+A layout is a normal Resux component and can use state, async data, head helpers, and resumable handlers. Keep state keys stable and serializable.
+
+## Head composition
+
+App, module, layout, and page head entries are composed rather than treated as one replace-only object. Arrays such as meta and links can accumulate; attributes are merged. Verify final output with:
+
+```sh
+resux inspect seo --json
+```
+
+## Localized layouts
+
+Layouts do not need separate copies for each locale. Use i18n helpers and the current route locale inside the same component.

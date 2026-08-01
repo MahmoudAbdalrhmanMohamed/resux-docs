@@ -1,46 +1,46 @@
-# Example: Docker Deployment
+# Docker Deployment Example
 
-Generate deployment files:
+Generate the maintained Docker files:
 
 ```sh
 resux deploy . --preset docker
 ```
 
-A typical Dockerfile looks like:
+Review the generated `Dockerfile`, `.dockerignore`, and `DEPLOYMENT.md` before deploying.
 
-```Dockerfile
-FROM node:24-alpine AS build
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
-RUN npm prune --omit=dev
-
-FROM node:24-alpine AS runner
-WORKDIR /app
-ENV NODE_ENV=production
-ENV PORT=3000
-COPY --from=build /app /app
-EXPOSE 3000
-CMD ["npm", "run", "start"]
-```
-
-Build and run:
+## Build
 
 ```sh
-docker build -t resux-app .
-docker run --rm -p 3000:3000 resux-app
+export RESUX_HALAL_REPORT_SIGNING_SECRET='private-random-secret-at-least-32-characters'
+docker build \
+  --build-arg RESUX_HALAL_REPORT_SIGNING_SECRET="$RESUX_HALAL_REPORT_SIGNING_SECRET" \
+  -t resux-app .
 ```
 
-Check health:
+Avoid baking long-lived secrets into image layers. Prefer your CI platform's secret mounts/build secrets and pass the same report verification secret securely at runtime when required by the generated production guard.
+
+## Run
 
 ```sh
-curl http://localhost:3000/__resux/health
+docker run --rm \
+  -p 3000:3000 \
+  -e PORT=3000 \
+  -e RESUX_HALAL_REPORT_SIGNING_SECRET="$RESUX_HALAL_REPORT_SIGNING_SECRET" \
+  resux-app
 ```
 
-If your reverse proxy owns security headers, start Resux with:
+## Health check
 
-```sh
-resux start . --no-security-headers
+```txt
+GET /__resux/health
 ```
+
+## Production checklist
+
+- run as a non-root user where practical,
+- use a read-only filesystem except required cache/temp paths,
+- set memory/CPU limits,
+- terminate TLS at a trusted proxy or platform,
+- configure logs and graceful shutdown,
+- protect environment variables,
+- and scan the final image and dependency tree.
