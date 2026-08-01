@@ -73,6 +73,7 @@ Recognized public origin keys include `appOrigin`, `appURL`, `siteURL`, and `ori
 The async-data handler receives an optional `AbortSignal`. Pass it to fetch operations so obsolete or disposed work can be cancelled.
 
 ```ts
+const route = useRoute()
 const record = await useAsyncData(`record:${route.params.id}`, ({ signal }) =>
   $fetch(`/api/records/${route.params.id}`, { signal })
 )
