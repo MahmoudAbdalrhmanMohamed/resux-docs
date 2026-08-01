@@ -61,8 +61,17 @@ Use server handlers, middleware, server plugins, and `server/utils` for:
 
 ```ts
 export default defineEventHandler(async (event) => {
-  const body = await readBody<{ name: string }>(event)
-  return { saved: Boolean(body.name) }
+  const body = await readBody<unknown>(event)
+  const saved = Boolean(
+    body &&
+    typeof body === 'object' &&
+    !Array.isArray(body) &&
+    'name' in body &&
+    typeof body.name === 'string' &&
+    body.name.trim()
+  )
+
+  return { saved }
 })
 ```
 
@@ -80,15 +89,32 @@ Do not read `window`, `document`, storage, or browser constructors directly duri
 
 ## Browser resume and cleanup
 
+`onMounted` queues work for the first browser resume, but its return value is not a disposal hook. Put long-lived browser resources in a client enhancement whose setup returns cleanup.
+
 ```ts
-onMounted(() => {
-  const onResize = () => console.log(window.innerWidth)
-  window.addEventListener('resize', onResize)
-  return () => window.removeEventListener('resize', onResize)
+// enhancements/window-resize.ts
+export const windowResizeEnhancement = defineClientEnhancement(
+  'window-resize',
+  () => {
+    const onResize = () => console.log(window.innerWidth)
+    window.addEventListener('resize', onResize)
+
+    return () => window.removeEventListener('resize', onResize)
+  }
+)
+```
+
+```ts
+onMounted(async () => {
+  const enhancement = await useClientEnhancement('window-resize', {
+    trigger: 'immediate'
+  })
+
+  await enhancement.activate()
 })
 ```
 
-Client enhancement setup can also return a cleanup function. Resux calls disposal during navigation or explicit disposal.
+Resux calls enhancement cleanup during navigation or explicit disposal.
 
 ## Environment boundaries
 
