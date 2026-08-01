@@ -10,8 +10,21 @@ export default defineEventHandler(async (event) => {
   }
 
   if (event.method === 'POST') {
-    const body = await readBody<{ title: string }>(event)
-    if (!body.title?.trim()) {
+    let body: unknown
+    try {
+      body = await readBody(event)
+    } catch {
+      return new Response('Invalid request body', { status: 400 })
+    }
+
+    if (
+      !body ||
+      typeof body !== 'object' ||
+      Array.isArray(body) ||
+      !('title' in body) ||
+      typeof body.title !== 'string' ||
+      !body.title.trim()
+    ) {
       return new Response('Title is required', { status: 400 })
     }
 
@@ -30,10 +43,14 @@ export default defineEventHandler(async (event) => {
 const tasks = await useFetch<Array<{ id: number; title: string; done: boolean }>>('/api/tasks')
 const title = useState('new-task-title', () => '')
 const saving = ref(false)
+const submissionError = ref('')
 
 async function addTask() {
   if (!title.value.trim() || saving.value) return
+
+  submissionError.value = ''
   saving.value = true
+
   try {
     const created = await $fetch<{ id: number; title: string; done: boolean }>('/api/tasks', {
       method: 'POST',
@@ -41,6 +58,10 @@ async function addTask() {
     })
     tasks.data.value = [...(tasks.data.value ?? []), created]
     title.value = ''
+  } catch (error) {
+    submissionError.value = error instanceof Error
+      ? error.message
+      : 'Unable to add the task'
   } finally {
     saving.value = false
   }
@@ -53,6 +74,7 @@ async function addTask() {
     <button :disabled="saving">Add</button>
   </form>
 
+  <p v-if="submissionError" role="alert">{{ submissionError }}</p>
   <p v-if="tasks.pending">Loading…</p>
   <p v-else-if="tasks.error">{{ tasks.error.message }}</p>
   <ul v-else>
