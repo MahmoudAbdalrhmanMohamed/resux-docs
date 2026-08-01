@@ -21,14 +21,18 @@ Do not edit generated directories manually.
 
 ## Run the production server
 
+Production startup verifies the authenticated Halal report, so the report signing secret must be present in the runtime environment as well as the build environment:
+
 ```sh
-node .output/server/index.mjs
+RESUX_HALAL_REPORT_SIGNING_SECRET="$RESUX_HALAL_REPORT_SIGNING_SECRET" \
+  node .output/server/index.mjs
 ```
 
 Generated applications normally provide:
 
 ```sh
-npm run start
+RESUX_HALAL_REPORT_SIGNING_SECRET="$RESUX_HALAL_REPORT_SIGNING_SECRET" \
+  npm run start
 ```
 
 The health endpoint is:
@@ -88,17 +92,27 @@ Review the resulting diff before committing.
 
 ## Node deployment
 
+Build and runtime are often separate processes or machines. Configure the same private report secret in both environments:
+
 ```sh
 npm ci
-npm run build
-HOST=0.0.0.0 PORT=3000 npm run start
+
+# Build environment
+RESUX_HALAL_REPORT_SIGNING_SECRET='a-long-private-random-secret' \
+  npm run build
+
+# Runtime host/container environment — set it again here
+RESUX_HALAL_REPORT_SIGNING_SECRET='a-long-private-random-secret' \
+  HOST=0.0.0.0 PORT=3000 npm run start
 ```
+
+Use a secret manager rather than writing the literal value into a script or shell history.
 
 Recommended runtime requirements:
 
 - use the Node version required by the installed `resuxjs` package
 - deploy `.output` and any runtime files referenced by the server
-- provide private runtime environment variables at the host
+- provide `RESUX_HALAL_REPORT_SIGNING_SECRET` and other private variables at runtime
 - keep writable cache directories available when runtime-generated media caching is enabled
 - terminate TLS at a trusted proxy or configure the server appropriately
 
@@ -114,10 +128,13 @@ Build and run:
 
 ```sh
 docker build -t resux-app .
-docker run --rm -p 3000:3000 --env-file .env.production resux-app
+docker run --rm \
+  -p 3000:3000 \
+  --env-file .env.production \
+  resux-app
 ```
 
-Do not copy development `.env` files or source-control credentials into the image. Use BuildKit/runtime secrets where appropriate.
+The runtime environment file or secret injection must include `RESUX_HALAL_REPORT_SIGNING_SECRET`. Do not copy development `.env` files or source-control credentials into the image. Use BuildKit/runtime secrets where appropriate.
 
 ## Nitro integration
 
@@ -163,7 +180,7 @@ export RESUX_HALAL_REPORT_SIGNING_SECRET="a-long-private-random-secret"
 npm run build
 ```
 
-A plain `sha256:` checksum is sufficient for local integrity checks but is not accepted as production authentication.
+The production server or deployment verifier must receive the same secret at runtime. A plain `sha256:` checksum is sufficient for local integrity checks but is not accepted as production authentication.
 
 When a signed human approval is needed, also provide a separate review secret:
 
@@ -187,6 +204,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
@@ -200,7 +219,7 @@ jobs:
       - run: npm run inspect -- --json > resux-inspect.json
 ```
 
-Do not provide production secrets to untrusted fork pull requests.
+The deployment platform must also inject `RESUX_HALAL_REPORT_SIGNING_SECRET` into the production server runtime. Do not provide production secrets to untrusted fork pull requests.
 
 ## Inspect deployment output
 
@@ -238,6 +257,7 @@ Confirm native dependencies exist in the final runtime image, not only in the bu
 - `resux check` passes.
 - `resux build` succeeds with production secrets.
 - The correct deploy target/preset is selected.
+- The production runtime receives the same `RESUX_HALAL_REPORT_SIGNING_SECRET` used for the build.
 - `node .output/server/index.mjs` starts successfully.
 - `/__resux/health` responds successfully.
 - SSR pages, APIs, route payloads, runtime assets, and media routes have the expected cache headers.
