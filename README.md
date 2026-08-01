@@ -14,6 +14,8 @@ The site covers:
 
 Documentation changes must identify the framework source or release used as the source of truth. The current global audit is aligned with `MahmoudAbdalrhmanMohamed/resux` branch `audit/full-history-correctness` at commit `35f00b0ddb68b098cb1def4c59356f722c5db72b`.
 
+The complete source-alignment refresh was validated with a clean dependency installation and a successful VitePress production build.
+
 Some documented changes depend on the corresponding framework pull request being merged and released.
 
 ## Local development
