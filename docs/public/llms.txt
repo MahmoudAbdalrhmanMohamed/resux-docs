@@ -1,28 +1,77 @@
 # Resux Documentation
 
-Resux is an experimental web framework prototype with a custom resumable runtime.
-It uses Vue-like single-file components, pages routing, SSR, serialized state, lazy event handler loading, and optional Vue runtime islands.
+Resux is an HTML-first resumable web framework published as `resuxjs`.
+It compiles a focused Vue-like SFC subset into server-rendered HTML, serialized state, route payloads, and event-handler modules loaded only when interaction requires them. Normal Resux components do not hydrate through Vue; full Vue runtime behavior is available through explicit Vue islands.
 
-Important pages:
+Start here:
 
+- /guide/framework-tour
 - /guide/what-is-resux
-- /guide/core-concepts
 - /guide/getting-started
+- /guide/core-concepts
 - /guide/execution-contexts
 - /guide/rendering-lifecycle
 - /guide/resumability-handlers
-- /guide/app-shell-errors
+
+Application guides:
+
+- /guide/project-structure
+- /guide/components
 - /guide/template-syntax
+- /guide/state
 - /guide/async-data
 - /guide/routing
+- /guide/layouts
+- /guide/head-seo
+- /guide/runtime-config
+- /guide/plugins
+- /guide/middleware
+- /guide/server-api
+- /guide/modules-route-rules
+- /guide/package-integration
+- /guide/media
+- /guide/icons
+- /guide/fonts
+- /guide/ui-animations
+- /guide/i18n
 - /guide/security-caching
+- /guide/halal-core
 - /guide/dev-build-output
-- /reference/composables
+- /guide/vue-islands
+- /guide/deployment
+- /guide/troubleshooting
+
+Reference:
+
+- /reference/packages
 - /reference/cli
+- /reference/composables
 - /reference/configuration
+- /reference/file-conventions
+- /reference/runtime
+- /reference/compiler
+- /reference/release
 - /reference/limits
 
-Package: resuxjs
-Latest npm release (checked 2026-05-07): 0.2.23
+Important facts:
+
+- Package: resuxjs
+- Main app APIs: resuxjs
+- Node adapters: resuxjs/node
+- Runtime internals: resuxjs/runtime
+- Native reactivity: resuxjs/reactivity
+- Compiler tooling: resuxjs/compiler
+- Module authoring: resuxjs/kit
+- Optional modules: resuxjs/i18n, resuxjs/icons, resuxjs/fonts, resuxjs/ui
+- Generated production server: .output/server/index.mjs
+- Health endpoint: /__resux/health
+- Halal review_required is currently a manual local file workflow; the framework does not automatically email, upload, or create a GitHub issue.
+- Production Halal reports require RESUX_HALAL_REPORT_SIGNING_SECRET.
+- Signed human review approvals use the separate RESUX_HALAL_REVIEW_SIGNING_SECRET.
+- Image transforms require sharp.
+- Requested video transforms require ffmpeg or RESUX_FFMPEG_PATH.
+
+The documentation intentionally does not hard-code a permanent npm latest version. Check the installed package and release notes for release-specific behavior.
+
 Source: https://github.com/MahmoudAbdalrhmanMohamed/resux
 Docs: https://github.com/MahmoudAbdalrhmanMohamed/resux-docs
