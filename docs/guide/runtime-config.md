@@ -56,9 +56,12 @@ Use environment variables for deployment-specific secrets and values. Keep a non
 
 ```txt
 DATABASE_URL=
+SIGNING_KEY=
 APP_ORIGIN=
 RESUX_HALAL_REPORT_SIGNING_SECRET=
 ```
+
+`SIGNING_KEY` populates the application-specific `runtimeConfig.signingKey` shown above. `RESUX_HALAL_REPORT_SIGNING_SECRET` is a separate framework build/runtime secret used to authenticate the Halal report; do not reuse one secret for both purposes.
 
 Never commit actual keys.
 
