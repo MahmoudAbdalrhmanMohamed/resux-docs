@@ -1,0 +1,59 @@
+name: Temporary Framework Docs Audit
+
+on:
+  push:
+    branches:
+      - docs-framework-complete-reference
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout documentation
+        uses: actions/checkout@v4
+        with:
+          path: docs-repo
+
+      - name: Checkout framework source
+        uses: actions/checkout@v4
+        with:
+          repository: MahmoudAbdalrhmanMohamed/resux
+          ref: audit/full-history-correctness
+          path: framework
+
+      - name: Build framework inventory
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo '=== PACKAGE ==='
+          node - <<'NODE'
+          const pkg = require('./framework/package.json')
+          console.log(JSON.stringify({ version: pkg.version, engines: pkg.engines, bin: pkg.bin, exports: pkg.exports }, null, 2))
+          NODE
+
+          echo '=== SOURCE FILES ==='
+          find framework/src -type f | sort
+
+          echo '=== PUBLIC SYMBOLS ==='
+          grep -RhoE '^export (async )?(function|class|const|let|var|interface|type|\{)[^;{]*' framework/src --include='*.ts' | sed 's/[[:space:]]\+/ /g' | sort -u || true
+
+          echo '=== CLI COMMANDS AND FLAGS ==='
+          grep -nE 'halal|prepare|inspect|deploy|compile|preview|start|check|--[a-z][a-z-]+' framework/src/cli.ts framework/src/create.ts | head -n 500 || true
+
+          echo '=== BUILT-IN TEMPLATE TAGS ==='
+          grep -RhoE 'Resux[A-Z][A-Za-z]+' framework/src framework/templates --include='*.ts' --include='*.vue' | sort -u || true
+
+          echo '=== FILE CONVENTIONS ==='
+          find framework/templates -type f | sort
+          printf '\nCompiler discovery strings:\n'
+          grep -nE 'pages|components|layouts|middleware|plugins|server/api|server/routes|server/middleware|islands/vue|app\.vue|error\.vue' framework/src/compiler/index.ts | head -n 300 || true
+
+          echo '=== DOC FILES ==='
+          find docs-repo/docs -type f -name '*.md' | sort
+
+          echo '=== POSSIBLY STALE DOC TERMS ==='
+          grep -RInE '0\.2\.|0\.3\.|checked on|current npm|create-resux(?!js)|useFetch.*ref|automatic.*(email|GitHub issue|upload)' docs-repo/docs docs-repo/README.md --include='*.md' --include='*.txt' -P || true
