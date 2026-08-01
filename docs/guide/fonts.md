@@ -36,7 +36,7 @@ export default defineResuxConfig({
 | --- | --- | --- |
 | `google` | `ResuxFontFamilyInput[]` | `[]` |
 | `preconnect` | `boolean` | `true` |
-| `strategy` | `'eager' | 'preload' | 'lazy'` | `'eager'` |
+| `strategy` | `'eager' \| 'preload' \| 'lazy'` | `'eager'` |
 | `deferUntilPageLoad` | `boolean` | `false` |
 
 ## Family options
@@ -44,7 +44,7 @@ export default defineResuxConfig({
 | Property | Type | Behavior |
 | --- | --- | --- |
 | `name` | `string` | Required family name. Control characters are removed and URL encoding is applied. |
-| `weights` | `(number | string)[]` | Values from 1–1000 or ranges such as `'100..900'`. Invalid entries are ignored. |
+| `weights` | `(number \| string)[]` | Values from 1–1000 or ranges such as `'100..900'`. Invalid entries are ignored. |
 | `display` | Google font-display value | Invalid values fall back to `swap`. |
 | `strategy` | eager/preload/lazy | Overrides the module default for the family. |
 | `deferUntilPageLoad` | `boolean` | Explicitly controls deferred loading. |
