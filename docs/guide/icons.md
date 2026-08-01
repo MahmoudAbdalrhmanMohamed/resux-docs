@@ -26,7 +26,7 @@ export default defineResuxConfig({
 | --- | --- | --- | --- |
 | `collections` | `string[]` | built-in/default list | Collections intended for the app. |
 | `component` | `string` | `Icon` | Registered component name. |
-| `mode` | `'css' | 'svg'` | `'svg'` | Rendering mode metadata. Current component renders SVG. |
+| `mode` | `'css' \| 'svg'` | `'svg'` | Rendering mode metadata. Current component renders SVG. |
 | `apiProvider` | `string` | Iconify API | Base URL used for dynamic icon fetching. |
 | `lazy` | `boolean` | `true` | Defer fetching until the icon becomes visible where supported. |
 
