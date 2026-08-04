@@ -1,10 +1,10 @@
 # Counter Example
 
-A counter demonstrates SSR state, resumable events, computed values, and reactive DOM patches.
+A counter demonstrates component-local reactivity, resumable events, computed values, and reactive DOM patches.
 
 ```vue
 <script setup lang="ts">
-const count = useState('example-counter', () => 0)
+const count = ref(0)
 const doubled = computed(() => count.value * 2)
 
 function increment() {
@@ -27,6 +27,6 @@ function reset() {
 </template>
 ```
 
-The server renders the initial values. The browser imports the generated handler module after the first relevant click, reconstructs the state, and patches the three dynamic bindings.
+The server renders the initial values. The browser imports the generated handler module after the first relevant click, resumes the component scope, and patches the three dynamic bindings.
 
-Use a stable state key and keep its value serializable.
+Use `ref` for ordinary local state like this counter. Use `reactive` when several local fields belong together. Choose `useState` only when a named JSON-compatible value must be serialized and restored as part of the component scope payload.
