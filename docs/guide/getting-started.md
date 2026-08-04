@@ -122,7 +122,7 @@ useSeoMeta({
   description: 'My first Resux application'
 })
 
-const count = useState('home-count', () => 0)
+const count = ref(0)
 
 function increment() {
   count.value++
@@ -138,6 +138,8 @@ function increment() {
 ```
 
 Templates auto-unwrap Resux refs. Script code uses `.value`.
+
+`ref` is the right default here because the counter belongs only to this page component. Use `reactive` for grouped local fields. Use `useState` only when a named value must be serialized into the component scope payload and restored exactly during browser resume.
 
 ## Add an API route
 
