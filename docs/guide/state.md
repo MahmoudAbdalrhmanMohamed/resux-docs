@@ -4,18 +4,21 @@ Resux includes a native reactivity layer used by resumable components and expose
 
 ## Choose the smallest state scope
 
-Use local reactivity by default. Reach for named resumable state only when the value must be serialized and restored across the server/browser boundary.
+Use local reactivity by default. Reach for serialized state only when the value must cross the server/browser boundary, and use app-wide state only when multiple components intentionally own the same value.
 
 | Need | Preferred API |
 | --- | --- |
 | One local scalar value | `ref` |
 | A local object with related fields | `reactive` |
 | A derived value | `computed` |
-| A named value that must be serialized and restored | `useState` |
+| Named serialized state owned by one component scope | `useState` |
+| Named serialized state shared across component scopes | `useGlobalState` |
 | Server data with pending and error state | `useAsyncData` or `useFetch` |
 
-::: tip Important
-`useState` in Resux is stored **per rendered component scope**. It is not one app-global object shared by every component. Using the same key in two different component instances does not make one component overwrite the other. Reusing a key inside the same component scope returns the same ref.
+::: tip Scope matters
+`useState` is stored **per rendered component scope**. Reusing a key inside that scope returns the same ref, but the same key in another component instance creates a different scoped ref.
+
+`useGlobalState` is stored once for the current Resux application. Components using the same global key receive the same ref.
 :::
 
 ## Local refs
@@ -44,19 +47,52 @@ Array index changes and length-dependent effects are tracked. Mutating an array 
 
 Avoid wrapping unrelated values in one large reactive object. Smaller state is easier to understand, test, and reset.
 
-## Named resumable state
+## Component-scoped resumable state
 
-Use `useState` only when the value must be included in the serialized scope payload and restored by the browser:
+Use `useState` when a named value belongs to one component scope and must be serialized and restored by the browser:
 
 ```ts
-const cart = useState('cart', () => ({
-  items: [] as string[]
+const draft = useState('draft', () => ({
+  title: '',
+  body: ''
 }))
 ```
 
-The key identifies the value **inside the current component scope**. Use stable, descriptive keys and keep the value JSON-compatible.
+The key identifies the value **inside the current component scope**. Another component can use the same key without overwriting this component's value.
 
-Do not use `useState` merely because a value is reactive. For normal local UI state, `ref` or `reactive` is clearer and avoids unnecessary serialization.
+Do not use `useState` merely because a value is reactive. For normal local UI state that does not require named serialization, `ref` or `reactive` is clearer.
+
+## App-wide global state
+
+Use `useGlobalState` when layouts, pages, or separate components intentionally need one shared serialized value:
+
+```ts
+const session = useGlobalState('session', () => ({
+  user: null as null | { id: string; name: string },
+  authenticated: false
+}))
+```
+
+A second component using the same key receives the same ref:
+
+```ts
+const session = useGlobalState('session')
+
+function signOut() {
+  session.value = {
+    user: null,
+    authenticated: false
+  }
+}
+```
+
+During SSR, global state is isolated to the current request. It is serialized once under `payload.globalState`, restored as shared browser refs, and preserved during Resux client navigation. Changing a global value refreshes bindings in every rendered scope that reads it.
+
+Use stable, descriptive keys. The first factory used for a key provides its initial value; later factories for the same key are ignored.
+
+Suitable uses include authenticated-user summaries, application preferences, cart summaries, feature flags loaded for the current application, and state shared by a persistent layout and its pages.
+
+Do not use global state for unrelated local controls or as a replacement for server APIs. Private credentials, database clients, and request-only server objects must never be placed in it.
 
 ## Computed values
 
@@ -131,6 +167,6 @@ The focused `resuxjs/reactivity` entry also exports lower-level APIs such as `ef
 
 ## Serialization rules
 
-Values included in the Resux payload must be JSON-compatible. Keep functions, class instances, DOM nodes, sockets, streams, `Map`, `Set`, and runtime-only clients outside `useState` and resolved async-data values.
+Values included in the Resux payload must be JSON-compatible. Keep functions, class instances, DOM nodes, sockets, streams, `Map`, `Set`, and runtime-only clients outside `useState`, `useGlobalState`, and resolved async-data values.
 
 For private or complex server state, store an identifier and retrieve the actual resource through a server endpoint.
