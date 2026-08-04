@@ -2,24 +2,36 @@
 
 Resux includes a native reactivity layer used by resumable components and exposed through `resuxjs` and `resuxjs/reactivity`.
 
+## Choose the smallest state scope
+
+Use local reactivity by default. Reach for named resumable state only when the value must be serialized and restored across the server/browser boundary.
+
+| Need | Preferred API |
+| --- | --- |
+| One local scalar value | `ref` |
+| A local object with related fields | `reactive` |
+| A derived value | `computed` |
+| A named value that must be serialized and restored | `useState` |
+| Server data with pending and error state | `useAsyncData` or `useFetch` |
+
+::: tip Important
+`useState` in Resux is stored **per rendered component scope**. It is not one app-global object shared by every component. Using the same key in two different component instances does not make one component overwrite the other. Reusing a key inside the same component scope returns the same ref.
+:::
+
 ## Local refs
+
+Use `ref` for ordinary component-local values:
 
 ```ts
 const count = ref(0)
 const doubled = computed(() => count.value * 2)
 ```
 
-A plain `ref` participates in reactive rendering. Use `useState` when the value must be serialized and restored as named application state.
-
-## Resumable state
-
-```ts
-const cart = useState('cart', () => ({ items: [] as string[] }))
-```
-
-Keys should be stable and unique for the intended scope/application behavior.
+A plain `ref` participates in reactive rendering and keeps state ownership close to the component that uses it. Prefer this for counters, toggles, selected tabs, open/closed state, and similar UI details.
 
 ## Reactive objects
+
+Use `reactive` when several local fields belong together:
 
 ```ts
 const form = reactive({
@@ -29,6 +41,22 @@ const form = reactive({
 ```
 
 Array index changes and length-dependent effects are tracked. Mutating an array can trigger both the changed index and relevant length dependencies.
+
+Avoid wrapping unrelated values in one large reactive object. Smaller state is easier to understand, test, and reset.
+
+## Named resumable state
+
+Use `useState` only when the value must be included in the serialized scope payload and restored by the browser:
+
+```ts
+const cart = useState('cart', () => ({
+  items: [] as string[]
+}))
+```
+
+The key identifies the value **inside the current component scope**. Use stable, descriptive keys and keep the value JSON-compatible.
+
+Do not use `useState` merely because a value is reactive. For normal local UI state, `ref` or `reactive` is clearer and avoids unnecessary serialization.
 
 ## Computed values
 
@@ -41,7 +69,9 @@ Writable form:
 ```ts
 const normalized = computed({
   get: () => form.name.trim(),
-  set: value => { form.name = value }
+  set: value => {
+    form.name = value
+  }
 })
 ```
 
@@ -101,6 +131,6 @@ The focused `resuxjs/reactivity` entry also exports lower-level APIs such as `ef
 
 ## Serialization rules
 
-State included in the Resux payload must be JSON-compatible. Keep runtime-only objects outside `useState` and resolved async-data values.
+Values included in the Resux payload must be JSON-compatible. Keep functions, class instances, DOM nodes, sockets, streams, `Map`, `Set`, and runtime-only clients outside `useState` and resolved async-data values.
 
 For private or complex server state, store an identifier and retrieve the actual resource through a server endpoint.
