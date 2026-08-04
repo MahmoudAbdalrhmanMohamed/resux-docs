@@ -106,14 +106,33 @@ These APIs are similar to familiar Vue APIs but are implemented by Resux. Do not
 
 ### `useState<T>(key, factory?)`
 
-Create or retrieve a scope state ref:
+Create or retrieve a named ref owned by the current rendered component scope:
 
 ```ts
-const cartCount = useState<number>('cart-count', () => 0)
-cartCount.value++
+const draftStep = useState<number>('draft-step', () => 0)
+draftStep.value++
 ```
 
-The key must be stable. Values that cross SSR/browser boundaries must be JSON-serializable.
+Calling `useState` again with the same key inside that component scope returns the same ref. A different component scope using the same key receives a different ref.
+
+Use `ref` or `reactive` when named serialization is unnecessary. The key must be stable and the value must be JSON-serializable.
+
+### `useGlobalState<T>(key, factory?)`
+
+Create or retrieve an app-wide serialized ref shared by all Resux component scopes:
+
+```ts
+const session = useGlobalState('session', () => ({
+  user: null as null | { id: string; name: string },
+  authenticated: false
+}))
+```
+
+Components using the same key receive the same ref. The first factory initializes the key; later factories for that key are ignored.
+
+During SSR, the registry belongs only to the current request. The values are serialized once under `payload.globalState`, restored as shared browser refs, and preserved during Resux client navigation. A mutation refreshes rendered scopes so bindings in separate components remain synchronized.
+
+Global-state values must be JSON-serializable. Keep credentials, database clients, DOM nodes, sockets, functions, and other runtime-only objects outside global state.
 
 ## Async data
 

@@ -8,15 +8,19 @@ A scope may contain:
 
 - component/module id,
 - serializable props,
-- `useState` values,
+- component-scoped `useState` values,
 - resolved async data,
 - pending and error state,
 - and references to generated browser modules.
 
+The application payload may also contain `useGlobalState` values once under `payload.globalState`.
+
 Only values representable by the Resux JSON payload should cross the server/browser boundary.
 
-::: tip Scope, not global state
-`useState` values belong to one rendered component scope. The same key used by another component instance does not overwrite this scope. For ordinary component-local UI state that does not require named serialization, prefer `ref` or `reactive`.
+::: tip Scoped and global state
+`useState` values belong to one rendered component scope. The same key used by another component instance does not overwrite this scope.
+
+Use `useGlobalState` when multiple component scopes intentionally need the same serialized ref. For ordinary local UI state that does not require named serialization, prefer `ref` or `reactive`.
 :::
 
 ## Safe serialized state
