@@ -15,7 +15,13 @@ A scope may contain:
 
 Only values representable by the Resux JSON payload should cross the server/browser boundary.
 
-## Safe state
+::: tip Scope, not global state
+`useState` values belong to one rendered component scope. The same key used by another component instance does not overwrite this scope. For ordinary component-local UI state that does not require named serialization, prefer `ref` or `reactive`.
+:::
+
+## Safe serialized state
+
+The examples in this section intentionally use `useState` because they demonstrate values that must be included in the serialized scope payload:
 
 ```ts
 const count = useState('counter', () => 0)
