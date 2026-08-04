@@ -20,7 +20,7 @@ Only values representable by the Resux JSON payload should cross the server/brow
 ::: tip Scoped and global state
 `useState` values belong to one rendered component scope. The same key used by another component instance does not overwrite this scope.
 
-Use `useGlobalState` when multiple component scopes intentionally need the same serialized ref. For ordinary local UI state that does not require named serialization, prefer `ref` or `reactive`.
+Use `useGlobalState` when multiple component scopes intentionally need the same serialized ref. Its SSR registry is isolated to the current request, while the browser registry is shared by the active Resux application. For ordinary local UI state that does not require named serialization, prefer `ref` or `reactive`.
 :::
 
 ## Safe serialized state
