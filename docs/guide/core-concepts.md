@@ -65,7 +65,10 @@ The browser runtime:
 
 | Need | Preferred feature |
 | --- | --- |
-| Shared serializable UI state | `useState` |
+| Component-local scalar state | `ref` |
+| Component-local object state | `reactive` |
+| Derived reactive state | `computed` |
+| Named serializable state that must cross SSR/resume | `useState` |
 | SSR data with pending/error refs | `useAsyncData` or `useFetch` |
 | Private database or credential work | server API, middleware, plugin, or utility |
 | App-wide provided value | plugin and `useResuxApp()` |
@@ -74,6 +77,8 @@ The browser runtime:
 | Full Vue component behavior | Vue island |
 | Third-party library loaded later | progressive package adapter |
 | Response headers, cache, redirects, CORS | route rules |
+
+`useState` belongs to the current rendered component scope. It is not a global store shared by every component. Prefer `ref` or `reactive` unless serialization and restoration are specifically required.
 
 ## Serialization is architectural
 
