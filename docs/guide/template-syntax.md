@@ -73,6 +73,35 @@ Supported modifier groups include:
 
 The browser runtime remains delegated even when capture/passive syntax is accepted.
 
+### Development-only delegation diagnostics
+
+During `resux dev`, Resux reports clear cases where a normal Resux component bypasses its resumable delegated event model.
+
+```vue
+<!-- RX_EVENT_INLINE_ATTRIBUTE: use @click instead. -->
+<button onclick="save()">Save</button>
+
+<script setup lang="ts">
+const button = ref<HTMLButtonElement | null>(null)
+
+onMounted(() => {
+  // RX_EVENT_DIRECT_LISTENER: move this to @click on the template element.
+  button.value?.addEventListener('click', save)
+})
+</script>
+```
+
+Each warning includes a stable code, file, line, column, and an actionable replacement. The diagnostics are advisory: they do not fail compilation and are not printed by production builds.
+
+Resux intentionally avoids warnings for:
+
+- `window` and `document` listeners,
+- third-party or unknown `EventTarget` objects,
+- dependencies under `node_modules`,
+- and Vue components under `islands/vue`.
+
+Use a direct listener when the interaction genuinely belongs to a global target, a third-party API, or manual lifecycle work. In those cases, remove the listener during cleanup; an `AbortController` or a client enhancement that returns a cleanup function is usually the safest pattern.
+
 ## Conditional chains
 
 ```vue
