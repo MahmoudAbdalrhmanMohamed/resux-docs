@@ -14,7 +14,7 @@ The site covers:
 
 ## Source alignment
 
-The `rx-*` documentation update is aligned with `MahmoudAbdalrhmanMohamed/resux` branch `feat/rx-directive-branding` at commit `d845100b801015fd6ef3336b7a7784cdda0012c7` and pull request `#9`.
+The `rx-*` documentation update is aligned with `MahmoudAbdalrhmanMohamed/resux` branch `feat/rx-directive-branding` at verified commit `4248f55b54066c143d4e619fc15383d422c43d6e` and pull request `#9`.
 
 The framework change must be merged and released before the new syntax is considered available in a published `resuxjs` version. Existing `v-*`, `:binding`, and `@event` syntax remains documented as migration compatibility.
 
