@@ -1,6 +1,8 @@
 # Vue Islands
 
-Vue islands are an explicit escape hatch for widgets that need the full Vue runtime.
+Vue islands are an explicit boundary for widgets that need the full Vue runtime. Normal Resux components use the Resux compiler, reactivity layer, server renderer, and resumable browser runtime.
+
+Read [How Resux Uses Vue](/guide/how-resux-uses-vue) before choosing this boundary.
 
 ## When to use an island
 
@@ -14,6 +16,8 @@ Use a Vue island for:
 Do not use islands by default for simple counters, forms, links, or server-rendered content.
 
 ## Create an island
+
+A file under `islands/vue` is a real Vue component. Import reactivity from `vue` and use native Vue template semantics inside the island:
 
 ```vue
 <!-- islands/vue/CounterIsland.vue -->
@@ -29,11 +33,11 @@ const count = ref(props.initial ?? 0)
 </template>
 ```
 
-Resux discovers islands and creates separate Vite client entries.
+Resux discovers islands and creates separate Vite/Vue client entries.
 
-## Render an island
+## Render an island from Resux
 
-Render the discovered filename through the built-in `<VueIsland>` tag:
+The surrounding page is a normal Resux component. Use the official `:binding` shortcut there:
 
 ```vue
 <template>
@@ -47,11 +51,13 @@ Render the discovered filename through the built-in `<VueIsland>` tag:
 </template>
 ```
 
-The surrounding page remains a Resux-rendered component; only the island container is mounted by Vue. See the [built-in application tags](/guide/template-syntax#built-in-application-tags) reference for the template boundary.
+`:props` is the concise Resux form of `rx-bind:props`. Only the island container is mounted by Vue. The surrounding page remains server-rendered and resumable.
+
+The `@click` inside `CounterIsland.vue` is handled by Vue because that file is inside the Vue-island boundary. The `:props` binding on `<VueIsland>` is handled by Resux because it appears in a normal Resux component. The familiar spelling does not change which runtime owns each side.
 
 ## Props
 
-The `props` binding must evaluate to an object whose values are JSON-compatible. Resux serializes that object into the SSR island container and passes it to the Vue component during mounting.
+The `props` binding must evaluate to an object whose values are JSON-compatible. Resux serializes the object into the SSR island container and passes it to Vue during mounting.
 
 ```vue
 <VueIsland
@@ -64,15 +70,21 @@ The `props` binding must evaluate to an object whose values are JSON-compatible.
 />
 ```
 
-Do not pass functions, class instances, DOM nodes, open connections, or private server objects through island props.
+The explicit Resux form is also valid:
+
+```vue
+<VueIsland name="CounterIsland" rx-bind:props="{ initial: 3 }" />
+```
+
+Do not pass functions, live refs, class instances, DOM nodes, open connections, or private server objects through island props.
 
 ## Boundaries
 
-- Island state is Vue state, not automatically Resux resumable state.
+- Island state is Vue state, not Resux resumable state.
 - Island lifecycle is Vue lifecycle.
 - Resux route navigation may replace the island container and mount a new instance.
 - Global listeners and external library instances still require cleanup.
-- Avoid sharing private server objects through props.
+- Data crossing the boundary must be serializable and safe for the browser.
 
 ## Alternatives
 

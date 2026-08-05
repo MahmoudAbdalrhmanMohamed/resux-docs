@@ -139,7 +139,9 @@ function increment() {
 
 Templates auto-unwrap Resux refs. Script code uses `.value`.
 
-`ref` is the right default here because the counter belongs only to this page component. Use `reactive` for grouped local fields. Use `useState` only when a named value must be serialized into the component scope payload and restored exactly during browser resume.
+`ref` is the right default because this counter belongs only to the page component. Use `reactive` for grouped local fields. Use `useState` only when a named JSON-compatible value must be serialized into the component scope payload. Use `useGlobalState` only when separate components intentionally share one request-isolated application value.
+
+`@click` is the official shortcut for `rx-on:click`. Likewise, `:disabled` is the shortcut for `rx-bind:disabled`. The full and shortcut forms compile to the same Resux handler and binding model. See [How Resux Uses Vue](/guide/how-resux-uses-vue).
 
 ## Add an API route
 
@@ -196,6 +198,7 @@ Build output normally includes:
 ## Recommended reading
 
 - [Framework Tour](/guide/framework-tour)
+- [How Resux Uses Vue](/guide/how-resux-uses-vue)
 - [Project Structure](/guide/project-structure)
 - [Rendering Lifecycle](/guide/rendering-lifecycle)
 - [Template Syntax](/guide/template-syntax)

@@ -72,6 +72,28 @@ Resux installs shared event listeners and finds handler metadata in the event pa
 
 Supported modifier groups include control, system, mouse, and key filters. `.capture` and `.passive` are accepted syntax but still participate in the delegated runtime model.
 
+Event delegation uses browser propagation so one shared listener can serve many rendered elements, including elements produced later by reactive list or conditional updates. The runtime uses `event.target` and the event path to find the matching Resux handler metadata.
+
+### Development warnings for delegation bypasses
+
+During `resux dev`, the compiler warns about clear element-level patterns that bypass the resumable event system:
+
+```vue
+<button onclick="increment()">Add</button>
+```
+
+```ts
+const button = ref<HTMLButtonElement | null>(null)
+
+onMounted(() => {
+  button.value?.addEventListener('click', increment)
+})
+```
+
+Use `@click="increment"` for these cases. The warning is development-only, does not fail compilation, and is deduplicated to avoid repeated HMR noise.
+
+Direct event listeners are still appropriate for global targets, third-party `EventTarget` implementations, or integrations that need manual lifecycle ownership. Resux does not warn for `window`, `document`, Vue islands, dependencies, or unknown third-party objects.
+
 ## Reactive patches
 
 The compiler records dynamic text, attributes, class, style, visibility, and HTML bindings. After a handler mutates a dependency, the resumed effect evaluates the relevant expressions and updates the matching DOM nodes.

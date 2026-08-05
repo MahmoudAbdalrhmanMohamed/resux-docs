@@ -27,6 +27,8 @@ function reset() {
 </template>
 ```
 
-The server renders the initial values. The browser imports the generated handler module after the first relevant click, resumes the component scope, and patches the three dynamic bindings.
+`@click` is the concise form of `rx-on:click`, and `:disabled` is the concise form of `rx-bind:disabled`. Both are official Resux shortcuts and produce the same compiled event and binding model as the full forms.
+
+The server renders the initial values. After the first relevant click, the browser imports the generated Resux handler module, resumes the component scope, and patches the dynamic bindings. It does not hydrate a Vue application around the page.
 
 Use `ref` for ordinary local state like this counter. Use `reactive` when several local fields belong together. Choose `useState` only when a named JSON-compatible value must be serialized and restored as part of the component scope payload.
