@@ -86,9 +86,11 @@ function signOut() {
 }
 ```
 
+Choose one canonical initiator for each key and give only that call the factory. Consumers that omit the factory receive the same ref and the initial value already established for the key; they do not create a separate value. The first call wins: if it omits the factory, the key is initialized to `undefined`, and a factory supplied by a later call is ignored.
+
 During SSR, global state is isolated to the current request. It is serialized once under `payload.globalState`, restored as shared browser refs, and preserved during Resux client navigation. Changing a global value refreshes bindings in every rendered scope that reads it.
 
-Use stable, descriptive keys. The first factory used for a key provides its initial value; later factories for the same key are ignored.
+Use stable, descriptive keys, and make sure the canonical initiator runs before factory-free consumers.
 
 Suitable uses include authenticated-user summaries, application preferences, cart summaries, feature flags loaded for the current application, and state shared by a persistent layout and its pages.
 
