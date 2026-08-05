@@ -33,14 +33,20 @@ The Resux compiler discovers pages, layouts, components, plugins, middleware, AP
 
 ### 3. Resux directive normalization
 
-Public Resux templates use the branded `rx-*` prefix:
+Public Resux templates use the branded `rx-*` prefix and official shortcuts for events and bindings:
 
 ```vue
-<button rx-on:click="save" rx-bind:disabled="pending">Save</button>
+<button @click="save" :disabled="pending">Save</button>
 <p rx-if="error">{{ error.message }}</p>
 ```
 
-Before the Vue template parser runs, Resux converts only directive attribute names to the equivalent internal Vue-parser spelling. For example, `rx-if` becomes `v-if` internally and `rx-on:click` becomes `v-on:click` internally.
+The explicit forms are equivalent:
+
+```vue
+<button rx-on:click="save" rx-bind:disabled="pending">Save</button>
+```
+
+Before the Vue template parser runs, Resux converts only branded directive attribute names to the equivalent internal Vue-parser spelling. For example, `rx-if` becomes `v-if` internally and `rx-on:click` becomes `v-on:click` internally. The `@event` and `:binding` shortcuts are already parser-level shorthand and compile into the same Resux event and binding model.
 
 This is a parser adapter, not a runtime dependency. Script strings, CSS, comments, visible text, and attribute values are not rewritten.
 
@@ -90,7 +96,7 @@ Files under `islands/vue` are different. They are compiled by the normal Vue Vit
 <template>
   <VueIsland
     name="ChartWidget"
-    rx-bind:props="{ series }"
+    :props="{ series }"
   />
 </template>
 ```
@@ -113,11 +119,18 @@ const open = ref(false)
 
 Do not pass live refs, functions, DOM nodes, or class instances across the island boundary. Pass JSON-compatible props.
 
-## Why keep Vue compatibility syntax?
+## Official shortcuts and migration compatibility
 
-Existing projects may still contain `v-*`, `:prop`, and `@event`. Resux continues to accept them as a migration compatibility layer. New code and official examples should use explicit `rx-*` syntax so it is clear which framework owns the behavior.
+For normal Resux components:
 
-There is currently no removal date for compatibility syntax.
+- `@event` is the official shortcut for `rx-on:event`.
+- `:binding` is the official shortcut for `rx-bind:binding`.
+- The full and shortcut forms are equally supported and emit the same Resux model.
+- Existing `v-*` syntax remains available for gradual migration.
+
+Only `v-*` should be considered compatibility syntax. The event and binding shortcuts are part of the recommended Resux authoring experience.
+
+There is currently no removal date for `v-*` compatibility syntax.
 
 ## Practical rule
 

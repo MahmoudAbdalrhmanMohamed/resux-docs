@@ -37,7 +37,7 @@ Resux discovers islands and creates separate Vite/Vue client entries.
 
 ## Render an island from Resux
 
-The surrounding page is a normal Resux component, so use Resux directive syntax there:
+The surrounding page is a normal Resux component. Use the official `:binding` shortcut there:
 
 ```vue
 <template>
@@ -45,13 +45,15 @@ The surrounding page is a normal Resux component, so use Resux directive syntax 
     <h2>Interactive counter</h2>
     <VueIsland
       name="CounterIsland"
-      rx-bind:props="{ initial: 3 }"
+      :props="{ initial: 3 }"
     />
   </section>
 </template>
 ```
 
-Only the island container is mounted by Vue. The surrounding page remains server-rendered and resumable.
+`:props` is the concise Resux form of `rx-bind:props`. Only the island container is mounted by Vue. The surrounding page remains server-rendered and resumable.
+
+The `@click` inside `CounterIsland.vue` is handled by Vue because that file is inside the Vue-island boundary. The `:props` binding on `<VueIsland>` is handled by Resux because it appears in a normal Resux component. The familiar spelling does not change which runtime owns each side.
 
 ## Props
 
@@ -60,12 +62,18 @@ The `props` binding must evaluate to an object whose values are JSON-compatible.
 ```vue
 <VueIsland
   name="CounterIsland"
-  rx-bind:props="{
+  :props="{
     initial: 3,
     labels: ['Increase', 'Reset'],
     preferences: { compact: true }
   }"
 />
+```
+
+The explicit Resux form is also valid:
+
+```vue
+<VueIsland name="CounterIsland" rx-bind:props="{ initial: 3 }" />
 ```
 
 Do not pass functions, live refs, class instances, DOM nodes, open connections, or private server objects through island props.

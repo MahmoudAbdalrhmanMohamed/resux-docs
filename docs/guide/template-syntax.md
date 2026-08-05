@@ -2,8 +2,12 @@
 
 Resux parses `.vue` templates with Vue compiler packages, then emits its own resumable template model. Public Resux directives use the branded `rx-*` prefix.
 
-::: tip Compatibility
-Existing `v-*`, `:prop`, and `@event` syntax remains accepted so projects can migrate gradually. New Resux code should prefer explicit `rx-bind:*` and `rx-on:*` forms.
+::: tip Official shortcuts
+Use `@event` as the concise form of `rx-on:event`, and `:prop` as the concise form of `rx-bind:prop`. These are first-class Resux shortcuts and are recommended for everyday templates.
+:::
+
+::: tip Migration compatibility
+Existing `v-*` syntax remains accepted so projects can migrate gradually. It is compatibility syntax, while `rx-*`, `@event`, and `:prop` are the public Resux forms for new code.
 :::
 
 Read [How Resux Uses Vue](/guide/how-resux-uses-vue) for the complete compiler and runtime boundary.
@@ -20,27 +24,43 @@ Refs are auto-unwrapped in template expressions. Script code still uses `.value`
 
 ## Static and dynamic attributes
 
+Use `:name` for concise dynamic bindings:
+
 ```vue
 <button
   id="save"
-  rx-bind:disabled="pending"
-  rx-bind:aria-label="label"
-  rx-bind:class="['button', { active, loading: pending }]"
-  rx-bind:style="{ opacity: pending ? 0.5 : 1 }"
+  :disabled="pending"
+  :aria-label="label"
+  :class="['button', { active, loading: pending }]"
+  :style="{ opacity: pending ? 0.5 : 1 }"
 >
   Save
 </button>
+```
+
+The explicit form is equivalent:
+
+```vue
+<button rx-bind:disabled="pending">Save</button>
 ```
 
 Dynamic bindings become patch targets in the Resux runtime.
 
 ## Events
 
+Use `@event` for concise event handlers:
+
+```vue
+<button @click="increment">Add</button>
+<button @click="count.value = 0">Reset</button>
+<form @submit.prevent="save">...</form>
+<input @keydown.enter.exact="search" />
+```
+
+The explicit form is equivalent:
+
 ```vue
 <button rx-on:click="increment">Add</button>
-<button rx-on:click="count.value = 0">Reset</button>
-<form rx-on:submit.prevent="save">...</form>
-<input rx-on:keydown.enter.exact="search" />
 ```
 
 Supported modifier groups include:
@@ -74,7 +94,7 @@ Adjacent `rx-if`, `rx-else-if`, and `rx-else` branches are compiled as one condi
 ## Lists
 
 ```vue
-<li rx-for="(item, index) in items" rx-bind:key="item.id">
+<li rx-for="(item, index) in items" :key="item.id">
   {{ index }} — {{ item.title }}
 </li>
 ```
@@ -101,7 +121,7 @@ The model expression must be assignable, such as a ref, member expression, or in
 
 ## Slots
 
-Named and scoped slots use the same branded directive convention:
+Named and scoped slots use the branded directive convention:
 
 ```vue
 <template rx-slot:header="{ title }">
@@ -113,21 +133,37 @@ Only the documented slot subset should be considered stable.
 
 ## Directive mapping
 
-| Public Resux syntax | Internal parser spelling |
-| --- | --- |
-| `rx-if` | `v-if` |
-| `rx-else-if` | `v-else-if` |
-| `rx-else` | `v-else` |
-| `rx-for` | `v-for` |
-| `rx-show` | `v-show` |
-| `rx-text` | `v-text` |
-| `rx-html` | `v-html` |
-| `rx-model` | `v-model` |
-| `rx-bind:name` | `v-bind:name` |
-| `rx-on:event` | `v-on:event` |
-| `rx-slot:name` | `v-slot:name` |
+| Public Resux syntax | Shortcut | Internal parser spelling |
+| --- | --- | --- |
+| `rx-if` | — | `v-if` |
+| `rx-else-if` | — | `v-else-if` |
+| `rx-else` | — | `v-else` |
+| `rx-for` | — | `v-for` |
+| `rx-show` | — | `v-show` |
+| `rx-text` | — | `v-text` |
+| `rx-html` | — | `v-html` |
+| `rx-model` | — | `v-model` |
+| `rx-bind:name` | `:name` | `v-bind:name` |
+| `rx-on:event` | `@event` | `v-on:event` |
+| `rx-slot:name` | — | `v-slot:name` |
 
-The mapping happens only before parsing. The emitted Resux template model does not keep Vue directive objects.
+The full and shortcut forms emit the same Resux template model. The emitted model does not keep Vue directive objects.
+
+## Choosing full or shortcut syntax
+
+Prefer shortcuts for normal application code:
+
+```vue
+<button @click="save" :disabled="pending">Save</button>
+```
+
+Use the full form when teaching Resux, documenting the directive family, or when explicit naming improves clarity:
+
+```vue
+<button rx-on:click="save" rx-bind:disabled="pending">Save</button>
+```
+
+Mixing the two forms is valid, but consistent local style is easier to read.
 
 ## Template refs
 

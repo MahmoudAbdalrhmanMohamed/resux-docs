@@ -12,6 +12,8 @@ Start with [Getting Started](/guide/getting-started) and [Project Structure](/gu
 
 Resux authors components as `.vue` SFCs, uses Vue compiler packages as parsers, normalizes public `rx-*` directives, and emits a Resux-owned template model, server modules, handler modules, manifests, and types.
 
+For concise templates, `@event` is the official shortcut for `rx-on:event`, and `:binding` is the official shortcut for `rx-bind:binding`. Existing `v-*` syntax remains available only as migration compatibility.
+
 Normal components do not become hydrated Vue applications. The Vue runtime is reserved for explicit islands.
 
 Read [How Resux Uses Vue](/guide/how-resux-uses-vue), [Components](/guide/components), [Template Syntax](/guide/template-syntax), and [Compiler Reference](/reference/compiler).

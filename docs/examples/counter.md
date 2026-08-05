@@ -21,11 +21,13 @@ function reset() {
     <h1>Counter</h1>
     <p>Count: {{ count }}</p>
     <p>Double: {{ doubled }}</p>
-    <button rx-on:click="increment">Increment</button>
-    <button rx-on:click="reset" rx-bind:disabled="count === 0">Reset</button>
+    <button @click="increment">Increment</button>
+    <button @click="reset" :disabled="count === 0">Reset</button>
   </section>
 </template>
 ```
+
+`@click` is the concise form of `rx-on:click`, and `:disabled` is the concise form of `rx-bind:disabled`. Both are official Resux shortcuts and produce the same compiled event and binding model as the full forms.
 
 The server renders the initial values. After the first relevant click, the browser imports the generated Resux handler module, resumes the component scope, and patches the dynamic bindings. It does not hydrate a Vue application around the page.
 

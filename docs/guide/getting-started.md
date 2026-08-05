@@ -132,7 +132,7 @@ function increment() {
 <template>
   <main>
     <h1>Hello Resux</h1>
-    <button rx-on:click="increment">Clicked {{ count }} times</button>
+    <button @click="increment">Clicked {{ count }} times</button>
   </main>
 </template>
 ```
@@ -141,7 +141,7 @@ Templates auto-unwrap Resux refs. Script code uses `.value`.
 
 `ref` is the right default because this counter belongs only to the page component. Use `reactive` for grouped local fields. Use `useState` only when a named JSON-compatible value must be serialized into the component scope payload. Use `useGlobalState` only when separate components intentionally share one request-isolated application value.
 
-The `rx-on:click` attribute is Resux syntax. The compiler adapts it for Vue's template parser, then emits a Resux handler and binding model. See [How Resux Uses Vue](/guide/how-resux-uses-vue).
+`@click` is the official shortcut for `rx-on:click`. Likewise, `:disabled` is the shortcut for `rx-bind:disabled`. The full and shortcut forms compile to the same Resux handler and binding model. See [How Resux Uses Vue](/guide/how-resux-uses-vue).
 
 ## Add an API route
 
