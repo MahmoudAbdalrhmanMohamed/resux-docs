@@ -45,6 +45,7 @@ export default defineConfig({
         items: [
           { text: 'Framework Tour', link: '/guide/framework-tour' },
           { text: 'What is Resux?', link: '/guide/what-is-resux' },
+          { text: 'How Resux Uses Vue', link: '/guide/how-resux-uses-vue' },
           { text: 'Core Concepts', link: '/guide/core-concepts' },
           { text: 'Getting Started', link: '/guide/getting-started' },
           { text: 'Execution Contexts', link: '/guide/execution-contexts' },
