@@ -21,12 +21,12 @@ function reset() {
     <h1>Counter</h1>
     <p>Count: {{ count }}</p>
     <p>Double: {{ doubled }}</p>
-    <button @click="increment">Increment</button>
-    <button @click="reset" :disabled="count === 0">Reset</button>
+    <button rx-on:click="increment">Increment</button>
+    <button rx-on:click="reset" rx-bind:disabled="count === 0">Reset</button>
   </section>
 </template>
 ```
 
-The server renders the initial values. The browser imports the generated handler module after the first relevant click, resumes the component scope, and patches the three dynamic bindings.
+The server renders the initial values. After the first relevant click, the browser imports the generated Resux handler module, resumes the component scope, and patches the dynamic bindings. It does not hydrate a Vue application around the page.
 
 Use `ref` for ordinary local state like this counter. Use `reactive` when several local fields belong together. Choose `useState` only when a named JSON-compatible value must be serialized and restored as part of the component scope payload.
