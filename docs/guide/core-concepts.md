@@ -8,7 +8,8 @@ Resux combines compile-time analysis, SSR, serialized state, delegated events, r
 | --- | --- |
 | Resux component | A compiled `.vue` component using the documented subset, without Vue hydration. |
 | Scope | One rendered component instance and its resumable state, async data, props, and module id. |
-| Payload | Route, scopes, client modules, public config, plugins, middleware, page metadata, and island entries serialized for the browser. |
+| Global state | Named serializable refs shared by all component scopes in one application/request. |
+| Payload | Route, scopes, global state, client modules, public config, plugins, middleware, page metadata, and island entries serialized for the browser. |
 | Binding | A compiler-marked text, attribute, class, style, visibility, or HTML location that can be patched after resume. |
 | Handler module | Client code generated for a component's event handlers. |
 | Route payload | Fresh rendered output fetched for same-origin client navigation. |
@@ -42,7 +43,7 @@ The server:
 - runs route middleware,
 - renders the app shell, layout, and page,
 - merges head entries,
-- serializes state and public configuration,
+- serializes scoped state, global state, and public configuration,
 - serves runtime and handler assets,
 - transforms media when configured,
 - and exposes `/__resux/health`.
@@ -52,10 +53,12 @@ The server:
 The browser runtime:
 
 - reads the serialized payload,
+- restores component scopes and shared global refs,
 - delegates supported events,
 - imports handlers on demand,
 - resumes scopes,
 - applies DOM patches,
+- keeps global-state consumers synchronized,
 - runs client plugins and middleware,
 - handles route payload navigation,
 - activates registered client enhancements,
@@ -65,18 +68,24 @@ The browser runtime:
 
 | Need | Preferred feature |
 | --- | --- |
-| Shared serializable UI state | `useState` |
+| Component-local scalar state | `ref` |
+| Component-local object state | `reactive` |
+| Derived reactive state | `computed` |
+| Named serializable state owned by one component scope | `useState` |
+| Named serializable state shared across components | `useGlobalState` |
 | SSR data with pending/error refs | `useAsyncData` or `useFetch` |
 | Private database or credential work | server API, middleware, plugin, or utility |
-| App-wide provided value | plugin and `useResuxApp()` |
+| App-wide runtime service or non-serializable dependency | plugin and `useResuxApp()` |
 | Build-time extension | module or `resuxjs/kit` |
 | Browser-only DOM behavior | client enhancement |
 | Full Vue component behavior | Vue island |
 | Third-party library loaded later | progressive package adapter |
 | Response headers, cache, redirects, CORS | route rules |
 
+`useState` belongs to the current rendered component scope. `useGlobalState` returns one shared ref for the same key across component scopes. Both require JSON-compatible values when their data crosses SSR and browser resume.
+
 ## Serialization is architectural
 
 Resux does not reconstruct a complete client component tree. It resumes from serialized values. Functions, class instances, sockets, DOM nodes, and other runtime-only objects should not be stored in resumable state.
 
-Read [Resumability and Handlers](/guide/resumability-handlers) and [Execution Contexts](/guide/execution-contexts) next.
+Read [State and Reactivity](/guide/state), [Resumability and Handlers](/guide/resumability-handlers), and [Execution Contexts](/guide/execution-contexts) next.
