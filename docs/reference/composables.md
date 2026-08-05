@@ -128,7 +128,7 @@ const session = useGlobalState('session', () => ({
 }))
 ```
 
-Components using the same key receive the same ref. The first factory initializes the key; later factories for that key are ignored.
+Components using the same key receive the same ref. Choose one canonical initiator for each key and give only that call the factory. Calls without a factory receive the same ref and the initial value already established for the key; they do not create another value. The first call wins: if it omits the factory, the key is initialized to `undefined`, and any later factory for that key is ignored.
 
 During SSR, the registry belongs only to the current request. The values are serialized once under `payload.globalState`, restored as shared browser refs, and preserved during Resux client navigation. A mutation refreshes rendered scopes so bindings in separate components remain synchronized.
 
