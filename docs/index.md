@@ -13,8 +13,8 @@ hero:
       text: Get Started
       link: /guide/getting-started
     - theme: alt
-      text: Framework Tour
-      link: /guide/framework-tour
+      text: Code to Browser
+      link: /guide/code-to-browser
     - theme: alt
       text: API Index
       link: /reference/api-index
@@ -55,6 +55,7 @@ Node.js `>=20.19.0` is required by the current framework source.
 
 | Goal | Read |
 | --- | --- |
+| See how authored code reaches the browser | [Code to Browser](/guide/code-to-browser) |
 | Understand the architecture | [Framework Tour](/guide/framework-tour) and [Mental Model](/guide/mental-model) |
 | Build components and routes | [Components](/guide/components), [Template Syntax](/guide/template-syntax), [Routing](/guide/routing) |
 | Load data and manage state | [State](/guide/state), [Async Data](/guide/async-data) |
