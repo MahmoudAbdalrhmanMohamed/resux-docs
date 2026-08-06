@@ -127,7 +127,7 @@ const stop = watch(
 )
 ```
 
-Watching a reactive object is deep by default. Options include `immediate`, `deep`, `flush`, and `once` where supported by the current API.
+Watching a reactive object is deep by default. Deep traversal includes enumerable string and symbol keys. Current options are `immediate`, `deep`, and `flush` (`'sync'` or `'post'`).
 
 ## `watchEffect`
 
@@ -154,6 +154,16 @@ unref(name)
 toRaw(form)
 ```
 
+`toRefs()` preserves array shape when its input is an array, so positional refs continue to work with array checks and array-oriented code:
+
+```ts
+const values = reactive([1, 2])
+const valueRefs = toRefs(values)
+
+Array.isArray(valueRefs) // true
+valueRefs[0].value = 3
+```
+
 ## Scheduler
 
 ```ts
@@ -161,7 +171,7 @@ form.name = 'Mahmoud'
 await nextTick()
 ```
 
-`nextTick` waits for queued reactive work to flush.
+`nextTick` waits for queued reactive work to flush. If one queued callback throws, the scheduler continues running the other queued callbacks and then rejects with the first error.
 
 ## Low-level reactivity
 
