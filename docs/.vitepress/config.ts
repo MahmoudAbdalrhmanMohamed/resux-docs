@@ -44,6 +44,7 @@ export default defineConfig({
         collapsed: false,
         items: [
           { text: 'Framework Tour', link: '/guide/framework-tour' },
+          { text: 'Code to Browser', link: '/guide/code-to-browser' },
           { text: 'What is Resux?', link: '/guide/what-is-resux' },
           { text: 'How Resux Uses Vue', link: '/guide/how-resux-uses-vue' },
           { text: 'Core Concepts', link: '/guide/core-concepts' },
