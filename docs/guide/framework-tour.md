@@ -2,6 +2,8 @@
 
 This tour maps the complete Resux framework surface and where to learn each part.
 
+For a concrete line-by-line walkthrough, start with [Code to Browser](/guide/code-to-browser). It follows one component from authored SFC code through compiler records, SSR HTML and payload, browser resume, and targeted DOM patches.
+
 ## 1. Create and validate
 
 The create system offers eight templates and composable feature flags. Generated projects use `prepare`, `check`, TypeScript declarations, Nitro output, deployment files, and optional tests, Tailwind, media, and i18n examples.
@@ -22,7 +24,7 @@ Read [How Resux Uses Vue](/guide/how-resux-uses-vue), [Components](/guide/compon
 
 The server renders HTML and serializes route/scope data. The browser resumes handlers and patches compiler-marked bindings instead of hydrating the whole app.
 
-Read [Rendering Lifecycle](/guide/rendering-lifecycle), [Mental Model](/guide/mental-model), and [Resumability and Handlers](/guide/resumability-handlers).
+Read [Code to Browser](/guide/code-to-browser), [Rendering Lifecycle](/guide/rendering-lifecycle), [Mental Model](/guide/mental-model), and [Resumability and Handlers](/guide/resumability-handlers).
 
 ## 4. State ownership
 
