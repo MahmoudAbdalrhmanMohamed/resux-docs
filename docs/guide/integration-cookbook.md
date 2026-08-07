@@ -199,15 +199,21 @@ export default defineResuxConfig({
 })
 ```
 
+Configure the worker in the client-only PDF adapter before the first document is loaded:
+
 ```ts
+import workerUrl from 'pdfjs-dist/build/pdf.worker.mjs?url'
+
 const pdfjs = await useClientPackage<typeof import('pdfjs-dist')>('pdfjs-dist')
+pdfjs.GlobalWorkerOptions.workerSrc = workerUrl
+
 const documentTask = pdfjs.getDocument('/files/guide.pdf')
 const pdf = await documentTask.promise
 const page = await pdf.getPage(1)
 // render the page to a canvas owned by the client integration
 ```
 
-Keep worker configuration in one adapter module so upgrades do not spread through pages. Avoid rendering dozens of pages immediately; render visible pages and release canvases when they leave the working set.
+Keep worker configuration in one adapter module so upgrades do not spread through pages. Verify the worker URL resolves in the production build. Avoid rendering dozens of pages immediately; render visible pages and release canvases when they leave the working set.
 
 Common mistakes: trying to render canvas on the server, forgetting the worker asset, and removing the ordinary download/open link.
 
@@ -319,7 +325,10 @@ Use capability detection first, then the Permissions API where it is actually su
 
 ```ts
 async function readPermission(name: PermissionName) {
-  if (!('permissions' in navigator)) return 'unsupported'
+  if (typeof navigator === 'undefined' || !('permissions' in navigator)) {
+    return 'unsupported'
+  }
+
   try {
     return (await navigator.permissions.query({ name })).state
   } catch {
@@ -327,6 +336,8 @@ async function readPermission(name: PermissionName) {
   }
 }
 ```
+
+The `typeof navigator` check makes the helper safe if it is reached during SSR; permission queries should still normally run only after client initialization or a user-driven browser flow.
 
 Do not use a permission query as a substitute for calling the real browser API. Browsers expose different permission names and behaviors. Handle `denied`, unavailable APIs, and re-prompt behavior explicitly.
 
