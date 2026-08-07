@@ -26,6 +26,7 @@ export default defineConfig({
     search: { provider: 'local' },
     nav: [
       { text: 'Guide', link: '/guide/framework-tour' },
+      { text: 'Integrations', link: '/guide/integration-cookbook' },
       { text: 'Reference', link: '/reference/api-index' },
       { text: 'Examples', link: '/examples/counter' },
       { text: 'Brand', link: '/brand' },
@@ -34,7 +35,8 @@ export default defineConfig({
         items: [
           { text: 'npm package', link: 'https://www.npmjs.com/package/resuxjs' },
           { text: 'Source repo', link: 'https://github.com/MahmoudAbdalrhmanMohamed/resux' },
-          { text: 'Docs repo', link: 'https://github.com/MahmoudAbdalrhmanMohamed/resux-docs' }
+          { text: 'Docs repo', link: 'https://github.com/MahmoudAbdalrhmanMohamed/resux-docs' },
+          { text: 'Compatibility lab', link: 'https://github.com/MahmoudAbdalrhmanMohamed/resux-lab' }
         ]
       }
     ],
@@ -80,6 +82,7 @@ export default defineConfig({
           { text: 'Server API', link: '/guide/server-api' },
           { text: 'Modules and Route Rules', link: '/guide/modules-route-rules' },
           { text: 'Third-party Packages', link: '/guide/package-integration' },
+          { text: 'Integration Cookbook', link: '/guide/integration-cookbook' },
           { text: 'CSS and Tailwind', link: '/guide/css-tailwind' },
           { text: 'TypeScript and Generated Types', link: '/guide/typescript-generated-types' },
           { text: 'Testing and Quality', link: '/guide/testing-quality' }
@@ -114,6 +117,7 @@ export default defineConfig({
         items: [
           { text: 'Package Exports', link: '/reference/packages' },
           { text: 'Public API Index', link: '/reference/api-index' },
+          { text: 'UI API', link: '/reference/ui' },
           { text: 'CLI', link: '/reference/cli' },
           { text: 'Composables and Globals', link: '/reference/composables' },
           { text: 'Configuration', link: '/reference/configuration' },
@@ -122,7 +126,8 @@ export default defineConfig({
           { text: 'Runtime Internals', link: '/reference/runtime' },
           { text: 'Compiler Internals', link: '/reference/compiler' },
           { text: 'Release and Publishing', link: '/reference/release' },
-          { text: 'Current Limits', link: '/reference/limits' }
+          { text: 'Current Limits', link: '/reference/limits' },
+          { text: 'Framework Audit 2026-08-07', link: '/reference/audit-2026-08-07' }
         ]
       },
       {
