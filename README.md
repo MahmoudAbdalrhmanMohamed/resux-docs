@@ -1,5 +1,7 @@
 # Resux Documentation
 
+**Resux** stands for **Resumability + User Experience (UX)**.
+
 VitePress documentation for the complete Resux framework surface.
 
 The site covers:
