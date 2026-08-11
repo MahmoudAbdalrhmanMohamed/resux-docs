@@ -6,7 +6,8 @@
     "dev": "vitepress dev docs",
     "build": "vitepress build docs",
     "preview": "vitepress preview docs",
-    "check:links": "vitepress build docs"
+    "check:links": "vitepress build docs",
+    "check:framework-parity": "node scripts/check-framework-parity.mjs .framework/resux"
   },
   "devDependencies": {
     "vitepress": "^1.6.4"
