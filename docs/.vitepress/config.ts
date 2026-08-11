@@ -180,6 +180,7 @@ export default defineConfig({
         collapsed: true,
         items: [
           { text: 'i18n and Localization', link: '/guide/i18n' },
+          { text: 'i18n API', link: '/reference/i18n' },
           { text: 'Vue Islands', link: '/guide/vue-islands' }
         ]
       },
@@ -189,8 +190,10 @@ export default defineConfig({
         items: [
           { text: 'Security and Caching', link: '/guide/security-caching' },
           { text: 'Halal Core', link: '/guide/halal-core' },
+          { text: 'Halal Core API', link: '/reference/halal' },
           { text: 'Dev Server and Build Output', link: '/guide/dev-build-output' },
           { text: 'Deployment', link: '/guide/deployment' },
+          { text: 'Node Handler API', link: '/reference/node' },
           { text: 'Troubleshooting', link: '/guide/troubleshooting' }
         ]
       },
@@ -204,11 +207,15 @@ export default defineConfig({
           { text: 'Composables and Globals', link: '/reference/composables' },
           { text: 'Reactivity API', link: '/reference/reactivity' },
           { text: 'UI Package API', link: '/reference/ui' },
+          { text: 'i18n API', link: '/reference/i18n' },
           { text: 'Resux Kit API', link: '/reference/kit' },
           { text: 'Core API', link: '/reference/core' },
           { text: 'Lifecycle Hooks', link: '/reference/hooks' },
           { text: 'Runtime Internals', link: '/reference/runtime' },
           { text: 'Compiler API', link: '/reference/compiler' },
+          { text: 'Project Creation API', link: '/reference/create' },
+          { text: 'Node Handler API', link: '/reference/node' },
+          { text: 'Halal Core API', link: '/reference/halal' },
           { text: 'CLI', link: '/reference/cli' },
           { text: 'Configuration', link: '/reference/configuration' },
           { text: 'File Conventions', link: '/reference/file-conventions' },
