@@ -1,13 +1,13 @@
 # Resux Documentation Index
 
-Resux is an HTML-first experimental web framework with a custom Vue-like SFC compiler, SSR renderer, serialized resumable state, delegated event runtime, route payload navigation, server APIs, modules, hooks, package modes, media optimization, deployment adapters, optional Vue islands, and a local safety/integrity subsystem.
+Resux is an HTML-first experimental web framework with a custom Vue-like SFC compiler, SSR renderer, serialized resumable state, delegated event runtime, route payload navigation, server APIs, modules, hooks, package modes, first-party media, deployment adapters, optional Vue islands, and a local safety/integrity subsystem.
 
 Framework source: https://github.com/MahmoudAbdalrhmanMohamed/resux
 Documentation source: https://github.com/MahmoudAbdalrhmanMohamed/resux-docs
 Package: resuxjs
 Node requirement in current source: >=20.19.0
 
-Do not assume the npm latest version permanently matches the source documentation. Check the package version and release notes.
+Source code and tests are the documentation source of truth. Do not assume npm latest permanently matches source documentation.
 
 Start:
 - /guide/framework-tour
@@ -28,20 +28,63 @@ Core:
 - /guide/head-seo
 - /guide/runtime-config
 
+UI components (`resuxjs/ui`, Vue runtime boundary):
+- /components/
+- /components/button
+- /components/input
+- /components/textarea
+- /components/select
+- /components/date-picker
+- /components/switch
+- /components/card
+- /components/badge
+- /components/avatar
+- /components/alert
+- /components/skeleton
+- /components/divider
+- /components/kbd
+- /components/accordion
+- /components/tabs
+- /components/popover
+- /components/dropdown
+- /components/tooltip
+- /components/modal
+- /components/motion
+- /components/reveal
+- /components/auto-animate
+- /components/icon
+- /reference/ui
+
+First-party media (Resux renderer primitives):
+- /media/
+- /media/images
+- /media/responsive-images
+- /media/optimization
+- /media/video
+
+Fonts:
+- /fonts/
+- /fonts/configuration
+- /fonts/performance
+
+Icons (`resuxjs/icons`, Vue runtime boundary):
+- /icons/
+- /icons/usage
+- /icons/configuration
+- /icons/runtime
+
 Platform:
 - /guide/plugins
 - /guide/middleware
 - /guide/server-api
 - /guide/modules-route-rules
 - /guide/package-integration
+- /guide/integration-cookbook
 - /guide/css-tailwind
 - /guide/typescript-generated-types
 - /guide/testing-quality
 
-Features:
-- /guide/media
-- /guide/icons
-- /guide/fonts
+Optional/advanced:
 - /guide/i18n
 - /guide/ui-animations
 - /guide/vue-islands
@@ -56,6 +99,8 @@ Operations and safety:
 Reference:
 - /reference/packages
 - /reference/api-index
+- /reference/coverage
+- /reference/ui
 - /reference/cli
 - /reference/composables
 - /reference/configuration
@@ -68,8 +113,12 @@ Reference:
 
 Important facts:
 - Normal Resux components do not hydrate through Vue.
-- resuxjs/ui and resuxjs/icons export Vue runtime components; use them in appropriate Vue/client contexts.
-- useFetch returns an AsyncDataResource with data/value/pending/error refs.
-- review_required creates a local manual review bundle; it is not automatically emailed or uploaded.
-- production server/deployment report verification requires RESUX_HALAL_REPORT_SIGNING_SECRET.
+- `resuxjs/ui` components and `resuxjs/icons` Icon/ResuxIcon are Vue runtime components; use explicit Vue/client contexts.
+- `ResuxImg`, `ResuxPicture`, and `ResuxVideo` are handled by the Resux renderer and are not `resuxjs/ui` Vue components.
+- The current fonts module is Google-Fonts-only; it does not implement local/self-host font management.
+- The current icon module defaults to `collections: []` and `lazy: false`; remote unknown icons load on the client.
+- `RxReveal` is mount-triggered, not viewport-triggered; the `vAnime`/`vAnimate` directive is the viewport-observed UI API.
+- `RxAutoAnimate` currently runs one mount animation and does not observe child/layout mutations.
+- `useFetch` returns an AsyncDataResource with data/value/pending/error refs.
 - image transforms require sharp; video transforms require ffmpeg.
+- production server/deployment report verification requires RESUX_HALAL_REPORT_SIGNING_SECRET.

@@ -1,32 +1,57 @@
-# UI API Reference (`resuxjs/ui`)
+# UI Package Reference (`resuxjs/ui`)
 
-`resuxjs/ui` is an optional Vue-runtime UI and motion package. The components are Vue `defineComponent` components, so use them inside a [Vue island](../guide/vue-islands.md) or another explicit Vue runtime boundary. They are not zero-hydration Resux template primitives.
+`resuxjs/ui` is an optional Vue UI and motion package. This page documents the package-level public API. Every component has a dedicated page in the [UI component catalog](/components/).
 
-Every `Rx*` component has a matching `Resux*` alias. For example, `RxDatePicker` and `ResuxDatePicker` are the same component.
+::: warning Runtime boundary
+All `Rx*` / `Resux*` components in this package are Vue `defineComponent` components. Use them inside a [Vue island](/guide/vue-islands) or another explicit Vue runtime boundary. They are not zero-hydration Resux template primitives.
+:::
 
-## Imports
+## Import surface
 
 ```ts
-import {
-  RxButton,
-  RxDatePicker,
-  RxModal,
+import uiModule, {
   defineUiTokens,
+  isReducedMotion,
   useAnimate,
-  vAnime
+  vAnime,
+  vAnimate,
+  RxButton,
+  ResuxButton
 } from 'resuxjs/ui'
 ```
 
-## Module setup
+## Module options
+
+```ts
+export interface ResuxUiModuleOptions {
+  css?: string[]
+  tokens?: Record<string, string>
+  defaultStyles?: boolean
+  animations?: {
+    enabled?: boolean
+    defaultPreset?: string
+  }
+}
+```
+
+| Option | Default | Behavior |
+| --- | --- | --- |
+| `css` | `[]` | Calls the module CSS registration hook for each configured path. |
+| `tokens` | `{}` | Stored in public runtime UI configuration. Arbitrary token keys are **not** automatically converted into built-in component CSS variables. |
+| `defaultStyles` | `true` | Injects the built-in `rx-*` primitive stylesheet when enabled. |
+| `animations.enabled` | `true` | Controls injection of the package's animation CSS definitions. |
+| `animations.defaultPreset` | `'fade-up'` | Exposed as runtime animation configuration. |
+
+Example:
 
 ```ts
 export default defineResuxConfig({
   modules: [
     ['resuxjs/ui', {
+      css: ['/assets/css/ui-overrides.css'],
       defaultStyles: true,
       tokens: {
-        accent: '#03c8bf',
-        radius: '12px'
+        accent: '#03c8bf'
       },
       animations: {
         enabled: true,
@@ -37,13 +62,13 @@ export default defineResuxConfig({
 })
 ```
 
-Set `unstyled` on a component when you want its behavior/markup without Resux's default component class.
+## `defineUiTokens(tokens)`
 
-## Package-level APIs
+Typed identity helper for token records:
 
-### `defineUiTokens(tokens)`
-
-Identity helper for defining UI tokens with type inference.
+```ts
+export function defineUiTokens<T extends Record<string, string>>(tokens: T): T
+```
 
 ```ts
 const tokens = defineUiTokens({
@@ -52,334 +77,175 @@ const tokens = defineUiTokens({
 })
 ```
 
-### `isReducedMotion()`
+The helper returns the same object. It does not generate CSS by itself.
 
-Returns whether the current browser requests reduced motion. Browser-only motion code should respect this result.
+## `AnimationPreset`
 
-### `useAnimate(element, options)`
-
-Runs a Web Animations API preset and returns the `Animation` instance or `null` when animation cannot/should not run.
-
-Common options:
-
-- `type`: animation preset
-- `duration`: milliseconds
-- `delay`: milliseconds
-- `easing`
-- `fill`
-
-Built-in presets include `fade-up`, `fade-down`, `scale-in`, `slide-in-left`, `slide-in-right`, `pulse-glow`, and `bounce-in`.
-
-### `vAnime` / `vAnimate`
-
-Vue directive aliases that animate an element when it enters the viewport when `IntersectionObserver` is available. Directive cleanup disconnects the observer and cancels the active animation when the element is unmounted.
-
-## Form components
-
-### `RxButton` / `ResuxButton`
-
-Button primitive.
-
-Key props:
-
-| Prop | Type | Default |
-| --- | --- | --- |
-| `variant` | `string` | `'primary'` |
-| `size` | `string` | `'md'` |
-| `type` | `string` | `'button'` |
-| `disabled` | `boolean` | `false` |
-| `unstyled` | `boolean` | `false` |
-
-Normal button attributes and listeners are forwarded.
-
-```vue
-<RxButton variant="primary" :disabled="saving" @click="save">
-  Save
-</RxButton>
+```ts
+type AnimationPreset =
+  | 'fade-up'
+  | 'fade-down'
+  | 'scale-in'
+  | 'slide-in-left'
+  | 'slide-in-right'
+  | 'pulse-glow'
+  | 'bounce-in'
 ```
 
-### `RxInput` / `ResuxInput`
+These names have verified keyframes in `useAnimate()`.
 
-Text/input primitive with `v-model` support.
+## `AnimateOptions`
 
-| Prop | Type | Default |
-| --- | --- | --- |
-| `modelValue` | `string \| number` | `''` |
-| `type` | `string` | `'text'` |
-| `placeholder` | `string` | `''` |
-| `disabled` | `boolean` | `false` |
-| `unstyled` | `boolean` | `false` |
-
-Emits `update:modelValue` from the underlying input event.
-
-```vue
-<RxInput v-model="email" type="email" placeholder="you@example.com" />
+```ts
+export interface AnimateOptions {
+  type?: AnimationPreset
+  duration?: number
+  delay?: number
+  easing?: string
+  fill?: FillMode
+}
 ```
 
-### `RxTextarea` / `ResuxTextarea`
+Defaults used by `useAnimate()`:
 
-| Prop | Type | Default |
-| --- | --- | --- |
-| `modelValue` | `string` | `''` |
-| `rows` | `number` | `3` |
-| `placeholder` | `string` | `''` |
-| `disabled` | `boolean` | `false` |
-| `unstyled` | `boolean` | `false` |
+- `type: 'fade-up'`
+- `duration: 400`
+- `delay: 0`
+- `easing: 'cubic-bezier(0.16, 1, 0.3, 1)'`
+- `fill: 'both'`
 
-Emits `update:modelValue`.
+## `isReducedMotion()`
 
-### `RxSelect` / `ResuxSelect`
-
-Custom select primitive.
-
-| Prop | Type | Default |
-| --- | --- | --- |
-| `modelValue` | `string \| number` | `''` |
-| `options` | `(string \| { label: string; value: string \| number })[]` | `[]` |
-| `placeholder` | `string` | `'Select an option'` |
-| `disabled` | `boolean` | `false` |
-| `unstyled` | `boolean` | `false` |
-
-Emits `update:modelValue` when an option is selected.
-
-```vue
-<RxSelect
-  v-model="role"
-  :options="[
-    { label: 'Admin', value: 'admin' },
-    { label: 'Editor', value: 'editor' }
-  ]"
-/>
+```ts
+export function isReducedMotion(): boolean
 ```
 
-### `RxDatePicker` / `ResuxDatePicker`
+Returns `false` outside a browser. In a browser it checks:
 
-Date input primitive. This is the built-in choice when you only need a standard calendar/date field and do not need a third-party calendar library.
-
-| Prop | Type | Default |
-| --- | --- | --- |
-| `modelValue` | `string \| Date` | `''` |
-| `placeholder` | `string` | `'Select date'` |
-| `unstyled` | `boolean` | `false` |
-
-Emits `update:modelValue` with the input's ISO-style `YYYY-MM-DD` string.
-
-`Date` values are formatted for the native `<input type="date">`. Invalid `Date` objects are treated as an empty input instead of throwing, and current prop changes are reflected on subsequent renders.
-
-```vue
-<script setup lang="ts">
-import { ref } from 'vue'
-import { RxDatePicker } from 'resuxjs/ui'
-
-const birthday = ref('')
-</script>
-
-<template>
-  <label>
-    Birthday
-    <RxDatePicker v-model="birthday" />
-  </label>
-  <p v-if="birthday">Selected: {{ birthday }}</p>
-</template>
+```txt
+(prefers-reduced-motion: reduce)
 ```
 
-For date ranges, time selection, locale-specific calendars, or advanced disabled-date rules, use a progressive third-party integration; see the [Integration Cookbook](../guide/integration-cookbook.md#date-pickers).
+Use this for browser-owned motion that should respect the user's reduced-motion preference.
 
-### `RxSwitch` / `ResuxSwitch`
+## `useAnimate(element, options)`
 
-| Prop | Type | Default |
-| --- | --- | --- |
-| `modelValue` | `boolean` | `false` |
-| `disabled` | `boolean` | `false` |
-| `unstyled` | `boolean` | `false` |
-
-Emits `update:modelValue` with the toggled boolean value.
-
-## Content and feedback
-
-### `RxCard` / `ResuxCard`
-
-Container primitive. Key props: `variant` (`'default'`) and `unstyled` (`false`). Default slot contains card content.
-
-### `RxBadge` / `ResuxBadge`
-
-Inline badge. Key props: `variant` (`'default'`) and `unstyled` (`false`).
-
-### `RxAvatar` / `ResuxAvatar`
-
-Avatar/image primitive.
-
-| Prop | Type | Default |
-| --- | --- | --- |
-| `src` | `string` | `''` |
-| `alt` | `string` | `'Avatar'` |
-| `size` | `string` | `'md'` |
-| `status` | `string` | `''` |
-
-Always provide a meaningful `alt` value when the image conveys identity or content.
-
-### `RxAlert` / `ResuxAlert`
-
-Feedback block.
-
-| Prop | Type | Default |
-| --- | --- | --- |
-| `variant` | `string` | `'info'` |
-| `title` | `string` | `''` |
-| `dismissible` | `boolean` | `false` |
-| `unstyled` | `boolean` | `false` |
-
-Use alert text that remains understandable without animation or color alone.
-
-### `RxSkeleton` / `ResuxSkeleton`
-
-Loading placeholder.
-
-| Prop | Type | Default |
-| --- | --- | --- |
-| `width` | `string` | `'100%'` |
-| `height` | `string` | `'1rem'` |
-| `rounded` | `string` | `'0.375rem'` |
-| `unstyled` | `boolean` | `false` |
-
-Skeletons are visual hints; expose real loading state through accessible text/ARIA where the user needs it.
-
-### `RxDivider` / `ResuxDivider`
-
-| Prop | Type | Default |
-| --- | --- | --- |
-| `label` | `string` | `''` |
-| `orientation` | `string` | `'horizontal'` |
-| `unstyled` | `boolean` | `false` |
-
-### `RxKbd` / `ResuxKbd`
-
-Keyboard-key visual primitive. It accepts the default slot and `unstyled`.
-
-```vue
-<RxKbd>Ctrl</RxKbd> + <RxKbd>K</RxKbd>
+```ts
+export function useAnimate(
+  target: HTMLElement | Element | null,
+  options?: AnimateOptions
+): Animation | null
 ```
 
-## Overlays and navigation
+The helper returns `null` when:
 
-### `RxModal` / `ResuxModal`
+- there is no browser `window`;
+- `target` is null;
+- reduced motion is requested;
+- the target does not expose `Element.animate`.
 
-| Prop | Type | Default |
-| --- | --- | --- |
-| `open` | `boolean` | `false` |
-| `title` | `string` | `''` |
-| `unstyled` | `boolean` | `false` |
+Otherwise it invokes the Web Animations API and returns the resulting `Animation`.
 
-Emits `update:open` and `close` when it closes.
-
-```vue
-<RxModal v-model:open="open" title="Delete item" @close="onClosed">
-  Confirm the destructive action here.
-</RxModal>
+```ts
+const animation = useAnimate(element, {
+  type: 'fade-up',
+  duration: 500,
+  delay: 100,
+  easing: 'ease-out',
+  fill: 'forwards'
+})
 ```
 
-Application code must test focus trapping/restoration, escape behavior, background interaction, and screen-reader labeling for its exact modal composition.
+The caller owns cancellation/lifecycle when using the imperative helper directly.
 
-### `RxPopover` / `ResuxPopover`
+## `vAnime` / `vAnimate`
 
-Props: `open` (`boolean`, default `false`) and `unstyled`. Emits `update:open`. Use the `trigger` slot for the activator and the default slot for popover content.
+`vAnimate` is an alias of `vAnime`.
 
-### `RxDropdown` / `ResuxDropdown`
+The Vue directive:
 
-| Prop | Type | Default |
-| --- | --- | --- |
-| `items` | `{ label: string; action?: () => void }[]` | `[]` |
-| `open` | `boolean` | `false` |
-| `unstyled` | `boolean` | `false` |
+- reads either a preset string or options object;
+- uses `IntersectionObserver` when available;
+- starts animation as the element approaches/enters the viewport;
+- disconnects its observer after activation;
+- cancels an active animation and disconnects the observer during unmount cleanup;
+- falls back to immediate animation when `IntersectionObserver` is unavailable.
 
-Emits `update:open`. An item's optional `action` is called when selected.
+Example in Vue-owned markup:
 
-### `RxTooltip` / `ResuxTooltip`
+```vue
+<div v-anime="{ type: 'fade-up', duration: 500 }">
+  Content
+</div>
+```
 
-Props: `text` (`''`), `placement` (`'top'`), and `unstyled`. Tooltips must not be the only place essential information appears.
+The directive is a Vue directive; do not present it as a native Resux template directive.
 
-### `RxAccordion` / `ResuxAccordion`
+## Public components
 
-Props: `title` (`'Accordion Title'`), `open` (`false`), and `unstyled`. The component keeps its own open state initialized from `open`; use it for simple disclosure content rather than as a controlled state primitive.
+Every `Rx*` component has an equivalent `Resux*` alias.
 
-### `RxTabs` / `ResuxTabs`
+| Component | Dedicated reference |
+| --- | --- |
+| `RxButton` / `ResuxButton` | [Button](/components/button) |
+| `RxInput` / `ResuxInput` | [Input](/components/input) |
+| `RxTextarea` / `ResuxTextarea` | [Textarea](/components/textarea) |
+| `RxSelect` / `ResuxSelect` | [Select](/components/select) |
+| `RxDatePicker` / `ResuxDatePicker` | [DatePicker](/components/date-picker) |
+| `RxSwitch` / `ResuxSwitch` | [Switch](/components/switch) |
+| `RxCard` / `ResuxCard` | [Card](/components/card) |
+| `RxBadge` / `ResuxBadge` | [Badge](/components/badge) |
+| `RxAvatar` / `ResuxAvatar` | [Avatar](/components/avatar) |
+| `RxAlert` / `ResuxAlert` | [Alert](/components/alert) |
+| `RxSkeleton` / `ResuxSkeleton` | [Skeleton](/components/skeleton) |
+| `RxDivider` / `ResuxDivider` | [Divider](/components/divider) |
+| `RxKbd` / `ResuxKbd` | [Kbd](/components/kbd) |
+| `RxAccordion` / `ResuxAccordion` | [Accordion](/components/accordion) |
+| `RxTabs` / `ResuxTabs` | [Tabs](/components/tabs) |
+| `RxPopover` / `ResuxPopover` | [Popover](/components/popover) |
+| `RxDropdown` / `ResuxDropdown` | [Dropdown](/components/dropdown) |
+| `RxTooltip` / `ResuxTooltip` | [Tooltip](/components/tooltip) |
+| `RxModal` / `ResuxModal` | [Modal](/components/modal) |
+| `RxMotion` / `ResuxMotion` | [Motion](/components/motion) |
+| `RxReveal` / `ResuxReveal` | [Reveal](/components/reveal) |
+| `RxAutoAnimate` / `ResuxAutoAnimate` | [AutoAnimate](/components/auto-animate) |
+| `RxIcon` / `ResuxIcon` | [UI Icon primitive](/components/icon) |
 
-| Prop | Type | Default |
-| --- | --- | --- |
-| `items` | `{ label: string; key: string }[]` | `[]` |
-| `modelValue` | `string` | `''` |
-| `unstyled` | `boolean` | `false` |
+## Important implementation boundaries
 
-Emits `update:modelValue` when a tab button is selected.
+### `RxReveal`
 
-## Motion components
+It runs a mount-time animation. It does **not** use viewport observation. For IntersectionObserver-triggered Vue animation, use `vAnime` / `vAnimate`.
 
-### `RxMotion` / `ResuxMotion`
+### `RxAutoAnimate`
 
-Animation wrapper. Key props include `tag` (`'div'`), `preset` (`'fade-up'`), `duration` (`400`), and `delay` (`0`). Use this when a Vue island owns the animated subtree.
+It runs a one-time `scale-in` animation after mount. It does **not** observe child insertion/removal/reordering or layout changes.
 
-### `RxReveal` / `ResuxReveal`
+### UI `RxIcon`
 
-Visibility-triggered reveal wrapper. Key props: `preset` (`'fade-up'`), `duration` (`400`), and `unstyled`.
+It renders text like `[check]`; it is not the SVG registry/provider component. For SVG icons use [`resuxjs/icons`](/icons/).
 
-### `RxAutoAnimate` / `ResuxAutoAnimate`
+## Styling and `unstyled`
 
-Wrapper for animating child-list/layout changes. Key props: `duration` (`300`) and `unstyled`.
+Most UI components expose `unstyled`. When true, component-specific Resux classes are omitted while user attributes/classes still pass through according to Vue attribute inheritance.
 
-## Icon component
+The default stylesheet is intentionally simple. Do not infer undeclared design-token behavior from the presence of `tokens` configuration.
 
-### `RxIcon` / `ResuxIcon`
+## Accessibility
 
-| Prop | Type | Default |
-| --- | --- | --- |
-| `name` | `string` | `'check'` |
-| `size` | `string \| number` | `'1.25rem'` |
-| `color` | `string` | `'currentColor'` |
-| `unstyled` | `boolean` | `false` |
+Native-element primitives inherit useful browser semantics. Several custom widgets are intentionally small and currently lack parts of complete ARIA interaction patterns. The dedicated component pages identify those limitations explicitly.
 
-For the larger icon registry/provider system, see [Icons](../guide/icons.md) and the `resuxjs/icons` package.
+Do not claim full keyboard/focus/screen-reader behavior without source/tests demonstrating it.
 
-## Alias list
+## SSR / hydration cost
 
-The package exports these equivalent names:
+Component markup may be rendered through Vue SSR, but interaction/state/mount hooks require the Vue runtime boundary. The cost is the island/subtree, not an imaginary Resux zero-JS component contract.
 
-- `RxMotion` / `ResuxMotion`
-- `RxReveal` / `ResuxReveal`
-- `RxAutoAnimate` / `ResuxAutoAnimate`
-- `RxButton` / `ResuxButton`
-- `RxCard` / `ResuxCard`
-- `RxBadge` / `ResuxBadge`
-- `RxInput` / `ResuxInput`
-- `RxSelect` / `ResuxSelect`
-- `RxDatePicker` / `ResuxDatePicker`
-- `RxPopover` / `ResuxPopover`
-- `RxIcon` / `ResuxIcon`
-- `RxAvatar` / `ResuxAvatar`
-- `RxAlert` / `ResuxAlert`
-- `RxAccordion` / `ResuxAccordion`
-- `RxTooltip` / `ResuxTooltip`
-- `RxDropdown` / `ResuxDropdown`
-- `RxTabs` / `ResuxTabs`
-- `RxTextarea` / `ResuxTextarea`
-- `RxSwitch` / `ResuxSwitch`
-- `RxSkeleton` / `ResuxSkeleton`
-- `RxDivider` / `ResuxDivider`
-- `RxKbd` / `ResuxKbd`
-- `RxModal` / `ResuxModal`
+For built-in resumable media, see [Images and Media](/media/).
 
-## Testing UI integrations
+## Related
 
-For a component library page, test at least:
-
-- server fallback around the Vue island
-- initial prop rendering
-- `v-model` events
-- disabled states
-- keyboard navigation
-- focus behavior for overlays
-- invalid/empty values
-- prop changes after mount
-- reduced-motion behavior
-- cleanup after unmount/navigation
-
-The `resux-lab` compatibility bench contains the executable UI showcase used to keep this reference aligned with the framework implementation.
+- [Component catalog](/components/)
+- [UI and Motion guide](/guide/ui-animations)
+- [Vue Islands](/guide/vue-islands)
+- [Current Limits](/reference/limits)

@@ -2,27 +2,35 @@
 
 **Resux** stands for **Resumability + User Experience (UX)**.
 
-VitePress documentation for the complete Resux framework surface.
+This repository contains the VitePress documentation for the Resux framework. The documentation site is the deep reference; the framework README is an introduction and entry point.
 
-The site covers:
+## Documentation structure
 
-- architecture, compiler, SSR, resumability, routing, layouts, state, async data, and errors,
-- the `rx-*` template language, official `@event` / `:binding` shortcuts, `v-*` migration compatibility, and development-only delegation diagnostics,
-- how Resux uses Vue compiler packages without hydrating normal Resux components,
-- plugins, middleware, server APIs, modules, Kit, hooks, generated templates/types, and route rules,
-- third-party package modes, client enhancements, Vue islands, UI, icons, fonts, i18n, media, CSS, and Tailwind,
-- create templates/features, CLI commands, targeted inspection, diagnostics, testing, deployment, release automation, security, and Halal Core,
-- examples for counters, routes, APIs, authentication, progressive packages, media, and Docker.
+The site covers the full public framework surface, including:
+
+- getting started, project structure, compiler/template behavior, SSR, resumability, routing, layouts, state, async data and errors;
+- plugins, middleware, server APIs, modules, Kit, hooks, configuration, generated templates/types and package integration;
+- a dedicated [UI component catalog](docs/components/index.md) with one page per public `resuxjs/ui` component;
+- dedicated [images/media](docs/media/index.md), [fonts](docs/fonts/index.md) and [icons](docs/icons/index.md) sections;
+- i18n, CSS/Tailwind, Vue islands, testing, security, deployment, release behavior and troubleshooting;
+- examples and API/package references.
 
 ## Source alignment
 
-The `rx-*` documentation update is aligned with `MahmoudAbdalrhmanMohamed/resux` branch `feat/rx-directive-branding` at commit `7ae1fff42edda8509a6badfc48a9d4e45671b3f0` and pull request `#9`.
+The framework implementation is the source of truth. Documentation must be verified against `MahmoudAbdalrhmanMohamed/resux` source, exports and tests before a prop, event, default, slot, behavior, runtime boundary or configuration option is documented.
 
-The framework change must be merged and released before the new syntax and diagnostics are considered available in a published `resuxjs` version. `@event` and `:binding` are first-class shortcuts for `rx-on:event` and `rx-bind:binding`; existing `v-*` syntax remains documented as migration compatibility.
+Do not pin this README to a historical feature branch or old pull request. Date-stamped audit pages may preserve historical evidence, but living documentation should track the current framework implementation.
 
-The development compiler warns about clear inline or element-level event listener patterns that bypass Resux delegation. These warnings are advisory and are not printed by production builds.
+The [Public API Documentation Coverage](docs/reference/coverage.md) page maps package entry points to their primary documentation and records focused coverage expectations.
 
-Documentation changes should identify the framework branch, commit, pull request, or release used as the source of truth.
+## Documentation conventions
+
+- Explain why/when, not only syntax.
+- Keep Resux resumability and explicit client/runtime boundaries visible.
+- Do not describe Vue UI components as zero-hydration Resux primitives.
+- Do not invent functionality to match another framework's documentation.
+- Document limitations explicitly when the implementation does not provide a complete behavior.
+- Prefer dedicated pages and cross-links over one giant catch-all reference.
 
 ## Local development
 
@@ -35,9 +43,10 @@ npm run dev
 
 ```sh
 npm run build
+npm run check:links
 ```
 
-The repository includes Documentation CI for pushes and pull requests.
+`check:links` currently uses the VitePress production build, so broken internal routes/anchors discovered by VitePress fail the same build path.
 
 ## Deployment
 

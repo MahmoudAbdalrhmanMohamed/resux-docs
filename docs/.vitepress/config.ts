@@ -2,7 +2,7 @@ import { defineConfig } from 'vitepress'
 
 export default defineConfig({
   title: 'Resux',
-  description: 'Complete documentation for the Resux compiler, SSR and resumable runtime, application platform, modules, packages, media, deployment, and safety tooling.',
+  description: 'Complete documentation for the Resux compiler, SSR and resumable runtime, application platform, UI, media, modules, deployment, and public APIs.',
   base: '/resux-docs/',
   cleanUrls: true,
   lastUpdated: true,
@@ -12,7 +12,7 @@ export default defineConfig({
     ['meta', { name: 'theme-color', content: '#111827' }],
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { property: 'og:title', content: 'Resux Documentation' }],
-    ['meta', { property: 'og:description', content: 'Learn the complete Resux framework: compiler, resumability, routing, server APIs, modules, packages, media, deployment, and safety.' }],
+    ['meta', { property: 'og:description', content: 'Learn Resux: resumability, compiler/runtime, routing, server APIs, UI components, media, fonts, icons, deployment, and public APIs.' }],
     ['meta', { property: 'og:image', content: 'https://mahmoudabdalrhmanmohamed.github.io/resux-docs/og-image.png' }],
     ['meta', { property: 'og:image:type', content: 'image/png' }],
     ['meta', { property: 'og:image:width', content: '1200' }],
@@ -26,10 +26,10 @@ export default defineConfig({
     search: { provider: 'local' },
     nav: [
       { text: 'Guide', link: '/guide/framework-tour' },
-      { text: 'Integrations', link: '/guide/integration-cookbook' },
+      { text: 'Components', link: '/components/' },
+      { text: 'Media', link: '/media/' },
       { text: 'Reference', link: '/reference/api-index' },
       { text: 'Examples', link: '/examples/counter' },
-      { text: 'Brand', link: '/brand' },
       {
         text: 'Links',
         items: [
@@ -74,6 +74,92 @@ export default defineConfig({
         ]
       },
       {
+        text: 'UI Components',
+        collapsed: false,
+        items: [
+          { text: 'Overview', link: '/components/' },
+          {
+            text: 'Forms and Input',
+            collapsed: true,
+            items: [
+              { text: 'Button', link: '/components/button' },
+              { text: 'Input', link: '/components/input' },
+              { text: 'Textarea', link: '/components/textarea' },
+              { text: 'Select', link: '/components/select' },
+              { text: 'DatePicker', link: '/components/date-picker' },
+              { text: 'Switch', link: '/components/switch' }
+            ]
+          },
+          {
+            text: 'Content and Feedback',
+            collapsed: true,
+            items: [
+              { text: 'Card', link: '/components/card' },
+              { text: 'Badge', link: '/components/badge' },
+              { text: 'Avatar', link: '/components/avatar' },
+              { text: 'Alert', link: '/components/alert' },
+              { text: 'Skeleton', link: '/components/skeleton' },
+              { text: 'Divider', link: '/components/divider' },
+              { text: 'Kbd', link: '/components/kbd' }
+            ]
+          },
+          {
+            text: 'Disclosure and Overlays',
+            collapsed: true,
+            items: [
+              { text: 'Accordion', link: '/components/accordion' },
+              { text: 'Tabs', link: '/components/tabs' },
+              { text: 'Popover', link: '/components/popover' },
+              { text: 'Dropdown', link: '/components/dropdown' },
+              { text: 'Tooltip', link: '/components/tooltip' },
+              { text: 'Modal', link: '/components/modal' }
+            ]
+          },
+          {
+            text: 'Motion and Utility',
+            collapsed: true,
+            items: [
+              { text: 'Motion', link: '/components/motion' },
+              { text: 'Reveal', link: '/components/reveal' },
+              { text: 'AutoAnimate', link: '/components/auto-animate' },
+              { text: 'UI Icon', link: '/components/icon' }
+            ]
+          },
+          { text: 'UI Package API', link: '/reference/ui' },
+          { text: 'UI and Motion Guide', link: '/guide/ui-animations' }
+        ]
+      },
+      {
+        text: 'Images and Media',
+        collapsed: false,
+        items: [
+          { text: 'Overview', link: '/media/' },
+          { text: 'Images', link: '/media/images' },
+          { text: 'Responsive Images', link: '/media/responsive-images' },
+          { text: 'Image Optimization', link: '/media/optimization' },
+          { text: 'Video', link: '/media/video' }
+        ]
+      },
+      {
+        text: 'Fonts',
+        collapsed: true,
+        items: [
+          { text: 'Overview', link: '/fonts/' },
+          { text: 'Configuration', link: '/fonts/configuration' },
+          { text: 'Performance and CSP', link: '/fonts/performance' }
+        ]
+      },
+      {
+        text: 'Icons',
+        collapsed: true,
+        items: [
+          { text: 'Overview', link: '/icons/' },
+          { text: 'Usage and Registry', link: '/icons/usage' },
+          { text: 'Configuration', link: '/icons/configuration' },
+          { text: 'Runtime Loading', link: '/icons/runtime' }
+        ]
+      },
+      {
         text: 'Platform and Extension',
         collapsed: false,
         items: [
@@ -90,13 +176,9 @@ export default defineConfig({
       },
       {
         text: 'Optional Features',
-        collapsed: false,
+        collapsed: true,
         items: [
-          { text: 'Media and Optimization', link: '/guide/media' },
-          { text: 'Icons', link: '/guide/icons' },
-          { text: 'Fonts', link: '/guide/fonts' },
           { text: 'i18n and Localization', link: '/guide/i18n' },
-          { text: 'UI and Motion', link: '/guide/ui-animations' },
           { text: 'Vue Islands', link: '/guide/vue-islands' }
         ]
       },
@@ -112,12 +194,13 @@ export default defineConfig({
         ]
       },
       {
-        text: 'Reference',
+        text: 'API Reference',
         collapsed: false,
         items: [
           { text: 'Package Exports', link: '/reference/packages' },
           { text: 'Public API Index', link: '/reference/api-index' },
-          { text: 'UI API', link: '/reference/ui' },
+          { text: 'Documentation Coverage', link: '/reference/coverage' },
+          { text: 'UI Package API', link: '/reference/ui' },
           { text: 'CLI', link: '/reference/cli' },
           { text: 'Composables and Globals', link: '/reference/composables' },
           { text: 'Configuration', link: '/reference/configuration' },
@@ -131,7 +214,7 @@ export default defineConfig({
       },
       {
         text: 'Examples',
-        collapsed: false,
+        collapsed: true,
         items: [
           { text: 'Counter', link: '/examples/counter' },
           { text: 'Blog Routes', link: '/examples/blog' },
@@ -144,7 +227,7 @@ export default defineConfig({
       },
       {
         text: 'Project',
-        collapsed: false,
+        collapsed: true,
         items: [
           { text: 'Brand System', link: '/brand' },
           { text: 'Contributing to Docs', link: '/community/contributing' }
@@ -155,7 +238,7 @@ export default defineConfig({
       { icon: 'github', link: 'https://github.com/MahmoudAbdalrhmanMohamed/resux' }
     ],
     footer: {
-      message: 'Complete Resux source-aligned documentation with stable and experimental boundaries documented explicitly.',
+      message: 'Source-aligned Resux documentation with resumability and runtime boundaries documented explicitly.',
       copyright: 'Copyright (c) 2026 Resux contributors'
     },
     editLink: {
