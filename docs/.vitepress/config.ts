@@ -126,8 +126,7 @@ export default defineConfig({
           { text: 'Runtime Internals', link: '/reference/runtime' },
           { text: 'Compiler Internals', link: '/reference/compiler' },
           { text: 'Release and Publishing', link: '/reference/release' },
-          { text: 'Current Limits', link: '/reference/limits' },
-          { text: 'Framework Audit 2026-08-07', link: '/reference/audit-2026-08-07' }
+          { text: 'Current Limits', link: '/reference/limits' }
         ]
       },
       {
