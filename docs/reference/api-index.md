@@ -50,15 +50,15 @@ Primary reference: [Compiler API](./compiler.md).
 
 ## `resuxjs/create`
 
-Programmatic project creation/scaffolding and create-target safety validation.
+Node-only programmatic project creation/scaffolding and destructive-target safety validation.
 
-Primary docs: [Getting Started](/guide/getting-started) and [CLI](./cli.md).
+Primary reference: [Project Creation API](./create.md). User workflow: [Getting Started](/guide/getting-started) and [CLI](./cli.md).
 
 ## `resuxjs/i18n`
 
-Optional i18n module/runtime surface, including configuration, `useI18n()`, locale-path helpers, translation behavior, locale switching, and head/SEO support.
+Optional i18n module/runtime surface, including public configuration types, `useI18n()`, locale-path helpers, `defineI18nConfig()`, and `createI18nHeadEntry()`.
 
-Primary docs: [i18n and Localization](/guide/i18n).
+Primary reference: [i18n API](./i18n.md). Conceptual guide: [i18n and Localization](/guide/i18n).
 
 ## `resuxjs/ui`
 
@@ -97,17 +97,15 @@ Primary references: [Core API](./core.md) and [Lifecycle Hooks](./hooks.md).
 
 ## `resuxjs/node`
 
-```ts
-import { createResuxNodeHandler } from 'resuxjs/node'
-```
+Focused production Node request-handler entry point exporting `createResuxNodeHandler()` and `ResuxNodeHandlerOptions`.
 
-Production Node handler/deployment boundary. Read [Deployment](/guide/deployment), [Runtime Internals](./runtime.md), and [Security and Caching](/guide/security-caching).
+Primary reference: [Node Handler API](./node.md). Operational guide: [Deployment](/guide/deployment).
 
 ## `resuxjs/halal`
 
-Halal Core classification/review/runtime-guard subsystem and its related types.
+Halal Core policy, scanner/evaluator, lifecycle enforcement, runtime-content guard, signed reviewed-memory, AI classifier, integrity/report/CLI utilities and their related types.
 
-Primary guide: [Halal Core](/guide/halal-core).
+Primary reference: [Halal Core API](./halal.md). Conceptual/security guide: [Halal Core](/guide/halal-core).
 
 ## `resuxjs/globals`
 
