@@ -26,6 +26,7 @@ export default defineConfig({
     search: { provider: 'local' },
     nav: [
       { text: 'Guide', link: '/guide/framework-tour' },
+      { text: 'Deep Dive', link: '/guide/architecture-deep-dive' },
       { text: 'Components', link: '/components/' },
       { text: 'Media', link: '/media/' },
       { text: 'Reference', link: '/reference/api-index' },
@@ -74,10 +75,21 @@ export default defineConfig({
         ]
       },
       {
+        text: 'Deep Dives',
+        collapsed: false,
+        items: [
+          { text: 'Architecture Deep Dive', link: '/guide/architecture-deep-dive' },
+          { text: 'Request Lifecycle', link: '/guide/request-lifecycle' },
+          { text: 'Resumability Deep Dive', link: '/guide/resumability-deep-dive' },
+          { text: 'Debugging Mental Model', link: '/guide/debugging-mental-model' }
+        ]
+      },
+      {
         text: 'UI Components',
         collapsed: false,
         items: [
           { text: 'Overview', link: '/components/' },
+          { text: 'Component Anatomy', link: '/components/component-anatomy' },
           {
             text: 'Forms and Input',
             collapsed: true,
@@ -204,6 +216,7 @@ export default defineConfig({
           { text: 'Package Exports', link: '/reference/packages' },
           { text: 'Public API Index', link: '/reference/api-index' },
           { text: 'Documentation Coverage', link: '/reference/coverage' },
+          { text: 'Framework Source Map', link: '/reference/source-map' },
           { text: 'Composables and Globals', link: '/reference/composables' },
           { text: 'Reactivity API', link: '/reference/reactivity' },
           { text: 'UI Package API', link: '/reference/ui' },

@@ -1,10 +1,43 @@
 # UI Components
 
-`resuxjs/ui` is Resux's optional Vue UI and motion package. This section is the component catalog; every public component has its own page with its actual props, emitted events, slots, styling hooks, accessibility behavior, and runtime cost.
+`resuxjs/ui` is Resux's optional Vue UI and motion package. This section is the component catalog; every public component has its own page with its actual props, emitted events, slots, styling hooks, accessibility behavior, runtime cost, examples, and current limitations.
 
 ::: warning Vue runtime boundary
 The components exported by `resuxjs/ui` are Vue `defineComponent` components. They belong inside a [Vue island](/guide/vue-islands) or another explicit Vue runtime boundary. They are **not** zero-hydration Resux template primitives. Use normal Resux templates when you do not need Vue-owned state or event handling.
 :::
+
+## Before choosing a component
+
+Read [Component Anatomy](./component-anatomy.md) once before working through the catalog. It explains the repeated model behind these pages:
+
+- why `resuxjs/ui` is a Vue boundary even when a primitive itself is static,
+- how props, native attrs, custom events, slots, and `v-model` are implemented,
+- how to distinguish an accepted string prop from a variant that actually has built-in CSS,
+- what `unstyled` does,
+- how mount animations and reduced motion work,
+- why root/native elements matter for accessibility,
+- how to decide between an `Rx*` component and normal Resux/native HTML.
+
+A component name is **not** a promise of design-system-level behavior. The individual page documents the current source. For example, a component named Modal or Dropdown must not be assumed to include focus trapping or complete keyboard navigation unless the implementation actually provides it.
+
+## How to read each page
+
+The detailed component pages answer the same practical questions wherever they apply:
+
+1. **What does it render?** Root/native element and structure.
+2. **When should I use it?** Including when native Resux HTML is better.
+3. **How do I import it?** `Rx*` plus matching alias.
+4. **What are every prop/default and verified variant?**
+5. **Which events are custom vs native/fallthrough listeners?**
+6. **Which slots exist?**
+7. **Does it keep internal state or support `v-model`?**
+8. **How do built-in classes and `unstyled` work?**
+9. **Which accessibility behaviors exist and which are application-owned?**
+10. **What happens during SSR/browser mount?**
+11. **What does it cost if it creates/requires a Vue boundary?**
+12. **What are the current limitations and common mistakes?**
+
+That standard is intentionally more demanding than a one-line component catalog.
 
 ## Install and enable
 
@@ -47,13 +80,13 @@ Every `Rx*` component has a matching `Resux*` alias that points to the same comp
 
 | Component | Use it for | Notes |
 | --- | --- | --- |
-| [Card](./card.md) | Grouped content | Non-interactive container |
-| [Badge](./badge.md) | Status/category labels | Non-interactive inline content |
+| [Card](./card.md) | Grouped visual content | Non-interactive `<div>` container; choose stronger native semantics when appropriate |
+| [Badge](./badge.md) | Status/category labels | Non-interactive inline content; do not rely on color alone |
 | [Avatar](./avatar.md) | Identity image/fallback initials | Uses a native `<img>` when `src` is provided |
 | [Alert](./alert.md) | Important feedback | Renders `role="alert"`; optional dismiss event |
 | [Skeleton](./skeleton.md) | Visual loading placeholder | Default shimmer does not currently suppress itself for reduced motion |
-| [Divider](./divider.md) | Visual separation | Visual primitive; no automatic separator ARIA role |
-| [Kbd](./kbd.md) | Keyboard key notation | Renders semantic `<kbd>` |
+| [Divider](./divider.md) | Visual separation | No automatic separator ARIA role; built-in vertical style is not implied |
+| [Kbd](./kbd.md) | Keyboard key notation | Renders semantic `<kbd>`; it is not an interactive shortcut system |
 
 ## Disclosure, navigation, and overlays
 
@@ -91,7 +124,9 @@ When `defaultStyles` is enabled, the UI module injects its built-in primitive CS
 <RxButton unstyled class="my-button">Headless styling</RxButton>
 ```
 
-`unstyled` removes Resux-generated component classes; attributes and your own `class` still pass through. `tokens` are stored under public runtime UI configuration, but the current primitive CSS does not automatically translate arbitrary token keys into CSS variables. Treat `defineUiTokens()` as a typed configuration helper, not as proof that every token changes built-in CSS.
+`unstyled` removes Resux-generated component classes; attributes and your own `class` still pass through. For motion primitives, read their pages carefully because `unstyled` also gates their mount animation behavior.
+
+`tokens` are stored under public runtime UI configuration, but the current primitive CSS does not automatically translate arbitrary token keys into CSS variables. Treat `defineUiTokens()` as a typed configuration helper, not as proof that every token changes built-in CSS.
 
 ## SSR, resumability, and hydration
 
@@ -102,7 +137,7 @@ The key distinction is ownership:
 - Non-interactive UI components such as Card, Badge, Divider, Kbd, Skeleton, and Avatar have little client behavior themselves, but using them through a Vue island still incurs that island's Vue runtime cost.
 - Interactive components such as Select, Switch, Popover, Dropdown, Tabs, Accordion, Tooltip, Modal, Input, and Textarea rely on Vue event/state behavior for interaction.
 
-Read [Vue Islands](/guide/vue-islands), [Execution Contexts](/guide/execution-contexts), and [Rendering Lifecycle](/guide/rendering-lifecycle) before using a large Vue-owned UI subtree.
+Read [Vue Islands](/guide/vue-islands), [Execution Contexts](/guide/execution-contexts), [Rendering Lifecycle](/guide/rendering-lifecycle), and [Architecture Deep Dive](/guide/architecture-deep-dive) before using a large Vue-owned UI subtree.
 
 ## Accessibility baseline
 
@@ -128,6 +163,7 @@ See the [UI package reference](/reference/ui) for these APIs.
 
 ## Related
 
+- [Component Anatomy](./component-anatomy.md)
 - [UI and Motion guide](/guide/ui-animations)
 - [Vue Islands](/guide/vue-islands)
 - [Icons](/icons/)
