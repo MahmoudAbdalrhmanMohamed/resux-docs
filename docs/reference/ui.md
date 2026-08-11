@@ -25,7 +25,7 @@ import uiModule, {
 ```ts
 export interface ResuxUiModuleOptions {
   css?: string[]
-  tokens?: Record<string, string>
+  tokens?: Record<string, unknown>
   defaultStyles?: boolean
   animations?: {
     enabled?: boolean
@@ -37,7 +37,7 @@ export interface ResuxUiModuleOptions {
 | Option | Default | Behavior |
 | --- | --- | --- |
 | `css` | `[]` | Calls the module CSS registration hook for each configured path. |
-| `tokens` | `{}` | Stored in public runtime UI configuration. Arbitrary token keys are **not** automatically converted into built-in component CSS variables. |
+| `tokens` | `{}` | Stored in public runtime UI configuration. Arbitrary token keys/values are **not** automatically converted into built-in component CSS variables. |
 | `defaultStyles` | `true` | Injects the built-in `rx-*` primitive stylesheet when enabled. |
 | `animations.enabled` | `true` | Controls injection of the package's animation CSS definitions. |
 | `animations.defaultPreset` | `'fade-up'` | Exposed as runtime animation configuration. |
@@ -67,17 +67,19 @@ export default defineResuxConfig({
 Typed identity helper for token records:
 
 ```ts
-export function defineUiTokens<T extends Record<string, string>>(tokens: T): T
+export function defineUiTokens<T extends Record<string, unknown>>(
+  tokens: T
+): T
 ```
 
 ```ts
 const tokens = defineUiTokens({
   accent: '#03c8bf',
-  surface: '#0f172a'
+  spacingScale: [4, 8, 12, 16]
 })
 ```
 
-The helper returns the same object. It does not generate CSS by itself.
+The helper returns the same object and preserves its inferred record type. It does not generate CSS by itself.
 
 ## `AnimationPreset`
 
@@ -98,7 +100,7 @@ These names have verified keyframes in `useAnimate()`.
 
 ```ts
 export interface AnimateOptions {
-  type?: AnimationPreset
+  type?: AnimationPreset | string
   duration?: number
   delay?: number
   easing?: string
@@ -112,7 +114,9 @@ Defaults used by `useAnimate()`:
 - `duration: 400`
 - `delay: 0`
 - `easing: 'cubic-bezier(0.16, 1, 0.3, 1)'`
-- `fill: 'both'`
+- `fill: 'forwards'`
+
+The type accepts custom strings for compatibility. A string that is not one of the verified presets falls through to the helper's default fade/translate keyframes rather than creating a new named preset automatically.
 
 ## `isReducedMotion()`
 
@@ -128,21 +132,26 @@ Returns `false` outside a browser. In a browser it checks:
 
 Use this for browser-owned motion that should respect the user's reduced-motion preference.
 
-## `useAnimate(element, options)`
+## `useAnimate(target, options)`
 
 ```ts
 export function useAnimate(
-  target: HTMLElement | Element | null,
+  target:
+    | HTMLElement
+    | { value: HTMLElement | null }
+    | null,
   options?: AnimateOptions
 ): Animation | null
 ```
 
+The helper accepts either a direct HTML element or a ref-like object whose `value` is an HTML element. Direct form elements are treated as elements even though they also expose their own `.value` property.
+
 The helper returns `null` when:
 
 - there is no browser `window`;
-- `target` is null;
+- `target` resolves to null;
 - reduced motion is requested;
-- the target does not expose `Element.animate`.
+- the resolved target does not expose `Element.animate`.
 
 Otherwise it invokes the Web Animations API and returns the resulting `Animation`.
 
@@ -167,6 +176,7 @@ The Vue directive:
 - reads either a preset string or options object;
 - uses `IntersectionObserver` when available;
 - starts animation as the element approaches/enters the viewport;
+- defaults its own `fill` behavior to `'both'` unless explicitly configured;
 - disconnects its observer after activation;
 - cancels an active animation and disconnects the observer during unmount cleanup;
 - falls back to immediate animation when `IntersectionObserver` is unavailable.

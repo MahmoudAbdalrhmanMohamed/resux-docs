@@ -14,6 +14,8 @@ import {
   compileVueFile,
   compileVueSource,
   createRouteManifest,
+  resolveFileExtension,
+  fileUrl,
   ResuxCompileError
 } from 'resuxjs/compiler'
 ```
@@ -152,6 +154,26 @@ interface RouteManifestRecord {
   meta?: PageMeta
 }
 ```
+
+## File-path helpers
+
+### `resolveFileExtension()`
+
+```ts
+function resolveFileExtension(filePath: string): string
+```
+
+Returns a path that already has an extension unchanged. For extensionless paths, the compiler checks its supported source extensions in order: `.ts`, `.js`, `.vue`, `.tsx`, `.jsx`, `.mjs`, then `.cjs`. If no supported sibling file is found, the original path is returned.
+
+This helper performs filesystem resolution and therefore belongs in Node/build tooling.
+
+### `fileUrl()`
+
+```ts
+function fileUrl(file: string): string
+```
+
+Converts a filesystem path to a `file:` URL using Node's path-to-file-URL behavior. It is useful for compiler/tooling code that needs an importable file URL.
 
 ## `buildProject()`
 

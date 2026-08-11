@@ -25,6 +25,14 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Checkout framework source
+        uses: actions/checkout@v4
+        with:
+          repository: MahmoudAbdalrhmanMohamed/resux
+          ref: main
+          path: .framework/resux
+          persist-credentials: false
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -33,6 +41,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Check framework documentation parity
+        run: npm run check:framework-parity
 
       - name: Build documentation
         run: npm run build

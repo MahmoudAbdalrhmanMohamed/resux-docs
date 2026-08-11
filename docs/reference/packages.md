@@ -35,6 +35,7 @@ Resux requires a modern Node.js runtime. Check the `engines` field of the instal
 | `resuxjs/fonts` | Font optimization module |
 | `resuxjs/kit` | Module-author utilities and extension types |
 | `resuxjs/core` | Lower-level framework container APIs for advanced tooling |
+| `resuxjs/halal` | Halal Core policy, scanner/evaluator, enforcement, runtime guard, review, AI, integrity, and reporting APIs |
 | `resuxjs/package.json` | Package metadata |
 
 ## Root runtime export
