@@ -8,15 +8,15 @@ This page maps each public `resuxjs` package entry point to the documentation th
 | `resuxjs/runtime` | [Runtime Internals](./runtime.md), [Rendering Lifecycle](/guide/rendering-lifecycle) | Renderer, SSR, templates, composables, payload/client runtime |
 | `resuxjs/reactivity` | [Reactivity API](./reactivity.md), [State and Reactivity](/guide/state) | Refs, proxies, computed, watch/effect, scheduler and types |
 | `resuxjs/compiler` | [Compiler API](./compiler.md), [Template Syntax](/guide/template-syntax) | Compiler entry points, build/result types and SFC limits |
-| `resuxjs/create` | [Getting Started](/guide/getting-started), [CLI](./cli.md) | Project creation/scaffolding |
-| `resuxjs/i18n` | [i18n and Localization](/guide/i18n) | Module config, translation/path/head runtime helpers |
+| `resuxjs/create` | [Project Creation API](./create.md), [CLI](./cli.md) | Programmatic scaffolding, arguments and destructive-target safety |
+| `resuxjs/i18n` | [i18n API](./i18n.md), [i18n and Localization](/guide/i18n) | Module config/types and public translation/path/head helpers |
 | `resuxjs/ui` | [Component catalog](/components/), [UI Package API](./ui.md) | 23 components + aliases + module/motion APIs |
 | `resuxjs/icons` | [Icons](/icons/), [Usage](/icons/usage), [Configuration](/icons/configuration), [Runtime Loading](/icons/runtime) | Registry, SVG component, remote/lazy loading and module config |
 | `resuxjs/fonts` | [Fonts](/fonts/), [Configuration](/fonts/configuration), [Performance](/fonts/performance) | Google Fonts loader/helper and loading strategies |
 | `resuxjs/kit` | [Resux Kit API](./kit.md), [Modules and Route Rules](/guide/modules-route-rules) | Module registration/extension helpers and public input types |
 | `resuxjs/core` | [Core API](./core.md), [Lifecycle Hooks](./hooks.md) | Config resolver, hooks, module container and core app factory |
-| `resuxjs/halal` | [Halal Core](/guide/halal-core) | Integrity/review/runtime-guard subsystem |
-| `resuxjs/node` | [Deployment](/guide/deployment), [Runtime Internals](./runtime.md) | Production Node handler/deployment boundary |
+| `resuxjs/halal` | [Halal Core API](./halal.md), [Halal Core](/guide/halal-core) | Policy, scanner/evaluator, enforcement, runtime guard/review utilities |
+| `resuxjs/node` | [Node Handler API](./node.md), [Deployment](/guide/deployment) | Production Node request-handler boundary and options |
 | `resuxjs/globals` | [TypeScript and Generated Types](/guide/typescript-generated-types) | Generated app-global declarations |
 | `resuxjs/package.json` | [Package Exports](./packages.md) | Package metadata export |
 
@@ -38,7 +38,7 @@ The docs constrain `resuxjs/fonts` to its verified Google Fonts stylesheet-loade
 
 The docs distinguish local registry SVG data from client-side remote fetching, correct module defaults, distinguish module metadata from component props, and separate `resuxjs/icons` from the UI package's placeholder `RxIcon`.
 
-### Low-level public packages
+### Low-level and optional public packages
 
 Focused references now cover:
 
@@ -46,7 +46,11 @@ Focused references now cover:
 - `resuxjs/compiler`: public entry points, result records and environment/compile limits;
 - `resuxjs/kit`: every exported module helper and its input contract;
 - `resuxjs/core`: config constants/resolution, hooks, module contributions and `createResux()`;
-- lifecycle hook names with their exact public payload types and dispatch behavior.
+- lifecycle hook names with their exact public payload types and dispatch behavior;
+- `resuxjs/create`: programmatic creator and safe destructive-target validation;
+- `resuxjs/node`: production Node handler signature/options and guard/build requirements;
+- `resuxjs/i18n`: verified entry-point types/composables/head helper without claiming internal shared helpers are exported;
+- `resuxjs/halal`: programmatic policy, scanner/evaluator, enforcement, runtime guard, serialization/review and AI/integrity surfaces.
 
 ## Coverage maintenance rule
 
