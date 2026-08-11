@@ -1,12 +1,12 @@
 # UI and Motion (`resuxjs/ui`)
 
-The optional UI package exports a Resux build-time module, design-token helpers, Web Animations API utilities, Vue directives, and Vue runtime components.
+`resuxjs/ui` is Resux's optional Vue UI/motion package. Use this guide for the runtime model and animation APIs; use the [Component catalog](/components/) for per-component contracts.
 
 ::: warning Vue runtime package
-The UI components are implemented with Vue `defineComponent`, `ref`, and `onMounted`. Use them in Vue islands or an explicit Vue/client runtime integration. They are not zero-hydration Resux template primitives.
+The package's components and directives are Vue-owned. Put them inside a [Vue island](./vue-islands.md) or another explicit Vue runtime boundary. Normal Resux components remain resumable and do not become Vue-hydrated just because the optional package exists.
 :::
 
-## Module configuration
+## Module setup
 
 ```ts
 export default defineResuxConfig({
@@ -14,10 +14,7 @@ export default defineResuxConfig({
     ['resuxjs/ui', {
       css: ['/assets/css/ui-overrides.css'],
       defaultStyles: true,
-      tokens: {
-        accent: '#03c8bf',
-        radius: '12px'
-      },
+      tokens: { accent: '#03c8bf' },
       animations: {
         enabled: true,
         defaultPreset: 'fade-up'
@@ -27,22 +24,9 @@ export default defineResuxConfig({
 })
 ```
 
-The module can add CSS and public token/animation configuration. Component imports remain explicit in Vue code.
+`tokens` are public configuration metadata/typed values. The current primitive CSS does not automatically map every token key to CSS variables.
 
-## Tokens
-
-```ts
-import { defineUiTokens } from 'resuxjs/ui'
-
-export const tokens = defineUiTokens({
-  accent: '#03c8bf',
-  surface: '#0f172a'
-})
-```
-
-## Animation helper
-
-Call `useAnimate` after the Vue island has mounted and the template ref contains a browser element.
+## Imperative animation
 
 ```vue
 <script setup lang="ts">
@@ -53,24 +37,15 @@ const element = ref<HTMLElement | null>(null)
 let animation: Animation | null = null
 
 onMounted(() => {
-  if (!element.value) return
-
   animation = useAnimate(element.value, {
     type: 'fade-up',
     duration: 400,
     delay: 100,
-    easing: 'ease-out',
     fill: 'forwards'
   })
-
-  if (!animation) {
-    return
-  }
 })
 
-onBeforeUnmount(() => {
-  animation?.cancel()
-})
+onBeforeUnmount(() => animation?.cancel())
 </script>
 
 <template>
@@ -78,71 +53,45 @@ onBeforeUnmount(() => {
 </template>
 ```
 
-Built-in presets:
+`useAnimate()` returns `null` when animation cannot/should not run, including reduced-motion requests.
 
-- `fade-up`
-- `fade-down`
-- `scale-in`
-- `slide-in-left`
-- `slide-in-right`
-- `pulse-glow`
-- `bounce-in`
+## Viewport-triggered directive
 
-`useAnimate` returns `null` when there is no browser element, Web Animations support is missing, or reduced motion is requested.
-
-## Directive
-
-`vAnime` and `vAnimate` are aliases. They trigger when an element enters the viewport when `IntersectionObserver` is available.
+`vAnime` and `vAnimate` are aliases. This is the package API that uses `IntersectionObserver` where available:
 
 ```vue
 <div v-anime="{ type: 'fade-up', duration: 500 }">Content</div>
 ```
 
-## Components
+It is a Vue directive, not a native Resux template directive.
 
-Both `Rx*` and matching `Resux*` aliases are exported:
+## Motion components
 
-### Forms
+- [`RxMotion`](/components/motion) runs its configured animation after mount.
+- [`RxReveal`](/components/reveal) also runs after mount. **It is not viewport-observed in the current implementation.**
+- [`RxAutoAnimate`](/components/auto-animate) runs a one-time `scale-in` after mount. **It does not observe child/layout changes in the current implementation.**
 
-- `RxButton` / `ResuxButton`
-- `RxInput` / `ResuxInput`
-- `RxTextarea` / `ResuxTextarea`
-- `RxSelect` / `ResuxSelect`
-- `RxDatePicker` / `ResuxDatePicker`
-- `RxSwitch` / `ResuxSwitch`
+These names should not be used to promise behavior the source does not implement.
 
-### Content and feedback
+## Reduced motion
 
-- `RxCard`, `RxBadge`, `RxAvatar`, `RxAlert`
-- `RxSkeleton`, `RxDivider`, `RxKbd`
+`isReducedMotion()` checks `prefers-reduced-motion: reduce` in browsers. `useAnimate`, `RxMotion`, `RxReveal`, and `RxAutoAnimate` skip their Web Animations path when reduced motion is requested.
 
-### Overlays and navigation
+The default CSS skeleton shimmer is separate CSS animation and currently needs an application-level reduced-motion override; see [Skeleton](/components/skeleton).
 
-- `RxModal`, `RxDropdown`, `RxPopover`, `RxTooltip`
-- `RxAccordion`, `RxTabs`
+## Component catalog
 
-### Motion and icons
+The package currently exports 23 `Rx*` components plus matching `Resux*` aliases. Browse the [component catalog](/components/) for forms, feedback, overlays, navigation, motion, and accessibility/runtime notes.
 
-- `RxMotion`, `RxReveal`, `RxAutoAnimate`, `RxIcon`
+## When to choose a Vue UI component
 
-## Example island
+Use the optional Vue package when the widget naturally needs Vue-owned local state/composition or you are integrating a Vue component tree. Prefer normal Resux HTML/templates when native/resumable behavior is enough.
 
-```vue
-<script setup lang="ts">
-import { RxButton, RxModal } from 'resuxjs/ui'
-import { ref } from 'vue'
+That keeps Vue an explicit boundary rather than turning the whole framework into Vue hydration.
 
-const open = ref(false)
-</script>
+## Related
 
-<template>
-  <RxButton @click="open = true">Open</RxButton>
-  <RxModal v-if="open" @close="open = false">
-    Modal content
-  </RxModal>
-</template>
-```
-
-## Accessibility
-
-The primitives provide structure and defaults, but application code must still test keyboard navigation, labels, focus management, contrast, reduced motion, and screen-reader behavior for the exact composition used.
+- [Component catalog](/components/)
+- [UI package API](/reference/ui)
+- [Vue Islands](./vue-islands.md)
+- [Execution Contexts](./execution-contexts.md)
