@@ -62,4 +62,6 @@ When a new public package export or symbol is added:
 4. add conceptual/reference cross-links;
 5. update this map when a package entry point or ownership area changes.
 
-A future CI improvement should generate an export manifest and fail when a new public symbol has no documentation mapping. Until that check exists, this page is a review aid—not a claim of machine-enforced completeness.
+Docs CI now checks the current `resux` `package.json` export map against both this coverage map and [Package Exports](./packages.md). Adding a new public package subpath without documenting it fails the parity check.
+
+That CI check is intentionally package-level. Exact public symbol signatures, defaults, implementation semantics, and newly exported symbols inside an existing subpath still require source-aware tests and review. A future richer export-manifest check can extend machine enforcement to that symbol-level contract.
