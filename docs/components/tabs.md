@@ -54,7 +54,7 @@ No slots are declared. Panel content is application-owned.
 
 ## Styling
 
-Styled markup uses `rx-tabs` and `rx-tab`; selected buttons receive `active`.
+Styled markup uses `rx-tabs` on the root, `rx-tabs-header` on the button container, and `rx-tab-btn` on each button. The selected button additionally receives `active`.
 
 ## Accessibility
 
