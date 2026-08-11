@@ -15,6 +15,24 @@ For an icon name:
 7. Cache successful data and render the resulting paths.
 8. On failure, keep/fall back safely rather than injecting arbitrary raw remote markup directly as the component template.
 
+## `normalizeIconApiProvider()`
+
+The provider normalizer is also public:
+
+```ts
+import { normalizeIconApiProvider } from 'resuxjs/icons'
+
+const provider = normalizeIconApiProvider(
+  'https://api.iconify.design/'
+)
+```
+
+```ts
+function normalizeIconApiProvider(value: unknown): string
+```
+
+It trims/normalizes configured provider input, removes unnecessary trailing slashes, rejects unsafe or malformed provider forms, and falls back to Resux's default Iconify API provider when no usable provider is supplied. The icon component, module setup, and `fetchIconifyIcon()` all use the same normalization path so cache/request identity stays consistent.
+
 ## `fetchIconifyIcon()`
 
 The package exports the remote helper used by the component:
