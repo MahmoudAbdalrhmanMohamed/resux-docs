@@ -38,10 +38,15 @@ function routeForFile(file) {
 const markdownFiles = collectMarkdownFiles(docsRoot)
 const failures = []
 
+if (!configSource.includes('sidebar: globalSidebar')) {
+  failures.push({
+    file: 'docs/.vitepress/config.ts',
+    route: 'themeConfig.sidebar must use globalSidebar so every section is visible from every page'
+  })
+}
+
 for (const file of markdownFiles) {
   const route = routeForFile(file)
-  if (route === '/') continue
-
   const singleQuoted = `'${route}'`
   const doubleQuoted = `"${route}"`
 
@@ -54,12 +59,12 @@ for (const file of markdownFiles) {
 }
 
 if (failures.length > 0) {
-  console.error('Documentation pages missing from VitePress navigation:')
+  console.error('Documentation pages missing from the global VitePress navigation:')
   for (const failure of failures) {
     console.error(`  - ${failure.file} -> ${failure.route}`)
   }
-  console.error('Add each route to docs/.vitepress/config.ts so every page remains discoverable.')
+  console.error('Keep themeConfig.sidebar global and add every docs route to docs/.vitepress/config.ts.')
   process.exit(1)
 }
 
-console.log(`Documentation navigation coverage OK: ${markdownFiles.length - 1} non-home pages are linked.`)
+console.log(`Global documentation sidebar coverage OK: all ${markdownFiles.length} Markdown pages are linked.`)
