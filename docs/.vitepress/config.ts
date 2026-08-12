@@ -2,6 +2,7 @@ import { defineConfig } from 'vitepress'
 
 const startHere = [
   { text: 'What is Resux?', link: '/guide/what-is-resux' },
+  { text: 'How Resux Uses Vue', link: '/guide/how-resux-uses-vue' },
   { text: 'Getting Started', link: '/guide/getting-started' },
   { text: 'Framework Tour', link: '/guide/framework-tour' },
   { text: 'Core Concepts', link: '/guide/core-concepts' },
@@ -40,7 +41,10 @@ const platformGuide = [
   { text: 'Integration Cookbook', link: '/guide/integration-cookbook' },
   { text: 'CSS and Tailwind', link: '/guide/css-tailwind' },
   { text: 'TypeScript and Generated Types', link: '/guide/typescript-generated-types' },
-  { text: 'Testing and Quality', link: '/guide/testing-quality' }
+  { text: 'Testing and Quality', link: '/guide/testing-quality' },
+  { text: 'Media Guide', link: '/guide/media' },
+  { text: 'Fonts Guide', link: '/guide/fonts' },
+  { text: 'Icons Guide', link: '/guide/icons' }
 ]
 
 const operationsGuide = [
@@ -110,6 +114,31 @@ const apiReference = [
   { text: 'File Conventions', link: '/reference/file-conventions' }
 ]
 
+const examplePages = [
+  { text: 'Overview', link: '/examples/' },
+  { text: 'Counter', link: '/examples/counter' },
+  { text: 'State and Resumable Handlers', link: '/examples/state-resumability' },
+  { text: 'Forms and v-model', link: '/examples/forms' },
+  { text: 'Blog Routes', link: '/examples/blog' },
+  { text: 'API and Fetch', link: '/examples/api-and-fetch' },
+  { text: 'Auth Middleware', link: '/examples/auth-middleware' },
+  { text: 'Error Handling', link: '/examples/errors' },
+  { text: 'Device Detection', link: '/examples/device-detection' },
+  { text: 'Vue Island', link: '/examples/vue-island' },
+  { text: 'Performance Measurements', link: '/examples/performance' },
+  { text: 'Progressive Package', link: '/examples/progressive-package' },
+  { text: 'Package Integrations', link: '/examples/package-integrations' },
+  { text: 'Media Optimization', link: '/examples/media-optimization' },
+  { text: 'Media Placeholders and Picture', link: '/examples/media-placeholders' },
+  { text: 'Docker Deployment', link: '/examples/docker' }
+]
+
+const projectPages = [
+  { text: 'All Documentation', link: '/all-pages' },
+  { text: 'Contributing to Docs', link: '/community/contributing' },
+  { text: 'Brand System', link: '/brand' }
+]
+
 export default defineConfig({
   title: 'Resux',
   description: 'Professional, source-aligned documentation for the Resux resumable web framework.',
@@ -147,6 +176,7 @@ export default defineConfig({
           { text: 'Getting Started', link: '/guide/getting-started' },
           { text: 'Framework Tour', link: '/guide/framework-tour' },
           { text: 'Core Concepts', link: '/guide/core-concepts' },
+          { text: 'How Resux Uses Vue', link: '/guide/how-resux-uses-vue' },
           { text: 'Architecture', link: '/guide/architecture-deep-dive' },
           { text: 'Resumability', link: '/guide/resumability-deep-dive' }
         ]
@@ -162,7 +192,8 @@ export default defineConfig({
         ]
       },
       { text: 'Reference', link: '/reference/api-index' },
-      { text: 'Examples', link: '/examples/counter' },
+      { text: 'Examples', link: '/examples/' },
+      { text: 'All Docs', link: '/all-pages' },
       {
         text: 'Ecosystem',
         items: [
@@ -213,14 +244,22 @@ export default defineConfig({
             { text: 'Images', link: '/media/images' },
             { text: 'Responsive Images', link: '/media/responsive-images' },
             { text: 'Image Optimization', link: '/media/optimization' },
-            { text: 'Video', link: '/media/video' }
+            { text: 'Video', link: '/media/video' },
+            { text: 'Original Media Guide', link: '/guide/media' }
+          ]
+        },
+        {
+          text: 'Examples',
+          collapsed: false,
+          items: [
+            { text: 'Media Optimization', link: '/examples/media-optimization' },
+            { text: 'Placeholders and Picture', link: '/examples/media-placeholders' }
           ]
         },
         {
           text: 'Related',
           collapsed: true,
           items: [
-            { text: 'Media Example', link: '/examples/media-optimization' },
             { text: 'Deployment', link: '/guide/deployment' },
             { text: 'Security and Caching', link: '/guide/security-caching' }
           ]
@@ -233,7 +272,8 @@ export default defineConfig({
           items: [
             { text: 'Overview', link: '/fonts/' },
             { text: 'Configuration', link: '/fonts/configuration' },
-            { text: 'Performance and CSP', link: '/fonts/performance' }
+            { text: 'Performance and CSP', link: '/fonts/performance' },
+            { text: 'Original Fonts Guide', link: '/guide/fonts' }
           ]
         },
         {
@@ -253,7 +293,8 @@ export default defineConfig({
             { text: 'Overview', link: '/icons/' },
             { text: 'Usage and Registry', link: '/icons/usage' },
             { text: 'Configuration', link: '/icons/configuration' },
-            { text: 'Runtime Loading', link: '/icons/runtime' }
+            { text: 'Runtime Loading', link: '/icons/runtime' },
+            { text: 'Original Icons Guide', link: '/guide/icons' }
           ]
         },
         {
@@ -279,29 +320,24 @@ export default defineConfig({
         }
       ],
       '/examples/': [
+        { text: 'Examples', collapsed: false, items: examplePages },
         {
-          text: 'Examples',
+          text: 'Lab',
           collapsed: false,
           items: [
-            { text: 'Counter', link: '/examples/counter' },
-            { text: 'Blog Routes', link: '/examples/blog' },
-            { text: 'API and Fetch', link: '/examples/api-and-fetch' },
-            { text: 'Auth Middleware', link: '/examples/auth-middleware' },
-            { text: 'Progressive Package', link: '/examples/progressive-package' },
-            { text: 'Media Optimization', link: '/examples/media-optimization' },
-            { text: 'Docker Deployment', link: '/examples/docker' }
+            { text: 'Live Resux Lab', link: 'https://resux-lab.vercel.app/' },
+            { text: 'Lab Source', link: 'https://github.com/MahmoudAbdalrhmanMohamed/resux-lab' }
           ]
         }
       ],
       '/community/': [
-        {
-          text: 'Project',
-          collapsed: false,
-          items: [
-            { text: 'Contributing to Docs', link: '/community/contributing' },
-            { text: 'Brand System', link: '/brand' }
-          ]
-        }
+        { text: 'Project', collapsed: false, items: projectPages }
+      ],
+      '/brand': [
+        { text: 'Project', collapsed: false, items: projectPages }
+      ],
+      '/all-pages': [
+        { text: 'Documentation Map', collapsed: false, items: projectPages }
       ]
     },
     socialLinks: [

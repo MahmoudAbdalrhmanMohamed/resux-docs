@@ -7,6 +7,7 @@
     "build": "vitepress build docs",
     "preview": "vitepress preview docs",
     "check:links": "vitepress build docs",
+    "check:navigation": "node scripts/check-doc-navigation.mjs",
     "check:framework-parity": "node scripts/check-framework-parity.mjs .framework/resux"
   },
   "devDependencies": {
