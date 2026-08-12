@@ -1,0 +1,30 @@
+name: Framework branch docs parity
+
+on:
+  push:
+    branches:
+      - agent/i18n-router-runtime-docs
+    paths:
+      - .github/workflows/framework-branch-parity.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  parity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: MahmoudAbdalrhmanMohamed/resux
+          ref: agent/i18n-router-runtime-hardening
+          path: .framework/resux
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - run: npm ci
+      - run: npm run check:framework-parity
+      - run: npm run build
