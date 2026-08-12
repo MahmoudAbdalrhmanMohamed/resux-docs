@@ -1,6 +1,8 @@
 import { defineConfig } from 'vitepress'
 
 const startHere = [
+  { text: 'Documentation Home', link: '/' },
+  { text: 'All Documentation', link: '/all-pages' },
   { text: 'What is Resux?', link: '/guide/what-is-resux' },
   { text: 'How Resux Uses Vue', link: '/guide/how-resux-uses-vue' },
   { text: 'Getting Started', link: '/guide/getting-started' },
@@ -59,39 +61,53 @@ const operationsGuide = [
   { text: 'Troubleshooting', link: '/guide/troubleshooting' }
 ]
 
-const componentForms = [
+const componentPages = [
+  { text: 'Overview', link: '/components/' },
+  { text: 'Component Anatomy', link: '/components/component-anatomy' },
   { text: 'Button', link: '/components/button' },
   { text: 'Input', link: '/components/input' },
   { text: 'Textarea', link: '/components/textarea' },
   { text: 'Select', link: '/components/select' },
   { text: 'DatePicker', link: '/components/date-picker' },
-  { text: 'Switch', link: '/components/switch' }
-]
-
-const componentContent = [
+  { text: 'Switch', link: '/components/switch' },
   { text: 'Card', link: '/components/card' },
   { text: 'Badge', link: '/components/badge' },
   { text: 'Avatar', link: '/components/avatar' },
   { text: 'Alert', link: '/components/alert' },
   { text: 'Skeleton', link: '/components/skeleton' },
   { text: 'Divider', link: '/components/divider' },
-  { text: 'Kbd', link: '/components/kbd' }
-]
-
-const componentOverlays = [
+  { text: 'Kbd', link: '/components/kbd' },
   { text: 'Accordion', link: '/components/accordion' },
   { text: 'Tabs', link: '/components/tabs' },
   { text: 'Popover', link: '/components/popover' },
   { text: 'Dropdown', link: '/components/dropdown' },
   { text: 'Tooltip', link: '/components/tooltip' },
-  { text: 'Modal', link: '/components/modal' }
-]
-
-const componentMotion = [
+  { text: 'Modal', link: '/components/modal' },
   { text: 'Motion', link: '/components/motion' },
   { text: 'Reveal', link: '/components/reveal' },
   { text: 'AutoAnimate', link: '/components/auto-animate' },
   { text: 'UI Icon', link: '/components/icon' }
+]
+
+const mediaPages = [
+  { text: 'Overview', link: '/media/' },
+  { text: 'Images', link: '/media/images' },
+  { text: 'Responsive Images', link: '/media/responsive-images' },
+  { text: 'Image Optimization', link: '/media/optimization' },
+  { text: 'Video', link: '/media/video' }
+]
+
+const fontPages = [
+  { text: 'Overview', link: '/fonts/' },
+  { text: 'Configuration', link: '/fonts/configuration' },
+  { text: 'Performance and CSP', link: '/fonts/performance' }
+]
+
+const iconPages = [
+  { text: 'Overview', link: '/icons/' },
+  { text: 'Usage and Registry', link: '/icons/usage' },
+  { text: 'Configuration', link: '/icons/configuration' },
+  { text: 'Runtime Loading', link: '/icons/runtime' }
 ]
 
 const apiReference = [
@@ -114,6 +130,13 @@ const apiReference = [
   { text: 'File Conventions', link: '/reference/file-conventions' }
 ]
 
+const referenceProjectPages = [
+  { text: 'Documentation Coverage', link: '/reference/coverage' },
+  { text: 'Framework Source Map', link: '/reference/source-map' },
+  { text: 'Current Limits', link: '/reference/limits' },
+  { text: 'Release and Publishing', link: '/reference/release' }
+]
+
 const examplePages = [
   { text: 'Overview', link: '/examples/' },
   { text: 'Counter', link: '/examples/counter' },
@@ -134,9 +157,32 @@ const examplePages = [
 ]
 
 const projectPages = [
-  { text: 'All Documentation', link: '/all-pages' },
   { text: 'Contributing to Docs', link: '/community/contributing' },
   { text: 'Brand System', link: '/brand' }
+]
+
+const globalSidebar = [
+  { text: 'Start Here', collapsed: false, items: startHere },
+  { text: 'Build an Application', collapsed: false, items: applicationGuide },
+  { text: 'Architecture and Runtime', collapsed: false, items: architectureGuide },
+  { text: 'Platform and Extensions', collapsed: false, items: platformGuide },
+  { text: 'Advanced and Operations', collapsed: false, items: operationsGuide },
+  { text: 'UI Components', collapsed: false, items: componentPages },
+  { text: 'Images and Media', collapsed: false, items: mediaPages },
+  { text: 'Fonts', collapsed: false, items: fontPages },
+  { text: 'Icons', collapsed: false, items: iconPages },
+  { text: 'API Reference', collapsed: false, items: apiReference },
+  { text: 'Reference and Project Status', collapsed: false, items: referenceProjectPages },
+  { text: 'Examples', collapsed: false, items: examplePages },
+  { text: 'Project', collapsed: false, items: projectPages },
+  {
+    text: 'Resux Lab',
+    collapsed: false,
+    items: [
+      { text: 'Live Resux Lab', link: 'https://resux-lab.vercel.app/' },
+      { text: 'Lab Source', link: 'https://github.com/MahmoudAbdalrhmanMohamed/resux-lab' }
+    ]
+  }
 ]
 
 export default defineConfig({
@@ -204,142 +250,7 @@ export default defineConfig({
         ]
       }
     ],
-    sidebar: {
-      '/guide/': [
-        { text: 'Start Here', collapsed: false, items: startHere },
-        { text: 'Build an Application', collapsed: false, items: applicationGuide },
-        { text: 'Architecture and Runtime', collapsed: true, items: architectureGuide },
-        { text: 'Platform and Extensions', collapsed: true, items: platformGuide },
-        { text: 'Advanced and Operations', collapsed: true, items: operationsGuide }
-      ],
-      '/components/': [
-        {
-          text: 'UI Components',
-          collapsed: false,
-          items: [
-            { text: 'Overview', link: '/components/' },
-            { text: 'Component Anatomy', link: '/components/component-anatomy' }
-          ]
-        },
-        { text: 'Forms and Input', collapsed: false, items: componentForms },
-        { text: 'Content and Feedback', collapsed: true, items: componentContent },
-        { text: 'Disclosure and Overlays', collapsed: true, items: componentOverlays },
-        { text: 'Motion and Utility', collapsed: true, items: componentMotion },
-        {
-          text: 'Related',
-          collapsed: true,
-          items: [
-            { text: 'UI Package API', link: '/reference/ui' },
-            { text: 'UI and Motion Guide', link: '/guide/ui-animations' },
-            { text: 'Vue Islands', link: '/guide/vue-islands' }
-          ]
-        }
-      ],
-      '/media/': [
-        {
-          text: 'Images and Media',
-          collapsed: false,
-          items: [
-            { text: 'Overview', link: '/media/' },
-            { text: 'Images', link: '/media/images' },
-            { text: 'Responsive Images', link: '/media/responsive-images' },
-            { text: 'Image Optimization', link: '/media/optimization' },
-            { text: 'Video', link: '/media/video' },
-            { text: 'Original Media Guide', link: '/guide/media' }
-          ]
-        },
-        {
-          text: 'Examples',
-          collapsed: false,
-          items: [
-            { text: 'Media Optimization', link: '/examples/media-optimization' },
-            { text: 'Placeholders and Picture', link: '/examples/media-placeholders' }
-          ]
-        },
-        {
-          text: 'Related',
-          collapsed: true,
-          items: [
-            { text: 'Deployment', link: '/guide/deployment' },
-            { text: 'Security and Caching', link: '/guide/security-caching' }
-          ]
-        }
-      ],
-      '/fonts/': [
-        {
-          text: 'Fonts',
-          collapsed: false,
-          items: [
-            { text: 'Overview', link: '/fonts/' },
-            { text: 'Configuration', link: '/fonts/configuration' },
-            { text: 'Performance and CSP', link: '/fonts/performance' },
-            { text: 'Original Fonts Guide', link: '/guide/fonts' }
-          ]
-        },
-        {
-          text: 'Related',
-          collapsed: true,
-          items: [
-            { text: 'CSS and Tailwind', link: '/guide/css-tailwind' },
-            { text: 'Performance', link: '/guide/security-caching' }
-          ]
-        }
-      ],
-      '/icons/': [
-        {
-          text: 'Icons',
-          collapsed: false,
-          items: [
-            { text: 'Overview', link: '/icons/' },
-            { text: 'Usage and Registry', link: '/icons/usage' },
-            { text: 'Configuration', link: '/icons/configuration' },
-            { text: 'Runtime Loading', link: '/icons/runtime' },
-            { text: 'Original Icons Guide', link: '/guide/icons' }
-          ]
-        },
-        {
-          text: 'Related',
-          collapsed: true,
-          items: [
-            { text: 'UI Icon Primitive', link: '/components/icon' },
-            { text: 'UI Components', link: '/components/' }
-          ]
-        }
-      ],
-      '/reference/': [
-        { text: 'API Reference', collapsed: false, items: apiReference },
-        {
-          text: 'Implementation and Coverage',
-          collapsed: true,
-          items: [
-            { text: 'Documentation Coverage', link: '/reference/coverage' },
-            { text: 'Framework Source Map', link: '/reference/source-map' },
-            { text: 'Current Limits', link: '/reference/limits' },
-            { text: 'Release and Publishing', link: '/reference/release' }
-          ]
-        }
-      ],
-      '/examples/': [
-        { text: 'Examples', collapsed: false, items: examplePages },
-        {
-          text: 'Lab',
-          collapsed: false,
-          items: [
-            { text: 'Live Resux Lab', link: 'https://resux-lab.vercel.app/' },
-            { text: 'Lab Source', link: 'https://github.com/MahmoudAbdalrhmanMohamed/resux-lab' }
-          ]
-        }
-      ],
-      '/community/': [
-        { text: 'Project', collapsed: false, items: projectPages }
-      ],
-      '/brand': [
-        { text: 'Project', collapsed: false, items: projectPages }
-      ],
-      '/all-pages': [
-        { text: 'Documentation Map', collapsed: false, items: projectPages }
-      ]
-    },
+    sidebar: globalSidebar,
     socialLinks: [
       { icon: 'github', link: 'https://github.com/MahmoudAbdalrhmanMohamed/resux' }
     ],
