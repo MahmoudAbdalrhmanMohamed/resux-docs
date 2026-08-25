@@ -135,6 +135,22 @@ Generated image cache metadata can record the transform key, creation/expiry tim
 
 Generated caches are build/runtime artifacts; do not commit them unless your deployment process explicitly treats them as deployable artifacts.
 
+### Serverless and read-only deployments
+
+Do not design a production image cache around writing into the deployed application directory. Vercel Functions and similar stateless/serverless runtimes may expose application files from a read-only deployment filesystem, so a request-time transform must not depend on creating `public/_resux/generated/**` inside that deployment.
+
+On stateless Node deployments, Resux keeps the generated/hash URL contract but performs the transform through the stateless image endpoint and returns the bytes directly. The requested cache TTL is expressed through browser/shared-cache headers so the CDN can persist the public response without requiring a writable application directory.
+
+On local development or a long-running Node server with a writable project directory, generated-media disk caching can still be used as a local/runtime optimization.
+
+This distinction is intentional:
+
+- **local / persistent Node:** disk cache may reduce repeated transform work;
+- **serverless / stateless Node:** transform response + CDN cache, no deployment-directory writes;
+- **external image provider/CDN:** follow that provider's cache contract instead of Resux disk-cache behavior.
+
+For Vercel, prefer CDN caching for public transformed responses rather than `/var/task` filesystem writes. A cached transform should remain valid for the TTL requested by `cache`; it should not silently become a one-year browser cache merely because the stateless transform endpoint is used internally.
+
 ## Remote-source security
 
 `/__resux/image` can cause server-side network access for remote inputs. This is a security boundary, not just a performance feature.
@@ -160,7 +176,8 @@ The framework's URL builder does not replace infrastructure-level SSRF controls.
 - Keep LCP images eager/high priority; lazy-load below-the-fold media.
 - Cache immutable transformations for long periods when source versioning makes that safe.
 - Avoid transforming the same source into excessive near-identical widths.
-- Put public immutable transformed output behind a CDN where appropriate.
+- Put public transformed output behind a CDN where appropriate.
+- On serverless hosts, prefer CDN response caching over request-time writes to the deployed application filesystem.
 
 ## Related
 
