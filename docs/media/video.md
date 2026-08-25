@@ -122,6 +122,24 @@ Do not make essential information depend on autoplay succeeding. Respect user pr
 
 Native `preload` is a hint, not a guaranteed browser command. Common values are `none`, `metadata`, and `auto`. For videos that are not immediately played, `metadata` or `none` often reduces competition for initial bandwidth.
 
+For a video-heavy page, default below-the-fold examples to `lazy`/`visible` plus `preload="metadata"` or `preload="none"`. Reserve eager/priority/preload-link behavior for the small number of videos that are genuinely critical to the initial viewport.
+
+## Direct static delivery, ranges, and CDN performance
+
+If a video does **not** need a Resux/FFmpeg transform, prefer a direct static/object-storage/CDN URL such as `/media/demo.mp4` instead of routing the bytes through `/__resux/video`.
+
+That keeps the browser and hosting platform in control of normal video delivery behavior:
+
+- byte/range requests can be served by the static/CDN layer;
+- seeking does not require the application function to buffer the whole file;
+- repeated views can be cached at the edge;
+- large MP4/WebM payloads do not consume serverless function memory just to pass through unchanged bytes;
+- the page can use `preload="metadata"` without forcing a full application-proxy transfer.
+
+Use `/__resux/video` or a generated-video transform URL when you actually need server-side format/quality transformation. Cached generated video transforms on stateless/serverless Node deployments follow the same rule as generated images: return transformed bytes directly and let browser/CDN cache headers provide persistence rather than writing into the deployed application `public` directory.
+
+For unversioned static filenames that may be replaced, use a bounded cache lifetime rather than `immutable`. If filenames are content-hashed/versioned, long immutable caching is appropriate.
+
 ## Captions and subtitles
 
 The safest baseline is native `<track>` content inside the video composition when the template API allows child markup for your case:
