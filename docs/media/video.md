@@ -122,9 +122,11 @@ Do not make essential information depend on autoplay succeeding. Respect user pr
 
 ## Preload
 
-Native `preload` is a hint, not a guaranteed browser command. Common values are `none`, `metadata`, and `auto`. For videos that are not immediately played, `metadata` or `none` often reduces competition for initial bandwidth.
+Native `preload` is a hint, not a guaranteed browser command. Common values are `none`, `metadata`, and `auto`.
 
-For below-the-fold lazy/visible video, avoid `preload="auto"` unless you intentionally want the media payload to compete for early bandwidth. `metadata` is a better default when duration/dimensions are useful before playback; `none` is the lowest-bandwidth choice.
+For videos that are not immediately played, `preload="metadata"` can reduce the initial transfer compared with `auto`, but it can still fetch enough of the resource to compete for bandwidth and connections with critical page assets. Use `preload="none"` when you want to avoid an eager media fetch until playback/loading is requested.
+
+For below-the-fold lazy/visible video, avoid `preload="auto"` unless you intentionally want the media payload to compete for early bandwidth. `metadata` is a useful middle ground when duration/dimensions are valuable before playback; `none` is the lowest-bandwidth choice.
 
 ## Serverless generated-video caching
 
@@ -146,7 +148,7 @@ For a cached generated video, successful serverless responses include public/sha
 />
 ```
 
-For static source files that do not need transformation, serve them directly from `public/` or object/CDN storage. Do not route an unchanged MP4 through the transform endpoint: direct static delivery is cheaper and avoids unnecessary function work.
+For static source files that do not need transformation, serve them directly from `public/` or object/CDN storage. Do not route an unchanged MP4 through the transform endpoint: direct static delivery is cheaper, keeps byte/range requests and seeking in the hosting/CDN layer, improves edge-cache reuse, and avoids making an application function buffer or proxy unchanged video bytes.
 
 ## Captions and subtitles
 
