@@ -135,6 +135,18 @@ Generated image cache metadata can record the transform key, creation/expiry tim
 
 Generated caches are build/runtime artifacts; do not commit them unless your deployment process explicitly treats them as deployable artifacts.
 
+## Stateless serverless cache behavior
+
+Starting with Resux `0.3.10`, cached generated image and video URLs are safe on stateless serverless runtimes such as Vercel, AWS Lambda, and Netlify-style functions.
+
+A deployed function filesystem must not be treated as a writable persistent media cache. On those runtimes, Resux keeps the public hashed generated-media URL contract but internally routes cached generated requests through the stateless `/__resux/image` or `/__resux/video` transform handler. The requested cache duration is then expressed in browser/shared-cache headers, including provider-specific CDN headers where supported.
+
+For example, `cache="7d"` results in a seven-day public/shared-cache TTL for a successful generated response rather than trying to create a persistent generated file under the deployed application directory.
+
+Do not add app-level scripts that copy, write, or patch generated media into a Vercel function's `public` directory. If serverless generated media fails because of filesystem writes, fix or upgrade the framework runtime instead.
+
+Static, unchanged files are a different case: keep them in `public/` or dedicated object/CDN storage and let the hosting platform serve them directly. Only use the generated transform endpoints when you actually need resizing, reformatting, quality changes, or video transformation.
+
 ## Remote-source security
 
 `/__resux/image` can cause server-side network access for remote inputs. This is a security boundary, not just a performance feature.
@@ -161,6 +173,8 @@ The framework's URL builder does not replace infrastructure-level SSRF controls.
 - Cache immutable transformations for long periods when source versioning makes that safe.
 - Avoid transforming the same source into excessive near-identical widths.
 - Put public immutable transformed output behind a CDN where appropriate.
+- Serve unchanged static images/video directly instead of sending them through a transformation function.
+- On serverless, rely on CDN/shared-cache headers rather than runtime filesystem persistence.
 
 ## Related
 

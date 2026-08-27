@@ -69,6 +69,8 @@ The existing Resux media API supports these documented strategies:
 
 Choose based on whether the video is immediately useful. A below-the-fold explainer should not compete with the page's LCP image, CSS, fonts, and critical JavaScript.
 
+For long pages, prefer `lazy` or `visible` for below-the-fold videos and keep only genuinely above-the-fold/hero media eager. Do not mark an example as “eager” while also enabling lazy loading; that makes performance tests misleading.
+
 ## Controls modes
 
 The documented control modes are:
@@ -121,6 +123,30 @@ Do not make essential information depend on autoplay succeeding. Respect user pr
 ## Preload
 
 Native `preload` is a hint, not a guaranteed browser command. Common values are `none`, `metadata`, and `auto`. For videos that are not immediately played, `metadata` or `none` often reduces competition for initial bandwidth.
+
+For below-the-fold lazy/visible video, avoid `preload="auto"` unless you intentionally want the media payload to compete for early bandwidth. `metadata` is a better default when duration/dimensions are useful before playback; `none` is the lowest-bandwidth choice.
+
+## Serverless generated-video caching
+
+Resux `0.3.10` fixes cached generated video/image delivery on stateless serverless runtimes such as Vercel, AWS Lambda, and Netlify-style functions.
+
+On a long-running local Node server, generated media may use the existing generated-media cache path. On stateless serverless runtimes, the deployed application filesystem is not a writable persistent cache. Resux therefore keeps the public generated-media URL contract but routes cached generated requests through the stateless transform handlers (`/__resux/video` and `/__resux/image`) and lets the browser/CDN cache the result for the requested TTL.
+
+That means applications should **not** add a project-side script that writes generated media into the deployed `public` directory just to make Vercel work. Keep the behavior framework-owned and use a supported Resux release.
+
+For a cached generated video, successful serverless responses include public/shared-cache headers derived from the requested cache duration. Vercel deployments also receive `Vercel-CDN-Cache-Control`, allowing the transform result to be reused at the edge instead of recomputed on every request.
+
+```vue
+<ResuxVideo
+  src="/media/demo.mp4"
+  format="mp4"
+  :quality="80"
+  cache="1d"
+  controls-mode="native"
+/>
+```
+
+For static source files that do not need transformation, serve them directly from `public/` or object/CDN storage. Do not route an unchanged MP4 through the transform endpoint: direct static delivery is cheaper and avoids unnecessary function work.
 
 ## Captions and subtitles
 
