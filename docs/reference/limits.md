@@ -153,7 +153,7 @@ Use the static target only for routes proven to be build-stable.
 - Image transformation requires a working `sharp` installation.
 - Video transformation requires `ffmpeg` on `PATH` or through `RESUX_FFMPEG_PATH`.
 - Remote media proxying must be restricted to avoid SSRF and unexpected bandwidth usage.
-- Runtime-generated caches require writable storage and may not persist on serverless platforms.
+- Persistent runtime-generated **disk** caches require writable storage and are not guaranteed to survive across stateless/serverless instances. On supported serverless deployments, Resux can instead return generated media through `/__resux/image` or `/__resux/video` and rely on browser/CDN cache headers without writing into the deployed application directory. See [Image Optimization](/media/optimization#stateless-serverless-cache-behavior) and [Video](/media/video#serverless-generated-video-caching).
 
 ## Halal Core limitations
 
