@@ -143,14 +143,16 @@ A deployed function filesystem must not be treated as a writable persistent medi
 
 For example, `cache="7d"` results in a seven-day public/shared-cache TTL for a successful generated response rather than trying to create a persistent generated file under the deployed application directory. `cache: true` uses the framework's one-day default cache lifetime; numeric values are seconds, and duration strings such as `30m`, `12h`, `7d`, and `2w` are converted to positive TTLs.
 
-Successful stateless generated-media responses use the requested TTL in the public/shared cache headers:
+Resux emits the requested TTL in these headers for successful stateless generated-media responses:
 
 ```txt
 Cache-Control: public, max-age=<seconds>, s-maxage=<seconds>
+X-Resux-Cache: stateless
 CDN-Cache-Control: public, max-age=<seconds>
 Vercel-CDN-Cache-Control: public, max-age=<seconds>
-X-Resux-Cache: stateless
 ```
+
+`Cache-Control` and `X-Resux-Cache` describe the general Resux response behavior. `CDN-Cache-Control` and `Vercel-CDN-Cache-Control` are provider-specific cache hints and only affect deployments that recognize them; `Vercel-CDN-Cache-Control` is intended for Vercel. Other providers may ignore unsupported CDN-specific headers.
 
 Do not add app-level scripts that copy, write, or patch generated media into a Vercel function's `public` directory. If serverless generated media fails because of filesystem writes, fix or upgrade the framework runtime instead.
 
