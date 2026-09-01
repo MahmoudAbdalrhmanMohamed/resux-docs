@@ -12,6 +12,8 @@ This guide creates a Resux app, explains the generated project, and prepares it 
 node --version
 ```
 
+The current stable framework release is **`resuxjs@0.3.10`**. The commands below use `@latest`, so new installs resolve to the newest stable npm release automatically.
+
 ## Create an application
 
 Use either the full CLI or the create wrapper:
