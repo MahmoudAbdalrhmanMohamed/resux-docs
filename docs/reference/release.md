@@ -1,79 +1,105 @@
 # Release and Publishing
 
-This page documents the framework repository's intended npm release process, not application deployment.
+This page documents the framework repository's npm release process, not application deployment.
 
-## Current stable release
+## Release channels
 
-The current stable framework release is `resuxjs@0.3.10`, tagged as `v0.3.10`.
+Resux uses separate npm channels while the framework is pre-1.0:
 
-Applications should normally install the latest stable release with:
+| Channel | npm tag | Intended use |
+| --- | --- | --- |
+| Stable 0.3 line | `latest` | Existing stable installs |
+| Public beta 0.4 line | `next` | Evaluation, real-world testing, compatibility feedback |
+
+The stable line is currently `resuxjs@0.3.11`. The public-beta line begins with `0.4.0-beta.1`.
+
+Install stable:
 
 ```sh
 npm install resuxjs@latest
 ```
 
+Install public beta:
+
+```sh
+npm install resuxjs@next
+```
+
+Prerelease versions do **not** replace `latest`; the publish workflow maps versions containing a prerelease suffix to `next`.
+
 ## CI versus publishing
 
-Normal pull requests and unrelated `main` pushes run validation without publishing npm packages.
+Normal pull requests and branch pushes run validation only. They do not publish npm packages.
 
-The repository's `npm-publish.yml` workflow also watches release metadata on `main`. When the package version changes and the corresponding version tag is missing, the workflow validates the release, creates the matching `vX.Y.Z` tag, and publishes through npm Trusted Publishing. Existing tag, GitHub Release, and manual-dispatch release paths remain supported.
+The framework's `.github/workflows/npm-publish.yml` workflow runs when a **GitHub Release is published**. The release must point to a tag matching the package version exactly, such as `v0.4.0-beta.1`, and that tagged commit must be reachable from `main`.
 
-Every publish path must verify that the resolved tag matches `package.json` before publishing.
+The workflow validates the release artifact before any publish step.
 
-## Required validation
+## Required release validation
 
-Before publishing:
+The release workflow verifies:
 
-```sh
-npm ci
-npm run typecheck
-npm run build
-npm test
-npm run pack:check
+- package/version metadata alignment;
+- framework and `create-resuxjs` version alignment;
+- the `create-resuxjs` dependency range on `resuxjs`;
+- dependency baseline checks;
+- TypeScript/build output;
+- framework tests;
+- runtime bundle budgets;
+- generated fixtures and templates;
+- package contract and `npm pack` contents;
+- Node, static, Netlify, Vercel, and Cloudflare deployment outputs;
+- npm artifact names before publication.
+
+The normal CI matrix additionally covers supported Node runtimes and Windows/macOS portability.
+
+## Version and tag contract
+
+A release version must be synchronized across:
+
+- root `package.json`;
+- root `package-lock.json`;
+- `packages/create-resuxjs/package.json`;
+- the `create-resuxjs` dependency on `resuxjs`.
+
+Then create a GitHub Release for the exact matching tag:
+
+```txt
+package version: 0.4.0-beta.1
+release tag:     v0.4.0-beta.1
+npm dist-tag:    next
 ```
 
-Package validation should verify native optional bindings, generated declarations, bundled output, templates, and `npm pack --dry-run` contents.
+Stable versions without a prerelease suffix publish under `latest`.
 
-## Version and tag
-
-For a new release, update the package metadata consistently before pushing `main`. The release workflow derives the version tag from `package.json` for an eligible `main` release-metadata push.
-
-A manual/tag-driven release can still use an explicit tag such as:
-
-```sh
-git tag v0.3.10
-git push origin v0.3.10
-```
-
-Use the actual intended version. Never move or reuse a version that has already been published to npm.
+Never move, overwrite, or reuse a version already published to npm.
 
 ## Trusted Publishing
 
-The repository release workflow uses npm Trusted Publishing through GitHub OIDC with provenance rather than a long-lived `NPM_TOKEN`.
+The release workflow uses npm Trusted Publishing through GitHub OIDC and publishes with provenance instead of relying on a long-lived `NPM_TOKEN`.
 
-Configure the npm trusted publisher for every package published by the workflow:
+Trusted Publisher configuration is package-specific. Both `resuxjs` and `create-resuxjs` must be authorized for:
 
-- repository: `MahmoudAbdalrhmanMohamed/resux`
-- workflow: `npm-publish.yml`
-- the correct npm package name
+- repository: `MahmoudAbdalrhmanMohamed/resux`;
+- workflow: `npm-publish.yml`;
+- the matching npm package.
 
-Trusted Publisher configuration is package-specific. Publishing `resuxjs` successfully does not automatically authorize a separate npm package such as `create-resuxjs`.
-
-## One-time passwords
-
-Automation should not attempt interactive OTP publishing. An OTP error indicates the workflow is using token/interactive authentication rather than a correctly configured trusted publisher, or the trusted publisher configuration does not match the workflow and package.
+The workflow intentionally fails if `create-resuxjs` has never been bootstrapped on npm, because Trusted Publishing must be configured against an existing package.
 
 ## Documentation coordination
 
-Framework documentation can describe source behavior before it reaches npm only when the change clearly states the dependency. Merge/release source changes before publishing docs that present them as generally available.
+Living documentation tracks current framework source, but release-specific pages must clearly distinguish source behavior from published package behavior.
+
+When a feature depends on an unreleased framework change, do not present it as available on `latest`. Use the public-beta channel or an explicit version when appropriate.
 
 ## Recovery
 
 If a release fails:
 
-1. inspect the exact workflow job and npm authentication mode,
-2. confirm Trusted Publishing is configured for the specific npm package that failed,
-3. do not reuse or move an already published version,
-4. fix CI/configuration,
-5. create a new patch version when package contents changed,
-6. keep provenance and tag/package versions aligned.
+1. inspect the exact release-validation or publish job;
+2. confirm the tag matches the package version;
+3. confirm the tagged commit is reachable from `main`;
+4. confirm Trusted Publishing is configured for the package that failed;
+5. do not reuse or move a version already published to npm;
+6. fix the source or release configuration and publish a new version when package contents changed;
+7. keep provenance, tags, package metadata, and documentation aligned.
