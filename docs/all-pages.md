@@ -131,6 +131,7 @@ The site navigation and CI are expected to keep every documentation page discove
 - [CLI](/reference/cli)
 - [Configuration](/reference/configuration)
 - [File Conventions](/reference/file-conventions)
+- [Project Status / Public Beta](/reference/status)
 - [Documentation Coverage](/reference/coverage)
 - [Framework Source Map](/reference/source-map)
 - [Current Limits](/reference/limits)

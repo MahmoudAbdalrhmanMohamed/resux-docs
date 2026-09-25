@@ -6,8 +6,14 @@ This page maps each public `resuxjs` package entry point to the documentation th
 | --- | --- | --- |
 | `resuxjs` | [Public API Index](./api-index.md), [Composables and Globals](./composables.md) | Application-facing runtime surface |
 | `resuxjs/runtime` | [Runtime Internals](./runtime.md), [Rendering Lifecycle](/guide/rendering-lifecycle) | Renderer, SSR, templates, composables, payload/client runtime |
+| `resuxjs/runtime/core` | [Runtime Internals](./runtime.md) | Browser enhancement triggers and scheduling |
+| `resuxjs/runtime/router` | [Runtime Internals](./runtime.md), [Routing](/guide/routing) | Lightweight local/external client navigation helpers |
+| `resuxjs/runtime/reactivity` | [Runtime Internals](./runtime.md), [Reactivity API](./reactivity.md) | Runtime-focused re-export of standalone Resux reactivity |
+| `resuxjs/runtime/resume` | [Runtime Internals](./runtime.md), [Resumability Deep Dive](/guide/resumability-deep-dive) | Lazy resumable-handler loading and registry contracts |
+| `resuxjs/runtime/streaming` | [Runtime Internals](./runtime.md), [Rendering Lifecycle](/guide/rendering-lifecycle) | Streaming eligibility and HTML stream helpers |
 | `resuxjs/reactivity` | [Reactivity API](./reactivity.md), [State and Reactivity](/guide/state) | Refs, proxies, computed, watch/effect, scheduler and types |
 | `resuxjs/compiler` | [Compiler API](./compiler.md), [Template Syntax](/guide/template-syntax) | Compiler entry points, build/result types and SFC limits |
+| `resuxjs/build` | [Package Exports](./packages.md), [Compiler API](./compiler.md) | Public build-contract version, logical module identifiers and artifact paths |
 | `resuxjs/create` | [Project Creation API](./create.md), [CLI](./cli.md) | Programmatic scaffolding, arguments and destructive-target safety |
 | `resuxjs/i18n` | [i18n API](./i18n.md), [i18n and Localization](/guide/i18n) | Module config/types and public translation/path/head helpers |
 | `resuxjs/ui` | [Component catalog](/components/), [UI Package API](./ui.md) | 23 components + aliases + module/motion APIs |
@@ -42,6 +48,8 @@ The docs distinguish local registry SVG data from client-side remote fetching, c
 
 Focused references now cover:
 
+- `resuxjs/runtime/core`, `resuxjs/runtime/router`, `resuxjs/runtime/reactivity`, `resuxjs/runtime/resume`, and `resuxjs/runtime/streaming`: focused low-level runtime entry points mapped to the Runtime reference;
+- `resuxjs/build`: the public build-contract identifiers and artifact mapping used by tooling/adapters;
 - `resuxjs/reactivity`: every exported function and public type family;
 - `resuxjs/compiler`: public entry points, result records and environment/compile limits;
 - `resuxjs/kit`: every exported module helper and its input contract;

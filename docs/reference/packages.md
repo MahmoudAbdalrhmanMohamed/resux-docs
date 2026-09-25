@@ -26,8 +26,14 @@ Resux requires a modern Node.js runtime. Check the `engines` field of the instal
 | `resuxjs/node` | Node server adapters such as `createResuxNodeHandler` |
 | `resuxjs/globals` | Type declarations for auto-imported application globals; normally referenced by generated app types |
 | `resuxjs/runtime` | Lower-level SSR/runtime APIs and types |
+| `resuxjs/runtime/core` | Lightweight browser enhancement scheduling primitives |
+| `resuxjs/runtime/router` | Lightweight same-origin client navigation helpers |
+| `resuxjs/runtime/reactivity` | Lightweight runtime entry to the standalone Resux reactivity API |
+| `resuxjs/runtime/resume` | Lazy resumable-handler registry and resume bootstrap helpers |
+| `resuxjs/runtime/streaming` | HTML streaming decisions, iterators, and Web ReadableStream helpers |
 | `resuxjs/reactivity` | Focused Resux-native reactivity APIs |
 | `resuxjs/compiler` | Compiler and project-build APIs for tooling; Node/build-time only |
+| `resuxjs/build` | Stable build-contract module/artifact identifiers for tooling and integrations |
 | `resuxjs/create` | Programmatic application scaffolding |
 | `resuxjs/i18n` | i18n module and localization helpers |
 | `resuxjs/ui` | UI tokens, primitives, motion helpers, and animation support |
@@ -117,6 +123,33 @@ import {
 ```
 
 Most applications do not call these functions directly.
+
+### Focused runtime subpaths
+
+Use focused runtime subpaths when an integration needs one low-level capability without importing the broader runtime entry:
+
+- `resuxjs/runtime/core` — `scheduleBrowserEnhancement()` and browser trigger types.
+- `resuxjs/runtime/router` — `isLocalClientNavigation()`, `normalizeClientPath()`, and `navigateClient()`.
+- `resuxjs/runtime/reactivity` — the standalone Resux reactivity API exposed through a runtime-focused path.
+- `resuxjs/runtime/resume` — resumable-handler registry/loading and resume bootstrap utilities.
+- `resuxjs/runtime/streaming` — response streaming decisions plus HTML async-iterator and `ReadableStream` helpers.
+
+These are advanced/runtime integration APIs. Application code should prefer higher-level framework APIs unless it specifically needs the lower-level contract.
+
+## Build contract export
+
+`resuxjs/build` exposes the public build-artifact contract used by tooling and adapters:
+
+```ts
+import {
+  RESUX_BUILD_CONTRACT_VERSION,
+  RESUX_BUILD_MODULES,
+  createResuxBuildContract,
+  getResuxBuildArtifact
+} from 'resuxjs/build'
+```
+
+It describes stable logical artifacts such as the server/client entries, manifests, routes, styles, resume manifest, and route resources. This is a tooling/build-time surface rather than an application browser entry.
 
 ## Compiler export
 

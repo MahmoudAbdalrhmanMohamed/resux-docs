@@ -131,6 +131,7 @@ const apiReference = [
 ]
 
 const referenceProjectPages = [
+  { text: 'Project Status / Public Beta', link: '/reference/status' },
   { text: 'Documentation Coverage', link: '/reference/coverage' },
   { text: 'Framework Source Map', link: '/reference/source-map' },
   { text: 'Current Limits', link: '/reference/limits' },
@@ -187,7 +188,7 @@ const globalSidebar = [
 
 export default defineConfig({
   title: 'Resux',
-  description: 'Professional, source-aligned documentation for the Resux resumable web framework.',
+  description: 'Professional, source-aligned documentation for the public-beta Resux resumable web framework.',
   base: '/resux-docs/',
   cleanUrls: true,
   lastUpdated: true,
@@ -237,6 +238,7 @@ export default defineConfig({
           { text: 'Deployment', link: '/guide/deployment' }
         ]
       },
+      { text: 'Public Beta', link: '/reference/status' },
       { text: 'Reference', link: '/reference/api-index' },
       { text: 'Examples', link: '/examples/' },
       { text: 'All Docs', link: '/all-pages' },

@@ -1,11 +1,13 @@
 # Resux Documentation Index
 
-Resux is an HTML-first experimental web framework with a custom Vue-like SFC compiler, SSR renderer, serialized resumable state, delegated event runtime, route payload navigation, server APIs, modules, hooks, package modes, first-party media, deployment adapters, optional Vue islands, and a local safety/integrity subsystem.
+Resux is an HTML-first public-beta web framework with a custom Vue-like SFC compiler, SSR renderer, serialized resumable state, delegated event runtime, route payload navigation, server APIs, modules, hooks, package modes, first-party media, deployment adapters, optional Vue islands, and a local safety/integrity subsystem.
 
 Framework source: https://github.com/MahmoudAbdalrhmanMohamed/resux
 Documentation source: https://github.com/MahmoudAbdalrhmanMohamed/resux-docs
 Package: resuxjs
 Node requirement in current source: >=20.19.0
+Release channels: stable 0.3 via npm latest; public beta 0.4 via npm next
+Public-beta milestone: 0.4.0-beta.1
 
 Source code and tests are the documentation source of truth. Do not assume npm latest permanently matches source documentation.
 
@@ -108,10 +110,13 @@ Reference:
 - /reference/hooks
 - /reference/runtime
 - /reference/compiler
+- /reference/status
 - /reference/release
 - /reference/limits
 
 Important facts:
+- Resux 0.4 is public beta; APIs may still change before 1.0.
+- Use npm `next` for public-beta packages and `latest` for the stable 0.3 line.
 - Normal Resux components do not hydrate through Vue.
 - `resuxjs/ui` components and `resuxjs/icons` Icon/ResuxIcon are Vue runtime components; use explicit Vue/client contexts.
 - `ResuxImg`, `ResuxPicture`, and `ResuxVideo` are handled by the Resux renderer and are not `resuxjs/ui` Vue components.

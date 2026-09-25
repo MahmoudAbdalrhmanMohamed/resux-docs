@@ -92,6 +92,20 @@ Advanced APIs include:
 
 The subpath exposes definitions for routes, handlers, middleware results, components, templates, bindings, app injections, package modes/adapters, media config, head/SEO input, errors, async data, device information, and rendering.
 
+## Focused runtime entry points
+
+The package also publishes focused runtime subpaths for integrations that do not need the full `resuxjs/runtime` surface.
+
+| Import | Primary surface |
+| --- | --- |
+| `resuxjs/runtime/core` | Browser enhancement scheduling and trigger types |
+| `resuxjs/runtime/router` | Same-origin navigation classification, URL normalization, and history navigation |
+| `resuxjs/runtime/reactivity` | Runtime-focused re-export of standalone Resux reactivity |
+| `resuxjs/runtime/resume` | Lazy resumable-handler registry/loading and resume bootstrap utilities |
+| `resuxjs/runtime/streaming` | Streaming eligibility, async HTML streaming, buffering, and Web `ReadableStream` creation |
+
+Use these as low-level integration contracts rather than default application imports.
+
 ## Stability
 
 Runtime internals are lower-level than application composables. Generated client source shape and internal URLs may evolve; prefer documented high-level APIs for application code.

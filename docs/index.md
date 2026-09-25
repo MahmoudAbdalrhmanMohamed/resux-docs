@@ -7,7 +7,7 @@ titleTemplate: false
 hero:
   name: Resux
   text: Build for resumability, not hydration.
-  tagline: Source-aligned documentation for the Resux HTML-first framework—covering application development, runtime architecture, UI boundaries, media, fonts, icons, deployment, and every public package surface.
+  tagline: Public-beta, source-aligned documentation for the Resux HTML-first framework—covering application development, runtime architecture, UI boundaries, media, fonts, icons, deployment, and every public package surface.
   image:
     src: /logo.svg
     alt: Resux logo
@@ -18,6 +18,9 @@ hero:
     - theme: alt
       text: Explore the Framework
       link: /guide/framework-tour
+    - theme: alt
+      text: Public Beta Status
+      link: /reference/status
     - theme: alt
       text: API Reference
       link: /reference/api-index
@@ -42,6 +45,25 @@ features:
     title: Source-aligned reference
     details: Public APIs, limits, accessibility behavior, runtime ownership, and source locations are documented explicitly.
 ---
+
+<div class="resux-home-section">
+  <p class="resux-home-eyebrow">Public beta</p>
+  <h2 class="resux-home-title">Resux 0.4 is open for real-world testing.</h2>
+  <p class="resux-home-lead">The 0.4 line is a public beta: use it to evaluate Resux, build non-critical applications, test deployment targets, and report compatibility gaps. APIs can still change before 1.0, so production adoption should include version pinning, upgrade testing, and the current limits review.</p>
+
+  <div class="resux-home-grid">
+    <a class="resux-home-card" href="./reference/status">
+      <span class="resux-card-kicker">Status</span>
+      <strong>Understand the public-beta contract</strong>
+      <span>See release channels, compatibility validation, production guidance, and what still needs broader real-world evidence.</span>
+    </a>
+    <a class="resux-home-card" href="./reference/release">
+      <span class="resux-card-kicker">Release channel</span>
+      <strong>Use stable or beta deliberately</strong>
+      <span>Stable releases use the npm latest tag. Public-beta prereleases use the next tag and do not replace latest.</span>
+    </a>
+  </div>
+</div>
 
 <div class="resux-home-section">
   <p class="resux-home-eyebrow">Start with the right path</p>
@@ -155,8 +177,16 @@ features:
   <p class="resux-home-lead">The current framework source requires Node.js <code>&gt;=20.19.0</code>.</p>
 </div>
 
+Stable channel:
+
 ```sh
 npx create-resuxjs@latest my-app
+```
+
+Public beta:
+
+```sh
+npx create-resuxjs@next my-app
 cd my-app
 npm install
 npm run dev
