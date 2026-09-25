@@ -34,7 +34,7 @@ npx resuxjs@next init my-app
 npx create-resuxjs@next my-app
 ```
 
-The beta is intended for evaluation and real-world testing. Pin versions for production-like testing and review [Project Status](/reference/status) and [Current Limits](/reference/limits) before adopting it for critical workloads.
+The beta is intended for evaluation and real-world testing. Pin versions for production-like testing and review [Project Status](/reference/status) and [Current Limits](/reference/limits) before adopting it for critical workloads. The remaining examples on this page use `@latest`; replace it with `@next` when following the public-beta channel.
 
 Then:
 
