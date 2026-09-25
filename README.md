@@ -2,7 +2,7 @@
 
 **Resux** stands for **Resumability + User Experience (UX)**.
 
-This repository contains the VitePress documentation for the Resux framework. The documentation site is the deep reference; the framework README is an introduction and entry point.
+This repository contains the VitePress documentation for the Resux framework. Resux is currently in **public beta**: suitable for evaluation and real-world testing, while APIs may still change before 1.0. The documentation site is the deep reference; the framework README is an introduction and entry point.
 
 ## Documentation structure
 
@@ -21,7 +21,7 @@ The framework implementation is the source of truth. Documentation must be verif
 
 Do not pin this README to a historical feature branch or old pull request. Date-stamped audit pages may preserve historical evidence, but living documentation should track the current framework implementation.
 
-The [Public API Documentation Coverage](docs/reference/coverage.md) page maps package entry points to their primary documentation and records focused coverage expectations.
+The [Project Status](docs/reference/status.md) page explains the public-beta support level, release channels, and validation matrix. The [Public API Documentation Coverage](docs/reference/coverage.md) page maps package entry points to their primary documentation and records focused coverage expectations.
 
 ## Documentation conventions
 
