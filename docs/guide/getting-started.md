@@ -12,17 +12,29 @@ This guide creates a Resux app, explains the generated project, and prepares it 
 node --version
 ```
 
-The current stable framework release is **`resuxjs@0.3.10`**. The commands below use `@latest`, so new installs resolve to the newest stable npm release automatically.
+The stable npm line is **`resuxjs@0.3.11`** under `latest`. Resux **`0.4.0-beta.1`** begins the public-beta line and is published under `next`, so trying the beta does not replace the stable channel.
 
 ## Create an application
 
-Use either the full CLI or the create wrapper:
+Choose a release channel deliberately.
+
+Stable:
 
 ```sh
 npx resuxjs@latest init my-app
 # or
 npx create-resuxjs@latest my-app
 ```
+
+Public beta:
+
+```sh
+npx resuxjs@next init my-app
+# or
+npx create-resuxjs@next my-app
+```
+
+The beta is intended for evaluation and real-world testing. Pin versions for production-like testing and review [Project Status](/reference/status) and [Current Limits](/reference/limits) before adopting it for critical workloads.
 
 Then:
 
