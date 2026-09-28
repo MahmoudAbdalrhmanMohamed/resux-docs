@@ -7,7 +7,8 @@ Documentation source: https://github.com/MahmoudAbdalrhmanMohamed/resux-docs
 Package: resuxjs
 Node requirement in current source: >=20.19.0
 Release channels: stable 0.3 via npm latest; public beta 0.4 via npm next
-Public-beta milestone: 0.4.0-beta.1
+First public-beta milestone: 0.4.0-beta.1
+Current public beta: 0.4.0-beta.2
 
 Source code and tests are the documentation source of truth. Do not assume npm latest permanently matches source documentation.
 
