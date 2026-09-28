@@ -1,42 +1,49 @@
 # Getting Started
 
-This guide creates a Resux app, explains the generated project, and prepares it for development and production.
+This guide gets a Resux app running, shows you the important generated files, and walks through the basic development workflow.
 
 ## Requirements
 
+You need:
+
 - Node.js `>=20.19.0`
 - npm, pnpm, yarn, or Bun
-- a modern browser for the resumable client runtime
+- a modern browser
+
+Check your Node.js version:
 
 ```sh
 node --version
 ```
 
-The stable npm line is **`resuxjs@0.3.11`** under `latest`. Resux **`0.4.0-beta.1`** begins the public-beta line and is published under `next`, so trying the beta does not replace the stable channel.
+Resux currently has two npm channels:
+
+- `latest` → stable 0.3.x releases
+- `next` → public-beta 0.4.x prereleases
+
+The current public beta is **0.4.0-beta.2**.
 
 ## Create an application
 
-Choose a release channel deliberately.
-
-Stable:
+For the stable channel:
 
 ```sh
-npx resuxjs@latest init my-app
-# or
 npx create-resuxjs@latest my-app
 ```
 
-Public beta:
+For the public beta:
 
 ```sh
-npx resuxjs@next init my-app
-# or
 npx create-resuxjs@next my-app
 ```
 
-The beta is intended for evaluation and real-world testing. Pin versions for production-like testing and review [Project Status](/reference/status) and [Current Limits](/reference/limits) before adopting it for critical workloads. The remaining examples on this page use `@latest`; replace it with `@next` when following the public-beta channel.
+If you want a repeatable beta setup, pin the exact release:
 
-Then:
+```sh
+npx create-resuxjs@0.4.0-beta.2 my-app
+```
+
+Then start the project:
 
 ```sh
 cd my-app
@@ -44,35 +51,45 @@ npm install
 npm run dev
 ```
 
-## Starter templates
+You can also create a project through the main package CLI:
 
 ```sh
-npx create-resuxjs@latest my-app --template default
+npx resuxjs@next init my-app
+```
+
+Before using the beta for an important workload, read [Project Status](/reference/status) and [Current Limits](/reference/limits).
+
+## Choose a starter template
+
+The default template is a good place to begin:
+
+```sh
+npx create-resuxjs@next my-app --template default
 ```
 
 Available templates:
 
-| Template | Intended use |
+| Template | Good for |
 | --- | --- |
-| `minimal` | Smallest app shell and page |
-| `default` | General starter with common conventions |
-| `full` | Broad feature demonstration |
+| `minimal` | The smallest Resux application |
+| `default` | General application development |
+| `full` | Exploring a broader set of framework features |
 | `i18n` | Localized routes and messages |
-| `pwa` | Progressive web app starter files |
-| `media` | Images, pictures, and video examples |
-| `package-compatibility` | Third-party package modes and diagnostics |
-| `dashboard` | Dashboard-oriented structure and UI |
+| `pwa` | Progressive web app setup |
+| `media` | Image, picture, and video examples |
+| `package-compatibility` | Testing third-party packages |
+| `dashboard` | Dashboard-style applications |
 
-## Optional features
+## Add optional features
 
-Features can be selected independently or combined:
+You can generate several optional features together:
 
 ```sh
-npx create-resuxjs@latest my-app \
+npx create-resuxjs@next my-app \
   --features seo,i18n,media,tailwind,server-api,tests
 ```
 
-Supported feature names:
+Supported feature names include:
 
 - `seo`
 - `i18n`
@@ -83,25 +100,25 @@ Supported feature names:
 - `server-api`
 - `tests`
 
-For i18n starters:
+For an i18n starter with hreflang output:
 
 ```sh
-npx create-resuxjs@latest my-app --features i18n --hreflang
+npx create-resuxjs@next my-app --features i18n --hreflang
 ```
 
-## Other create options
+Other useful create options:
 
 ```sh
-npx create-resuxjs@latest my-app --no-install
-npx create-resuxjs@latest my-app --package-manager pnpm
-npx create-resuxjs@latest my-app --yes
+npx create-resuxjs@next my-app --no-install
+npx create-resuxjs@next my-app --package-manager pnpm
+npx create-resuxjs@next my-app --yes
 ```
 
-`--force` empties a non-empty target, but Resux refuses to apply it to protected locations such as the filesystem root, home directory, current working directory, or an ancestor of the working directory.
+`--force` can clear a non-empty target directory, but Resux blocks dangerous locations such as the filesystem root, your home directory, the current working directory, and ancestors of the current working directory.
 
 ## Generated scripts
 
-A generated app contains scripts similar to:
+A generated app includes scripts similar to:
 
 ```json
 {
@@ -117,15 +134,16 @@ A generated app contains scripts similar to:
 }
 ```
 
-Run preparation and validation after changing framework versions or generated conventions:
+After upgrading Resux or changing generated conventions, it is useful to run:
 
 ```sh
 npm run prepare
 npx resux check
-npx resux check --fix
 ```
 
-## Your first page
+Use `npx resux check --fix` when you want Resux to apply supported automatic fixes.
+
+## Create your first page
 
 Create `pages/index.vue`:
 
@@ -151,11 +169,11 @@ function increment() {
 </template>
 ```
 
-Templates auto-unwrap Resux refs. Script code uses `.value`.
+Templates automatically unwrap Resux refs, while script code uses `.value`.
 
-`ref` is the right default because this counter belongs only to the page component. Use `reactive` for grouped local fields. Use `useState` only when a named JSON-compatible value must be serialized into the component scope payload. Use `useGlobalState` only when separate components intentionally share one request-isolated application value.
+For local component state, `ref` is usually the simplest choice. Use `reactive` for grouped fields, `useState` for named JSON-compatible state that belongs to a component scope, and `useGlobalState` when separate components intentionally share request-isolated application state.
 
-`@click` is the official shortcut for `rx-on:click`. Likewise, `:disabled` is the shortcut for `rx-bind:disabled`. The full and shortcut forms compile to the same Resux handler and binding model. See [How Resux Uses Vue](/guide/how-resux-uses-vue).
+`@click` is the shorter form of `rx-on:click`. Likewise, `:disabled` maps to `rx-bind:disabled`. See [How Resux Uses Vue](/guide/how-resux-uses-vue) for the syntax and runtime model.
 
 ## Add an API route
 
@@ -168,7 +186,7 @@ export default defineEventHandler(() => ({
 }))
 ```
 
-Request it from a page:
+Then request it from a page:
 
 ```ts
 const status = await useFetch<{ ok: boolean }>('/api/status')
@@ -177,6 +195,8 @@ const status = await useFetch<{ ok: boolean }>('/api/status')
 `useFetch` returns an async-data resource with `data`, `value`, `pending`, and `error` refs.
 
 ## Inspect the project
+
+The inspect command is useful when you want to see what Resux discovered or generated:
 
 ```sh
 npx resux inspect
@@ -187,33 +207,33 @@ npx resux inspect seo --json
 
 Inspect targets include routes, plugins, enhancements, middleware, imports, components, build, images, server, packages, templates, bundles, and SEO.
 
-## Production build
+## Build for production
 
-For production report authentication, configure a secret of at least 32 characters:
+If you use production report authentication, configure a private signing secret of at least 32 characters:
 
 ```sh
 export RESUX_HALAL_REPORT_SIGNING_SECRET='replace-with-a-private-random-secret'
 ```
 
-Then:
+Then build and start the app:
 
 ```sh
 npm run build
 npm run start
 ```
 
-Build output normally includes:
+Typical build output includes:
 
 ```txt
 .resux/   Resux compiler/runtime output
 .output/  Nitro production output
 ```
 
-## Recommended reading
+## Where to go next
 
 - [Framework Tour](/guide/framework-tour)
-- [How Resux Uses Vue](/guide/how-resux-uses-vue)
 - [Project Structure](/guide/project-structure)
-- [Rendering Lifecycle](/guide/rendering-lifecycle)
 - [Template Syntax](/guide/template-syntax)
+- [Rendering Lifecycle](/guide/rendering-lifecycle)
+- [Resumability Deep Dive](/guide/resumability-deep-dive)
 - [Deployment](/guide/deployment)

@@ -1,36 +1,24 @@
 # Resux Documentation
 
-**Resux** stands for **Resumability + User Experience (UX)**.
+This repository contains the official documentation site for **Resux**, a resumable web framework with Vue-like single-file components, server rendering, file-based routing, and an HTML-first runtime model.
 
-This repository contains the VitePress documentation for the Resux framework. Resux is currently in **public beta**: suitable for evaluation and real-world testing, while APIs may still change before 1.0. The documentation site is the deep reference; the framework README is an introduction and entry point.
+Resux is currently in **public beta**. The current beta release is **0.4.0-beta.2**. It is ready for evaluation, real-world testing, demos, and non-critical applications, while APIs may still change before 1.0.
 
-## Documentation structure
+## Start here
 
-The site covers the full public framework surface, including:
+- [Getting Started](docs/guide/getting-started.md)
+- [Framework Tour](docs/guide/framework-tour.md)
+- [Project Status](docs/reference/status.md)
+- [API Reference](docs/reference/api-index.md)
+- [Examples](docs/examples/index.md)
 
-- getting started, project structure, compiler/template behavior, SSR, resumability, routing, layouts, state, async data and errors;
-- plugins, middleware, server APIs, modules, Kit, hooks, configuration, generated templates/types and package integration;
-- a dedicated [UI component catalog](docs/components/index.md) with one page per public `resuxjs/ui` component;
-- dedicated [images/media](docs/media/index.md), [fonts](docs/fonts/index.md) and [icons](docs/icons/index.md) sections;
-- i18n, CSS/Tailwind, Vue islands, testing, security, deployment, release behavior and troubleshooting;
-- examples and API/package references.
+The site also includes dedicated guides for UI components, images and video, fonts, icons, i18n, routing, data fetching, Vue islands, deployment, security, and troubleshooting.
 
-## Source alignment
+## Documentation principles
 
-The framework implementation is the source of truth. Documentation must be verified against `MahmoudAbdalrhmanMohamed/resux` source, exports and tests before a prop, event, default, slot, behavior, runtime boundary or configuration option is documented.
+The framework source, package exports, and tests are the source of truth. The docs should explain the public behavior developers can actually use, including important limits and runtime costs, without copying features from other frameworks that Resux does not implement.
 
-Do not pin this README to a historical feature branch or old pull request. Date-stamped audit pages may preserve historical evidence, but living documentation should track the current framework implementation.
-
-The [Project Status](docs/reference/status.md) page explains the public-beta support level, release channels, and validation matrix. The [Public API Documentation Coverage](docs/reference/coverage.md) page maps package entry points to their primary documentation and records focused coverage expectations.
-
-## Documentation conventions
-
-- Explain why/when, not only syntax.
-- Keep Resux resumability and explicit client/runtime boundaries visible.
-- Do not describe Vue UI components as zero-hydration Resux primitives.
-- Do not invent functionality to match another framework's documentation.
-- Document limitations explicitly when the implementation does not provide a complete behavior.
-- Prefer dedicated pages and cross-links over one giant catch-all reference.
+When possible, pages should answer practical questions: what the feature does, when to use it, where it runs, how to configure it, and what to watch out for.
 
 ## Local development
 
@@ -39,15 +27,14 @@ npm ci
 npm run dev
 ```
 
-## Validate
+Build and validate the site with:
 
 ```sh
 npm run build
-npm run check:links
+npm run check:navigation
+npm run check:framework-parity
 ```
-
-`check:links` currently uses the VitePress production build, so broken internal routes/anchors discovered by VitePress fail the same build path.
 
 ## Deployment
 
-The VitePress site is configured for GitHub Pages under `/resux-docs/`.
+The documentation site is built with VitePress and deployed to GitHub Pages under `/resux-docs/`.
