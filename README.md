@@ -27,17 +27,12 @@ npm ci
 npm run dev
 ```
 
-Build the site with:
+Build and validate the site with:
 
 ```sh
 npm run build
-```
-
-Additional checks:
-
-```sh
 npm run check:navigation
-npm run check:framework-parity -- .framework/resux
+npm run check:framework-parity
 ```
 
 ## Deployment
