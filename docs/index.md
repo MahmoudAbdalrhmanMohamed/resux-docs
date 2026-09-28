@@ -6,8 +6,8 @@ titleTemplate: false
 
 hero:
   name: Resux
-  text: Build for resumability, not hydration.
-  tagline: Public-beta, source-aligned documentation for the Resux HTML-first framework—covering application development, runtime architecture, UI boundaries, media, fonts, icons, deployment, and every public package surface.
+  text: Build fast, resumable web applications.
+  tagline: Learn Resux with practical guides, examples, API reference, and clear explanations of how the framework behaves in the browser and on the server.
   image:
     src: /logo.svg
     alt: Resux logo
@@ -16,157 +16,87 @@ hero:
       text: Get Started
       link: /guide/getting-started
     - theme: alt
-      text: Explore the Framework
+      text: Framework Tour
       link: /guide/framework-tour
-    - theme: alt
-      text: Public Beta Status
-      link: /reference/status
     - theme: alt
       text: API Reference
       link: /reference/api-index
 
 features:
   - icon: SSR
-    title: HTML first
-    details: Render routes, layouts, head metadata, state, async data, and first-party media on the server.
+    title: Server-rendered by default
+    details: Build routes, layouts, metadata, data loading, and application UI around server-rendered HTML.
   - icon: RESUME
-    title: Resume on demand
-    details: Keep interaction code addressable and load generated handlers when the browser actually needs them.
+    title: Resume when needed
+    details: Resux can keep browser startup small and load interaction code only when a page actually needs it.
   - icon: ROUTE
-    title: Application platform
-    details: File routing, middleware, server APIs, plugins, modules, hooks, route rules, and deployment work as one system.
+    title: Full application framework
+    details: Routing, middleware, server APIs, plugins, modules, route rules, and deployment are part of the same framework.
   - icon: UI
-    title: Explicit runtime boundaries
-    details: Know when Resux owns the template, when Vue owns an island, and what that choice costs in browser JavaScript.
+    title: Clear client boundaries
+    details: Use normal Resux components for the default runtime model and Vue islands when you intentionally need a Vue-owned client boundary.
   - icon: MEDIA
-    title: First-party assets
-    details: Images, picture sources, video strategies, fonts, icons, preloading, providers, and optimization have dedicated guides.
+    title: Built-in asset tooling
+    details: Images, responsive sources, video, fonts, icons, preloading, and optimization have dedicated APIs and guides.
   - icon: SOURCE
-    title: Source-aligned reference
-    details: Public APIs, limits, accessibility behavior, runtime ownership, and source locations are documented explicitly.
+    title: Docs tied to the real framework
+    details: Public APIs and examples are checked against the framework source, package exports, and tests.
 ---
 
 <div class="resux-home-section">
   <p class="resux-home-eyebrow">Public beta</p>
-  <h2 class="resux-home-title">Resux 0.4 is open for real-world testing.</h2>
-  <p class="resux-home-lead">The 0.4 line is a public beta: use it to evaluate Resux, build non-critical applications, test deployment targets, and report compatibility gaps. APIs can still change before 1.0, so production adoption should include version pinning, upgrade testing, and the current limits review.</p>
+  <h2 class="resux-home-title">Current beta: 0.4.0-beta.2</h2>
+  <p class="resux-home-lead">Resux 0.4 is available for public testing. It is a good fit for learning, demos, compatibility testing, and non-critical applications. Because Resux is still pre-1.0, pin your version and test upgrades before using it in an important production system.</p>
 
   <div class="resux-home-grid">
     <a class="resux-home-card" href="./reference/status">
       <span class="resux-card-kicker">Status</span>
-      <strong>Understand the public-beta contract</strong>
-      <span>See release channels, compatibility validation, production guidance, and what still needs broader real-world evidence.</span>
+      <strong>What “public beta” means</strong>
+      <span>See what is validated today, what can still change, and how to evaluate Resux safely.</span>
     </a>
     <a class="resux-home-card" href="./reference/release">
-      <span class="resux-card-kicker">Release channel</span>
-      <strong>Use stable or beta deliberately</strong>
-      <span>Stable releases use the npm latest tag. Public-beta prereleases use the next tag and do not replace latest.</span>
+      <span class="resux-card-kicker">Releases</span>
+      <strong>Stable and beta channels</strong>
+      <span>Learn how the npm latest and next channels are used and how prerelease publishing works.</span>
     </a>
   </div>
 </div>
 
 <div class="resux-home-section">
-  <p class="resux-home-eyebrow">Start with the right path</p>
-  <h2 class="resux-home-title">Learn Resux by what you are trying to accomplish.</h2>
-  <p class="resux-home-lead">The documentation separates practical application guides, architecture deep dives, package reference, and production examples so you can move from a task to the exact implementation details without reading the entire site in order.</p>
+  <p class="resux-home-eyebrow">Start building</p>
+  <h2 class="resux-home-title">Pick the path that matches what you need.</h2>
+  <p class="resux-home-lead">You do not need to read the documentation from top to bottom. Start with a task and move into the deeper architecture only when you need it.</p>
 
   <div class="resux-home-grid">
     <a class="resux-home-card" href="./guide/getting-started">
-      <span class="resux-card-kicker">New to Resux</span>
-      <strong>Create your first application</strong>
-      <span>Install the framework, understand the generated project, run development mode, and build the first route.</span>
+      <span class="resux-card-kicker">New project</span>
+      <strong>Create your first app</strong>
+      <span>Install Resux, generate a project, run the dev server, and build your first interactive page.</span>
     </a>
-    <a class="resux-home-card" href="./guide/architecture-deep-dive">
-      <span class="resux-card-kicker">Architecture</span>
-      <strong>Understand the runtime model</strong>
-      <span>Trace compiler output, SSR, serialized state, resumable handlers, browser ownership, and Vue islands as one system.</span>
+    <a class="resux-home-card" href="./guide/framework-tour">
+      <span class="resux-card-kicker">Overview</span>
+      <strong>Tour the framework</strong>
+      <span>See how routing, rendering, resumability, data, server APIs, plugins, media, and deployment fit together.</span>
     </a>
     <a class="resux-home-card" href="./components/">
-      <span class="resux-card-kicker">Interface</span>
-      <strong>Build application UI</strong>
-      <span>Choose between normal Resux templates, the optional Vue UI package, media primitives, icons, motion, and native HTML.</span>
+      <span class="resux-card-kicker">UI</span>
+      <strong>Explore UI components</strong>
+      <span>Browse the optional component package, props, events, slots, accessibility notes, and runtime boundaries.</span>
     </a>
     <a class="resux-home-card" href="./media/">
-      <span class="resux-card-kicker">Performance</span>
-      <strong>Ship images and video well</strong>
-      <span>Use responsive sources, optimization, placeholders, preloads, video loading strategies, and production media patterns.</span>
+      <span class="resux-card-kicker">Assets</span>
+      <strong>Images and video</strong>
+      <span>Use responsive images, optimization, placeholders, preload strategies, and video tooling.</span>
     </a>
     <a class="resux-home-card" href="./reference/api-index">
       <span class="resux-card-kicker">Reference</span>
-      <strong>Look up an exact API</strong>
-      <span>Jump directly to package exports, composables, reactivity, compiler, runtime, UI, i18n, kit, node, and configuration APIs.</span>
+      <strong>Look up an API</strong>
+      <span>Find package exports, composables, runtime APIs, compiler APIs, UI, i18n, Kit, Node, and configuration.</span>
     </a>
-    <a class="resux-home-card" href="./guide/debugging-mental-model">
-      <span class="resux-card-kicker">Troubleshooting</span>
-      <strong>Find the failing subsystem</strong>
-      <span>Separate compiler, route, SSR, serialization, resumability, reactivity, navigation, package, media, and deployment failures.</span>
-    </a>
-  </div>
-</div>
-
-<div class="resux-home-section">
-  <p class="resux-home-eyebrow">The mental model</p>
-  <h2 class="resux-home-title">From authored component to interactive browser.</h2>
-  <p class="resux-home-lead">Resux does not treat client startup as a requirement to recreate the whole application. The framework compiles server output and browser-addressable behavior so the page can start from HTML and resume the interaction that is actually requested.</p>
-
-  <div class="resux-pipeline">
-    <div class="resux-pipeline-step">
-      <strong>Author</strong>
-      <span>Vue-like SFCs, routes, layouts, state, handlers, server APIs, and configuration.</span>
-    </div>
-    <div class="resux-pipeline-arrow">→</div>
-    <div class="resux-pipeline-step">
-      <strong>Compile</strong>
-      <span>Generate SSR code, handler modules, bindings, route metadata, and runtime artifacts.</span>
-    </div>
-    <div class="resux-pipeline-arrow">→</div>
-    <div class="resux-pipeline-step">
-      <strong>Render</strong>
-      <span>Send HTML, head output, serialized application data, and resumability metadata from the server.</span>
-    </div>
-    <div class="resux-pipeline-arrow">→</div>
-    <div class="resux-pipeline-step">
-      <strong>Resume</strong>
-      <span>Load and execute the specific browser behavior required by navigation, state, or user interaction.</span>
-    </div>
-  </div>
-</div>
-
-<div class="resux-home-section">
-  <p class="resux-home-eyebrow">Application platform</p>
-  <h2 class="resux-home-title">One documentation system for the whole framework.</h2>
-  <p class="resux-home-lead">Each area has its own focused navigation now, so component documentation does not compete with compiler internals and deployment reference in the same sidebar.</p>
-
-  <div class="resux-home-grid">
-    <a class="resux-home-card" href="./guide/routing">
-      <span class="resux-card-kicker">Core</span>
-      <strong>Routing, layouts and data</strong>
-      <span>Build pages with file routing, layouts, middleware, state, async data, metadata, and runtime configuration.</span>
-    </a>
-    <a class="resux-home-card" href="./fonts/">
-      <span class="resux-card-kicker">Assets</span>
-      <strong>Fonts</strong>
-      <span>Configure font families, loading behavior, generated CSS, performance, and content-security-policy requirements.</span>
-    </a>
-    <a class="resux-home-card" href="./icons/">
-      <span class="resux-card-kicker">Assets</span>
-      <strong>Icons</strong>
-      <span>Use the SVG registry, aliases, lazy or runtime loading, Iconify-compatible sources, and cache behavior.</span>
-    </a>
-    <a class="resux-home-card" href="./guide/i18n">
-      <span class="resux-card-kicker">Optional feature</span>
-      <strong>Internationalization</strong>
-      <span>Configure locales, localized route behavior, translation lookup, browser language handling, and the i18n package API.</span>
-    </a>
-    <a class="resux-home-card" href="./guide/package-integration">
-      <span class="resux-card-kicker">Extension</span>
-      <strong>Third-party packages</strong>
-      <span>Decide whether a dependency belongs on the server, in progressive enhancement, in the resumable runtime, or in a Vue island.</span>
-    </a>
-    <a class="resux-home-card" href="./guide/deployment">
-      <span class="resux-card-kicker">Production</span>
-      <strong>Deploy safely</strong>
-      <span>Understand build output, Node and serverless targets, caching, runtime dependencies, and production verification.</span>
+    <a class="resux-home-card" href="./guide/troubleshooting">
+      <span class="resux-card-kicker">Help</span>
+      <strong>Troubleshoot a problem</strong>
+      <span>Work through common development, build, runtime, package, media, and deployment issues.</span>
     </a>
   </div>
 </div>
@@ -174,7 +104,7 @@ features:
 <div class="resux-home-section">
   <p class="resux-home-eyebrow">Install</p>
   <h2 class="resux-home-title">Create a Resux project.</h2>
-  <p class="resux-home-lead">The current framework source requires Node.js <code>&gt;=20.19.0</code>.</p>
+  <p class="resux-home-lead">Resux currently requires Node.js <code>&gt;=20.19.0</code>.</p>
 </div>
 
 Stable channel:
@@ -192,26 +122,32 @@ npm install
 npm run dev
 ```
 
+For repeatable beta testing, pin the exact version:
+
+```sh
+npx create-resuxjs@0.4.0-beta.2 my-app
+```
+
 <div class="resux-home-section">
-  <p class="resux-home-eyebrow">Documentation standard</p>
-  <h2 class="resux-home-title">Every important page should answer more than “what is this symbol?”</h2>
-  <p class="resux-home-lead">Where relevant, the docs describe why a feature exists, when to use it, where it runs, its complete API and defaults, generated HTML or network behavior, resumability implications, browser-JavaScript cost, accessibility and security responsibilities, current limitations, source evidence, realistic examples, and common failure modes.</p>
+  <p class="resux-home-eyebrow">Learn the runtime</p>
+  <h2 class="resux-home-title">Understand what happens from request to interaction.</h2>
+  <p class="resux-home-lead">Resux starts from server-rendered HTML and adds browser execution only where the application needs it. The architecture guides explain compilation, rendering, serialized state, resumable handlers, routing, and Vue islands without hiding the trade-offs.</p>
 
   <div class="resux-home-grid">
-    <a class="resux-home-card" href="./reference/source-map">
-      <span class="resux-card-kicker">Evidence</span>
-      <strong>Framework source map</strong>
-      <span>Connect public features to the framework source and the tests that verify their behavior.</span>
+    <a class="resux-home-card" href="./guide/architecture-deep-dive">
+      <span class="resux-card-kicker">Architecture</span>
+      <strong>Architecture deep dive</strong>
+      <span>Follow the framework from source files through build output, SSR, and browser runtime behavior.</span>
     </a>
-    <a class="resux-home-card" href="./reference/coverage">
-      <span class="resux-card-kicker">Coverage</span>
-      <strong>Documentation coverage</strong>
-      <span>Track which framework surfaces have guides, reference, examples, source links, and known limitations documented.</span>
+    <a class="resux-home-card" href="./guide/resumability-deep-dive">
+      <span class="resux-card-kicker">Runtime</span>
+      <strong>Resumability</strong>
+      <span>Learn how handlers and client work are connected to server-rendered output.</span>
     </a>
-    <a class="resux-home-card" href="./reference/limits">
-      <span class="resux-card-kicker">Honesty</span>
-      <strong>Current limits</strong>
-      <span>See the boundaries that matter before adopting an API or relying on behavior the framework does not yet implement.</span>
+    <a class="resux-home-card" href="./guide/vue-islands">
+      <span class="resux-card-kicker">Vue</span>
+      <strong>Vue islands</strong>
+      <span>Use Vue deliberately when a feature needs a Vue-owned client runtime boundary.</span>
     </a>
   </div>
 </div>
