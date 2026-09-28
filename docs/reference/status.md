@@ -1,19 +1,19 @@
 # Project Status: Public Beta
 
-Resux is currently in **public beta**.
+Resux is currently in **public beta**. The current beta release is **0.4.0-beta.2**.
 
-The 0.4 line is intended for evaluation, real-world application testing, deployment validation, and compatibility feedback before the stable 1.0 API contract. It is more mature than an experimental prototype, but pre-1.0 APIs can still change as production feedback exposes missing constraints or better abstractions.
+The 0.4 line is meant for public evaluation, real-world testing, deployment checks, package compatibility work, and feedback before Resux reaches 1.0. The framework has passed a substantial CI and packaging hardening pass, but pre-1.0 APIs can still change as more applications uncover edge cases.
 
 ## Release channels
 
-| Channel | Version line | npm tag | Use it when |
+| Channel | Version line | npm tag | Best fit |
 | --- | --- | --- | --- |
-| Stable | 0.3.x | `latest` | You want the current stable pre-beta package line |
-| Public beta | 0.4.x prereleases | `next` | You want current hardening, features, and beta validation |
+| Stable | 0.3.x | `latest` | Existing projects that want the current stable pre-beta line |
+| Public beta | 0.4.x prereleases | `next` | New testing, feedback, and access to the latest hardening work |
 
-The first public-beta milestone is `0.4.0-beta.1`.
+The public beta started with `0.4.0-beta.1`. The current release, `0.4.0-beta.2`, fixes the npm publishing workflow used to complete the beta release. Framework runtime behavior is unchanged from beta.1.
 
-Try the beta with:
+Try the beta:
 
 ```sh
 npx create-resuxjs@next my-app
@@ -22,74 +22,81 @@ npm install
 npm run dev
 ```
 
-For repeatable production-like tests, pin an exact prerelease instead of relying indefinitely on a moving dist-tag.
+For repeatable testing, pin the exact release:
 
-## What public beta means
+```sh
+npx create-resuxjs@0.4.0-beta.2 my-app
+```
 
-Public beta means Resux is ready for:
+## What the beta is good for
 
-- public evaluation and feedback;
-- examples, demos, prototypes, and learning projects;
-- non-critical real applications with normal engineering safeguards;
-- compatibility testing with packages and deployment platforms;
-- performance measurement against realistic workloads;
-- bug reports and reproducible production-readiness findings.
+Resux 0.4 is appropriate for:
 
-It does **not** mean the project promises a frozen 1.0 API or long-term compatibility for every pre-1.0 behavior.
+- learning and evaluation;
+- demos and prototypes;
+- compatibility testing;
+- deployment experiments;
+- performance testing with realistic applications;
+- non-critical applications where you can pin versions and test upgrades;
+- finding and reporting production-readiness issues.
 
-## Current release validation
+It is still pre-1.0, so it does not promise a frozen API or long-term compatibility for every current behavior.
 
-The framework CI currently validates:
+## What is already validated
 
-- strict production quality and package checks;
-- Node.js 20.19 and Node.js 22 runtime compatibility;
+The framework CI currently covers:
+
+- production quality and package checks;
+- Node.js 20.19 and Node.js 22;
 - Windows and macOS portability;
 - minimal, default, full, i18n, PWA, media, package-compatibility, and dashboard starters;
 - Node, static, Netlify, Vercel, and Cloudflare deployment targets;
-- release package contents and npm publishing contracts.
+- package contents and npm release contracts;
+- runtime bundle budgets;
+- regression coverage for security-sensitive media and path handling.
 
-The production-hardening work also adds bounded route/icon caches and concurrency plus stricter remote-media and filesystem-path protections.
+The framework also includes bounded route/icon caches and request concurrency controls, plus protections around remote media fetching and filesystem paths.
 
-CI validation is important, but it is not a substitute for broader third-party production usage.
+That is useful evidence, but CI cannot replace testing across independent applications and workloads.
 
-## Production guidance
+## Using the beta in a production-like environment
 
-For a production-like beta deployment:
+If you want to evaluate Resux in staging or a real low-risk application:
 
 1. pin the exact Resux version;
 2. run your own integration and end-to-end tests;
 3. test the deployment target you actually use;
-4. verify server APIs, media transformations, caching, i18n, resumability, and any Vue islands your application depends on;
+4. verify the features your app depends on, especially server APIs, media, caching, i18n, resumability, and Vue islands;
 5. review [Current Limits](/reference/limits);
-6. monitor errors and resource usage after deployment;
-7. test framework upgrades before rolling them into a critical environment.
+6. monitor runtime errors and resource usage;
+7. test framework upgrades before shipping them.
 
-For business-critical systems with strict compatibility or support requirements, evaluate the beta in a staging or limited-risk workload before making it a core dependency.
+For business-critical systems with strict support or compatibility requirements, evaluate the beta in a limited-risk environment before making it a core dependency.
 
-## What needs more evidence before 1.0
+## What still needs broader evidence
 
-The main remaining maturity work is not simply “make CI green.” Before a stable 1.0 claim, Resux needs broader evidence from independent applications, including:
+Before Resux can make a stable 1.0 claim, it needs more experience outside its own test suite, including:
 
 - longer-running production workloads;
-- more ecosystem/package integrations;
-- upgrade experience across multiple releases;
-- more measured test coverage visibility;
+- more third-party package integrations;
+- upgrade experience across several releases;
+- clearer measured coverage reporting;
 - documented deprecation and API-stability rules;
-- continued security review and regression testing;
-- feedback from developers who did not build the framework itself.
+- continued security review;
+- feedback from developers who were not involved in building the framework.
 
-## Reporting problems
+## Reporting a problem
 
-When reporting a beta issue, include:
+A useful bug report should include:
 
 - the exact Resux version;
 - Node.js version and operating system;
 - deployment target;
-- minimal reproduction;
+- a minimal reproduction;
 - expected and actual behavior;
-- whether the issue occurs in development, production build, or both.
+- whether the issue happens in development, production build, or both.
 
-Security issues must follow the framework's security policy rather than being disclosed with exploit details in a public issue.
+Security issues should follow the framework security policy instead of being posted publicly with exploit details.
 
 ## Related pages
 
