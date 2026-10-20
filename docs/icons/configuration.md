@@ -1,93 +1,92 @@
 # Icon Configuration
 
-## Module options
+Resux provides full configuration control over icon sizes, rendering modes, aliases, offline collections, and custom local icon directories.
+
+## Module options (`ResuxIconsModuleOptions`)
 
 ```ts
-export interface ResuxIconsModuleOptions {
-  collections?: string[]
-  component?: string
-  mode?: 'css' | 'svg'
-  apiProvider?: string
-  lazy?: boolean
+// resux.config.ts
+export default defineResuxConfig({
+  modules: [
+    ['resuxjs/icons', {
+      component: 'Icon',
+      defaultSize: '1.25rem',
+      mode: 'svg', // 'svg' or 'css'
+      collections: ['lucide', 'ph', 'mdi'],
+      aliases: {
+        github: 'lucide:github',
+        twitter: 'lucide:twitter',
+        mail: 'lucide:mail',
+      },
+      customCollectionsDir: './assets/icons',
+      ssr: true,
+      apiProvider: 'https://api.iconify.design',
+      lazy: false,
+    }]
+  ]
+})
+```
+
+## Options reference
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `component` | `string` | `'Icon'` | Name of the component globally registered/available in templates. |
+| `defaultSize` | `string` | `'1em'` | Default width and height applied when no explicit `size` prop is provided. |
+| `mode` | `'svg' \| 'css'` | `'svg'` | Default rendering mode. `'svg'` produces full vector paths; `'css'` renders a `<span>` with CSS `mask` / `background`. |
+| `collections` | `string[]` | `[]` | List of enabled icon collections (e.g. `['lucide', 'mdi']`). |
+| `aliases` | `Record<string, string>` | `{}` | Custom shorthand aliases mapping friendly names to collection names (e.g. `{ logo: 'custom:brand-logo' }`). |
+| `customCollectionsDir` | `string` | `'./assets/icons'` | Path to the directory containing local `.svg` files for `custom:*` icons. |
+| `ssr` | `boolean` | `true` | When `true`, statically resolvable icons render directly during SSR. When `false`, icons render on the client only. |
+| `apiProvider` | `string` | `'https://api.iconify.design'` | Base URL for remote Iconify-compatible API fallback requests. |
+| `lazy` | `boolean` | `false` | Default loading strategy across icons. |
+
+## Aliases configuration
+
+Aliases let you define concise names for commonly used icons:
+
+```ts
+aliases: {
+  home: 'lucide:home',
+  check: 'ph:check-circle',
+  brand: 'custom:company-logo',
 }
 ```
 
-| Option | Default | Description |
-| --- | --- | --- |
-| `collections` | `[]` | Collection names exposed by module/runtime configuration. This does not automatically bundle/download every icon. |
-| `component` | `'Icon'` | Component registration/configuration name. |
-| `mode` | `'svg'` | Rendering mode metadata. The current `Icon` component renderer emits SVG. |
-| `apiProvider` | built-in Iconify-compatible provider | Default remote provider base URL after normalization. |
-| `lazy` | `false` | Runtime/module configuration flag. See the component note below. |
-
-## Correct defaults
-
-Use the source defaults, not assumptions from other icon libraries:
-
-```ts
-['resuxjs/icons', {
-  collections: [],
-  component: 'Icon',
-  mode: 'svg',
-  lazy: false
-}]
-```
-
-## Component vs module `lazy`
-
-The current `Icon` component decides lazy fetching from its **component props**:
-
-- `lazy` prop (default false), or
-- `loading="lazy"`.
-
-Although the module stores a `lazy` value in public icon runtime configuration, the component's `isLazy` decision in the current implementation does not read that runtime `lazy` field. Therefore, do not promise that setting only module `lazy: true` automatically makes every imported `Icon` instance lazy.
-
-Use an explicit component prop when you need the behavior today:
+In templates, you can then write:
 
 ```vue
-<Icon name="ph:camera" lazy />
+<Icon name="home" />
+<Icon name="brand" />
 ```
 
-## `mode`
+Resux resolves aliases recursively, preventing circular loops while ensuring that built-in aliases (like `check`, `mail`, `search`) and custom user aliases are resolved cleanly.
 
-Both module options and the component expose a mode surface, but the current Vue icon renderer produces an `<svg>` in the implementation path documented here. Do not document CSS-mask/span rendering as an implemented component mode until source behavior exists and tests cover it.
+## Offline collections configuration
 
-## Collections
+When an icon collection package such as `@iconify-json/lucide` is installed in your project:
 
-`collections` is useful metadata/configuration, but the current icon package is not a full build-time Iconify collection bundler. Known registry entries live in `iconRegistry`; unknown names may be fetched remotely at runtime.
+```sh
+npm install -D @iconify-json/lucide
+```
 
-Do not claim tree-shaking of arbitrary remote collection JSON or local `@iconify-json/*` bundle scanning: those capabilities are not implemented by this module today.
+Resux detects the installed package and resolves icon SVG data at build-time. This eliminates runtime API requests and enables compile-time inlining into your production bundles.
 
-## Provider
+## Custom local icons directory
+
+By default, Resux looks in `./assets/icons` for custom SVGs:
 
 ```ts
-['resuxjs/icons', {
-  apiProvider: 'https://icons.example.com'
-}]
+customCollectionsDir: './assets/icons'
 ```
 
-The normalized provider is exposed in public runtime config and used as the default provider for remote component requests unless `apiProvider` is supplied directly on the component.
+Icons placed in this directory (including subdirectories) become immediately accessible via the `custom:` prefix:
 
-Provider configuration is public and must never contain credentials.
-
-## Public runtime config
-
-Module setup exposes icon configuration under public runtime configuration, including component name, collections, mode, provider, and lazy metadata.
-
-## Security
-
-A remote provider means browser/client code fetches icon data over the network. Apply appropriate:
-
-- CSP `connect-src` rules;
-- HTTPS/provider trust requirements;
-- availability/reliability expectations;
-- privacy review;
-- application fallback behavior.
-
-For critical icons that must render without remote availability, register them in `iconRegistry`.
+- `./assets/icons/logo.svg` -> `<Icon name="custom:logo" />`
+- `./assets/icons/social/github.svg` -> `<Icon name="custom:social/github" />`
 
 ## Related
 
 - [Icons overview](./index.md)
 - [Usage and Registry](./usage.md)
-- [Runtime Loading](./runtime.md)
+- [Runtime Loading and SSR](./runtime.md)

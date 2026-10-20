@@ -1,170 +1,166 @@
 # Font Configuration
 
-The public font module surface is small enough to document completely.
+Resux provides a unified, strongly-typed font configuration interface supporting automated fontless scanning, Fontaine zero-CLS fallback metrics, local self-hosted files, and multi-provider options.
 
-## Module options
+## Module options (`ResuxFontsModuleOptions`)
 
 ```ts
 export interface ResuxFontsModuleOptions {
+  /** Enable automatic CSS and template font scanning with fontless. Defaults to true. */
+  autoScan?: boolean
+
+  /** Global font defaults across all resolved families */
+  defaults?: {
+    preload?: boolean
+    subsets?: string[]
+    weights?: ResuxFontWeight[]
+    styles?: Array<'normal' | 'italic' | 'oblique'>
+    fallbacks?: string[]
+  }
+
+  /** Provider configurations (google, bunny, fontshare, fontsource, local) */
+  providers?: {
+    google?: boolean | Record<string, unknown>
+    bunny?: boolean | Record<string, unknown>
+    fontshare?: boolean | Record<string, unknown>
+    fontsource?: boolean | Record<string, unknown>
+    local?: boolean | Record<string, unknown>
+  }
+
+  /** Devtools panel toggle during development (defaults to true) */
+  devtools?: boolean
+
+  /** Provider-aware font families list */
+  families?: ResuxFontFamilyInput[]
+
+  /** Backward-compatible Google font families list */
   google?: ResuxFontFamilyInput[]
+
+  /** Add preconnect hints when Google families exist. Defaults to true. */
   preconnect?: boolean
+
+  /** Default loading strategy across families ('eager' | 'preload' | 'lazy') */
   strategy?: 'eager' | 'preload' | 'lazy'
+
+  /** Default deferral until window.load */
   deferUntilPageLoad?: boolean
 }
 ```
 
-| Option | Type | Default | Description |
-| --- | --- | --- | --- |
-| `google` | `ResuxFontFamilyInput[]` | `[]` | Google font families to include. |
-| `preconnect` | `boolean` | `true` | Add preconnect hints when Google families exist. |
-| `strategy` | `'eager' | 'preload' | 'lazy'` | `'eager'` | Module default loading strategy. |
-| `deferUntilPageLoad` | `boolean` | `false` | Module-level deferred-loading default for families that do not override it. |
-
-## Family options
+## Family options (`ResuxFontFamilyInput`)
 
 ```ts
 export interface ResuxFontFamilyInput {
   name: string
-  weights?: Array<number | string>
+  provider?: 'google' | 'local' | 'remote'
+  weights?: ResuxFontWeight[]
+  weight?: ResuxFontWeight
+  style?: 'normal' | 'italic' | 'oblique'
   display?: 'auto' | 'block' | 'swap' | 'fallback' | 'optional'
   strategy?: 'eager' | 'preload' | 'lazy'
   deferUntilPageLoad?: boolean
+  src?: string | ResuxFontSourceInput | Array<string | ResuxFontSourceInput>
+  faces?: ResuxFontFaceInput[]
+  unicodeRange?: string
+  preload?: boolean
+  variable?: string
+  axes?: Record<string, number | [number, number]>
+  fallbacks?: string[]
 }
 ```
 
-| Property | Default | Behavior |
-| --- | --- | --- |
-| `name` | required | Family name used to build the Google Fonts URL. Control characters are removed and the value is encoded. |
-| `weights` | omitted | Positive font weights from 1–1000, or variable ranges like `'100..900'`. Invalid entries are ignored. |
-| `display` | effectively `swap` when not valid/supplied for generated URL grouping | Accepted: auto/block/swap/fallback/optional. |
-| `strategy` | inherits module | Per-family loading override. |
-| `deferUntilPageLoad` | inherits module | Boolean override for deferred behavior; explicit family `false` can prevent inherited deferral. |
+| Property | Type | Default | Description |
+| --- | --- | --- | --- |
+| `name` | `string` | *(required)* | Name of the font family. |
+| `provider` | `'google' \| 'local' \| 'remote'` | `'google'` | Provider determining font resolution. |
+| `weights` | `Array<number \| string \| ResuxFontWeightName>` | `[]` | List of weights to include. Accepts numeric values (`400`), ranges (`'100..900'`), or semantic names (`'bold'`). |
+| `display` | `ResuxFontDisplay` | `'swap'` | CSS `font-display` value. |
+| `fallbacks` | `string[]` | `[]` | List of fallback fonts. Resux invokes `fontaine` to calculate and emit zero-CLS fallback metrics (`size-adjust`, `ascent-override`, `descent-override`). |
+| `variable` | `string` | `undefined` | CSS custom property to define (e.g. `'--font-inter'`). |
+| `axes` | `Record<string, number \| [number, number]>` | `undefined` | Variable font axes settings (e.g. `{ wght: 700, wdth: 100 }`). |
+| `src` | `string \| ResuxFontSourceInput \| ...` | `undefined` | File path or URL for local or remote font files. |
+| `faces` | `ResuxFontFaceInput[]` | `undefined` | Specific `@font-face` definitions for multi-weight/style local fonts. |
+| `strategy` | `'eager' \| 'preload' \| 'lazy'` | inherits module | Loading strategy override for this family. |
 
-## Weight normalization
+## Semantic Named Weights
 
-Examples:
+Resux accepts standard CSS numeric weights or any of the following semantic aliases:
 
-```ts
-{ name: 'Inter', weights: [400, 500, 700] }
-{ name: 'Inter', weights: ['100..900'] }
-```
+- `100`: `'thin'`, `'hairline'`
+- `200`: `'extralight'`, `'extra-light'`, `'ultralight'`
+- `300`: `'light'`
+- `400`: `'normal'`, `'regular'`
+- `500`: `'medium'`
+- `600`: `'semibold'`, `'semi-bold'`, `'demibold'`
+- `700`: `'bold'`
+- `800`: `'extrabold'`, `'extra-bold'`, `'ultrabold'`
+- `900`: `'black'`, `'heavy'`
 
-The module normalizes, de-duplicates, and sorts accepted weights before producing the URL.
+## Example Configurations
 
-Invalid values such as negative weights, values above 1000, malformed ranges, or reversed ranges are ignored rather than documented as supported.
-
-## Display
-
-```ts
-{
-  name: 'Inter',
-  weights: [400, 700],
-  display: 'optional'
-}
-```
-
-The implementation recognizes:
-
-```ts
-'auto' | 'block' | 'swap' | 'fallback' | 'optional'
-```
-
-Do not document arbitrary strings as supported `font-display` values.
-
-## Strategy precedence
-
-Per-family configuration takes precedence over module defaults.
+### 1. Modern Google Font with Fontaine Zero-CLS
 
 ```ts
 export default defineResuxConfig({
   modules: [
     ['resuxjs/fonts', {
-      strategy: 'lazy',
-      google: [
-        { name: 'Inter', weights: [400, 600], strategy: 'eager' },
-        { name: 'Alexandria', weights: [400, 700] }
+      families: [
+        {
+          name: 'Inter',
+          weights: ['regular', 'bold'],
+          display: 'swap',
+          fallbacks: ['Arial'],
+          variable: '--font-inter',
+        }
       ]
     }]
   ]
 })
 ```
 
-Here:
-
-- Inter is eager because its family strategy overrides the module strategy.
-- Alexandria inherits lazy.
-
-### Boolean deferral override
+### 2. Local Self-Hosted Font
 
 ```ts
-['resuxjs/fonts', {
-  deferUntilPageLoad: true,
-  google: [
-    { name: 'Inter', weights: [400], deferUntilPageLoad: false },
-    { name: 'Alexandria', weights: [400] }
+export default defineResuxConfig({
+  modules: [
+    ['resuxjs/fonts', {
+      families: [
+        {
+          name: 'CalSans',
+          provider: 'local',
+          src: '/fonts/CalSans-SemiBold.woff2',
+          weight: 'semibold',
+          style: 'normal',
+          variable: '--font-cal-sans',
+        }
+      ]
+    }]
   ]
-}]
-```
-
-Inter stays eager/default-strategy unless otherwise specified; Alexandria inherits deferred loading.
-
-`strategy: 'lazy'` is itself a deferred path. You do not need to also set `deferUntilPageLoad: true` on the same family.
-
-## URL grouping
-
-Families are partitioned into eager/non-deferred and lazy/deferred groups. Each group receives a Google Fonts CSS URL containing that group's normalized family queries.
-
-This means two families with different loading strategies can result in separate Google Fonts stylesheet URLs/head behavior.
-
-## `googleFont()`
-
-```ts
-function googleFont(input: ResuxFontFamilyInput): ResuxFontFamilyInput
-```
-
-Example:
-
-```ts
-import { googleFont } from 'resuxjs/fonts'
-
-export const headingFont = googleFont({
-  name: 'Alexandria',
-  weights: [500, 600, 700],
-  display: 'swap',
-  strategy: 'eager'
 })
 ```
 
-## Public runtime metadata
+### 3. Variable Font with Axes
 
-Module setup extends public runtime config with font metadata including:
-
-- `provider: 'google'`
-- configured `families`
-- `familyConfigs` with each family's resolved strategy and deferred flag
-- module-level `strategy`
-- module-level `deferUntilPageLoad`
-
-This metadata is public by design. Do not put secrets in font module options.
-
-## Unsupported configuration
-
-The current `ResuxFontFamilyInput` has no first-party fields for:
-
-- local font file paths
-- custom provider IDs
-- styles/italics list
-- subsets
-- unicode ranges
-- font stretch
-- `@font-face` source definitions
-- fallback metric generation
-- CSS variable generation
-- download/caching directories
-
-Use normal CSS/assets or an integration when you need those capabilities.
+```ts
+export default defineResuxConfig({
+  modules: [
+    ['resuxjs/fonts', {
+      families: [
+        {
+          name: 'Roboto Flex',
+          weights: ['100..900'],
+          axes: {
+            wdth: 100,
+            opsz: 14
+          }
+        }
+      ]
+    }]
+  ]
+})
+```
 
 ## Related
 
 - [Fonts overview](./index.md)
-- [Performance and CSP](./performance.md)
+- [Performance and Zero-CLS](./performance.md)

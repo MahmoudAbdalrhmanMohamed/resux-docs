@@ -1,156 +1,124 @@
 # Icon Usage and Registry
 
-## Component imports
+## Component imports and availability
+
+In Resux, `<Icon>` (with alias `<ResuxIcon>`) is automatically available in your templates when `resuxjs/icons` is enabled. You can also import it explicitly:
 
 ```ts
 import { Icon, ResuxIcon } from 'resuxjs/icons'
 ```
 
-`ResuxIcon === Icon`.
-
 ## Props
 
-The Vue component declares these props:
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `name` | `string` | *(required)* | Icon identifier. Accepts collection prefix (`'lucide:mail'`), built-in alias (`'mail'`), custom alias (`'github'`), or local SVG (`'custom:logo'`). |
+| `size` | `string \| number` | `'1em'` | Icon dimensions (width and height). Numeric values are converted to px. |
+| `mode` | `'svg' \| 'css'` | `'svg'` | Rendering mode. `'svg'` produces an inline SVG; `'css'` produces an ultra-lightweight `<span>` with CSS `mask`. |
+| `ssr` | `boolean` | `true` | When `false`, defers icon rendering until client mount. |
+| `lazy` | `boolean` | `false` | Defers remote icon fetching until element is near the viewport using `IntersectionObserver`. |
+| `loading` | `'eager' \| 'lazy'` | `'eager'` | Alternative shorthand for lazy loading (`loading="lazy"`). |
+| `apiProvider` | `string` | `''` | Override the remote Iconify API endpoint for this specific icon. |
+| `class` | `string` | `''` | Custom CSS class names applied to the root icon element. |
 
-| Prop | Type | Default | Required | Description |
-| --- | --- | --- | --- | --- |
-| `name` | `string` | — | Yes | Registry key or remote Iconify-style name. |
-| `size` | `string | number` | `'1.25rem'` | No | SVG width/height. Numeric values become px-style dimensions. |
-| `mode` | `string` | `'svg'` | No | Current component metadata prop. The renderer currently emits SVG. |
-| `lazy` | `boolean` | `false` | No | Defer unknown/remote fetch until near viewport when IntersectionObserver is available. |
-| `loading` | `string` | `'eager'` | No | `loading="lazy"` also activates lazy fetch behavior. |
-| `apiProvider` | `string` | `''` | No | Per-component provider override; empty resolves through runtime config/default. |
-| `class` | `string` | `''` | No | Additional SVG class string. |
+## Sizing and Colors
 
-Undeclared Vue attributes are forwarded to the rendered SVG after the component's defaults.
+### Sizing
 
-## Size
-
-```vue
-<Icon name="check" size="16" />
-<Icon name="check" :size="24" />
-<Icon name="check" size="1.5rem" />
-```
-
-Use CSS-sized strings when you want the icon to scale with typography.
-
-## Color
-
-There is no declared `color` prop in the component. The SVG uses `fill="currentColor"`, so the normal CSS `color` property is the primary styling mechanism:
+Icons default to `1em`, allowing them to match the font size of surrounding text:
 
 ```vue
-<Icon name="check" class="text-success" />
+<!-- Matches font size -->
+<p class="text-xl">
+  <Icon name="lucide:sparkles" /> Featured Item
+</p>
+
+<!-- Explicit size override -->
+<Icon name="lucide:check" size="24" />
+<Icon name="lucide:check" size="2rem" />
 ```
 
-You can also forward native SVG/style attributes when needed.
+### Color inheritance
 
-## Registry shape
+Icons render with `fill="currentColor"` (in SVG mode) or `background-color: currentColor` (in CSS mode), so they automatically inherit the parent text color:
 
-```ts
-export interface IconPathData {
-  d: string
-  opacity?: string
-}
-
-export interface IconData {
-  path?: string
-  paths?: IconPathData[]
-  opacity?: string
-  viewBox?: string
-}
+```vue
+<button class="text-blue-600 hover:text-blue-800">
+  <Icon name="lucide:download" /> Download Report
+</button>
 ```
 
-An icon may use one path:
+## Compile-Time Inlining
+
+Resux features a Vite transform plugin (`createIconsVitePlugin`) that inspects your templates at build time. When it encounters statically named icons that exist in offline collections, custom SVGs, or built-in registries:
+
+```vue
+<!-- Source template -->
+<Icon name="lucide:check" size="1.5rem" class="text-green-500" />
+```
+
+The compiler replaces the `<Icon>` component directly with the inlined `<svg>` markup:
+
+```html
+<!-- Compiled output in production -->
+<svg xmlns="http://www.w3.org/2000/svg" width="1.5rem" height="1.5rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="resux-icon inline-block shrink-0 align-middle text-green-500" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+```
+
+This delivers **instant rendering during SSR and 0 B client JavaScript overhead**.
+
+## CSS Mode (`mode="css"`)
+
+For monochrome UI icons, CSS mode produces a single `<span>` using CSS `mask-image`:
+
+```vue
+<Icon name="lucide:arrow-right" mode="css" size="1.25rem" />
+```
+
+Rendered HTML:
+
+```html
+<span class="resux-icon resux-icon-css inline-block shrink-0 align-middle" style="width: 1.25rem; height: 1.25rem; display: inline-block; background-color: currentColor; mask-image: url('data:image/svg+xml,...'); mask-size: 100% 100%;" aria-hidden="true"></span>
+```
+
+CSS mode is ideal for lists, tables, and data grids where hundreds of icons share the same DOM structure.
+
+## Local SVG Directory (`custom:*`)
+
+Drop any `.svg` file into `./assets/icons/`:
+
+```txt
+assets/icons/
+  brand/
+    mark.svg
+  logo.svg
+```
+
+Use them in templates with the `custom:` prefix:
+
+```vue
+<Icon name="custom:logo" size="32" />
+<Icon name="custom:brand/mark" size="24" />
+```
+
+Resux cleans the SVG, strips hard-coded fills/strokes if appropriate, normalizes the viewBox, and caches the result for instant rendering.
+
+## Extending the In-Memory Registry
+
+You can also register custom SVGs programmatically via `registerStaticIcon`:
 
 ```ts
-iconRegistry['app:check'] = {
+import { registerStaticIcon } from 'resuxjs/icons'
+
+registerStaticIcon('app:heart', {
   viewBox: '0 0 24 24',
-  path: 'M…'
-}
-```
-
-Or multiple paths:
-
-```ts
-iconRegistry['app:brand'] = {
-  viewBox: '0 0 32 32',
   paths: [
-    { d: 'M…', opacity: '0.6' },
-    { d: 'M…' }
+    { d: 'M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z' }
   ]
-}
+})
 ```
-
-If `viewBox` is absent, the component uses its default SVG view box.
-
-## Extending the registry
-
-`iconRegistry` is an exported mutable object. Register application icons from a deterministic initialization module before the relevant Vue components render:
-
-```ts
-import { iconRegistry } from 'resuxjs/icons'
-
-iconRegistry['app:logo'] = {
-  viewBox: '0 0 24 24',
-  path: 'M…'
-}
-```
-
-Avoid mutating the registry unpredictably during rendering; treat it as an application-level registry.
-
-## `defineIconCollections()`
-
-```ts
-import { defineIconCollections } from 'resuxjs/icons'
-
-const iconOptions = defineIconCollections(['mdi', 'ph'])
-```
-
-The helper returns:
-
-```ts
-{ collections: ['mdi', 'ph'] }
-```
-
-It is a configuration convenience; it does not itself download or register every icon in those collections.
-
-## Decorative icons
-
-Default SVG output is `aria-hidden="true"`:
-
-```vue
-<button>
-  <Icon name="check" />
-  Save
-</button>
-```
-
-This keeps the icon decorative while the button text supplies the accessible name.
-
-## Semantic icon-only controls
-
-Do not rely on the SVG name string as an accessible label:
-
-```vue
-<button type="button" aria-label="Close">
-  <Icon name="close" />
-</button>
-```
-
-The surrounding interactive element should normally own the accessible name.
-
-## SVG attributes
-
-Because attributes are forwarded, you can deliberately override presentation/accessibility attributes for non-interactive semantic SVG usage. Test the resulting accessibility tree rather than assuming all SVG attribute combinations behave consistently.
-
-## SSR / runtime boundary
-
-A registry hit can render complete SVG path markup in the Vue render output without a network request. The icon is still a Vue component, so it belongs in the Vue rendering/island system rather than Resux's zero-hydration template component model.
-
-Remote registry misses require client behavior; see [Runtime Loading](./runtime.md).
 
 ## Related
 
 - [Icons overview](./index.md)
-- [Runtime Loading](./runtime.md)
 - [Configuration](./configuration.md)
+- [Runtime Loading and SSR](./runtime.md)
