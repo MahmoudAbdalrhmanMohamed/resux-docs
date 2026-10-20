@@ -1,29 +1,31 @@
 # Icons (`resuxjs/icons`)
 
-The deep icon documentation now lives in the dedicated [Icons](/icons/) section:
+The deep icon documentation lives in the dedicated [Icons](/icons/) section:
 
 - [Overview](/icons/)
-- [Usage and local registry](/icons/usage)
-- [Configuration](/icons/configuration)
-- [Remote/lazy runtime loading](/icons/runtime)
+- [Usage, Inlining, and Registry](/icons/usage)
+- [Configuration and Aliases](/icons/configuration)
+- [Runtime Loading and Resolution](/icons/runtime)
 
 This guide URL remains as a stable entry point for existing links.
 
-## Runtime boundary
+## Modern Icon System
 
-`Icon` / `ResuxIcon` from `resuxjs/icons` are Vue SVG components. They belong inside a [Vue island](./vue-islands.md) or another explicit Vue runtime boundary.
+`resuxjs/icons` provides **Nuxt Icon parity** and zero-overhead performance:
 
-The current module defaults are `collections: []`, `mode: 'svg'`, component name `Icon`, and `lazy: false`. Unknown registry icons can be fetched from the configured Iconify-compatible provider after client mount; local `iconRegistry` entries can render without that remote request.
+- **Nuxt Icon Parity:** Drop-in syntax compatibility (`<Icon name="lucide:check" />`, `<Icon name="ph:check-circle" />`, `<Icon name="mail" />`).
+- **Compile-time Inlining:** Known static icons are transformed directly into inlined `<svg>` markup during Vite compilation with 0 B runtime JavaScript.
+- **Offline Collections:** Bundles `@iconify-json/*` icon packages for offline/air-gapped rendering without external network requests.
+- **CSS Mode:** Renders icons via CSS `mask` / `background` for ultra-lightweight, color-inheriting icons.
+- **Custom Local SVGs:** Load custom SVG icons directly from your project's `./assets/icons` directory via `custom:*`.
 
 ```vue
-<script setup lang="ts">
-import { Icon } from 'resuxjs/icons'
-</script>
-
 <template>
-  <Icon name="check" />
-  <Icon name="ph:check-circle" lazy />
+  <!-- Auto-imported or explicit Icon component -->
+  <Icon name="lucide:check" size="1.25rem" />
+  <Icon name="ph:check-circle" mode="css" />
+  <Icon name="custom:logo" />
 </template>
 ```
 
-Do not confuse this with `RxIcon` from `resuxjs/ui`, which is a small text placeholder primitive rather than the SVG provider system.
+See [Icon Usage and Registry](/icons/usage) for full props and syntax details.
