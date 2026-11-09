@@ -186,7 +186,7 @@ body {
 .vp-doc div[class*='language-'] code {
   border: 0;
   border-radius: 0;
-  padding: 0;
+  padding: 0 24px;
   font-weight: 500;
 }
 
