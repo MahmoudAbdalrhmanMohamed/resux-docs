@@ -25,7 +25,7 @@ resux deploy [app-root] [options]
 resux halal <command> [app-root] [options]
 ```
 
-When `app-root` is omitted, Resux uses the current directory.
+When `app-root` is omitted, Resux uses the current directory. At startup, the CLI automatically loads `.env.local` and `.env` from `app-root` (`.env.local` takes precedence over `.env`, existing environment variables are preserved, `export ` prefixes and unquoted `#` inline comments are stripped, and `VITE_*` keys are deferred to Vite's mode-aware `.env.<mode>` loader).
 
 ## `init`
 

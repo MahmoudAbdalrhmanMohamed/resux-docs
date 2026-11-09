@@ -239,6 +239,20 @@ return navigateTo('/login', { statusCode: 302 })
 return abortNavigation('Not allowed', { statusCode: 403 })
 ```
 
+### `useViewTransition()`
+
+Access the browser View Transitions API with automatic reduced-motion and unsupported-browser fallbacks:
+
+```ts
+const vt = useViewTransition()
+
+await vt.start(() => {
+  // DOM or reactive state update
+})
+```
+
+Returns `{ isSupported: boolean, start: (callback: () => Promise<void> | void) => Promise<void> }`. See [View Transitions](/guide/view-transitions).
+
 ## Page metadata and document head
 
 ### `definePageMeta(meta)`
@@ -259,6 +273,7 @@ useHead({
   title: 'Account',
   meta: [{ name: 'description', content: 'Manage your account' }],
   link: [{ rel: 'canonical', href: 'https://example.com/account' }],
+  style: [{ id: 'page-style', textContent: 'body { margin: 0; }' }],
   htmlAttrs: { lang: 'en' }
 })
 ```

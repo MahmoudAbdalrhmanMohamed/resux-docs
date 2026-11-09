@@ -36,6 +36,28 @@ useHead({
 
 Use structured entries rather than interpolating untrusted HTML into head fields.
 
+### Reactive head values and style descriptors
+
+`useHead` accepts reactive refs or getter functions across `title`, `htmlAttrs`, `bodyAttrs`, `meta`, `link`, and `style`. Style descriptors (`style: [...]`) support `textContent`, `children`, or `innerHTML` (with `textContent` preferred), alongside attributes such as `id`, `media`, `nonce`, and `blocking`:
+
+```ts
+const themeColor = ref('#0f172a')
+
+useHead({
+  meta: [{ name: 'theme-color', content: themeColor }],
+  style: [
+    {
+      id: 'critical-tokens',
+      textContent: ':root { --brand: #38bdf8; }'
+    }
+  ]
+})
+```
+
+### Critical `<meta>` tag ordering
+
+Resux automatically places critical document-level `<meta>` tags (`charset`, `http-equiv` such as Content Security Policy, and `viewport`) at the very top of `<head>`—before preload links, stylesheets, and scripts—so browser parsers apply character encoding, viewport sizing, and security policies before fetching subresources.
+
 ## `useSeoMeta`
 
 ```ts

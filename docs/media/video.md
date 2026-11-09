@@ -69,6 +69,8 @@ The existing Resux media API supports these documented strategies:
 
 Choose based on whether the video is immediately useful. A below-the-fold explainer should not compete with the page's LCP image, CSS, fonts, and critical JavaScript.
 
+When `defer-until-page-ready` (or `load-strategy="page-ready"`) is enabled alongside a `poster`, Resux renders the `poster` attribute in the initial SSR HTML and keeps the poster visible (`reveal-on-page-ready` / `data-rx-video-defer-ready` and `data-rx-video-ready-reveal`) until both page load and video readiness complete, avoiding blank frames on hero videos.
+
 For long pages, prefer `lazy` or `visible` for below-the-fold videos and keep only genuinely above-the-fold/hero media eager. Do not mark an example as “eager” while also enabling lazy loading; that makes performance tests misleading.
 
 ## Controls modes

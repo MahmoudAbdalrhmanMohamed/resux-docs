@@ -1,6 +1,6 @@
 # Project Status: Public Beta
 
-Resux is currently in **public beta**. The current beta release is **0.4.0-beta.2**.
+Resux is currently in **public beta**. The current beta release is **0.4.0-beta.7**.
 
 The 0.4 line is meant for public evaluation, real-world testing, deployment checks, package compatibility work, and feedback before Resux reaches 1.0. The framework has passed a substantial CI and packaging hardening pass, but pre-1.0 APIs can still change as more applications uncover edge cases.
 
@@ -11,7 +11,7 @@ The 0.4 line is meant for public evaluation, real-world testing, deployment chec
 | Stable | 0.3.x | `latest` | Existing projects that want the current stable pre-beta line |
 | Public beta | 0.4.x prereleases | `next` | New testing, feedback, and access to the latest hardening work |
 
-The public beta started with `0.4.0-beta.1`. The current release, `0.4.0-beta.2`, fixes the npm publishing workflow used to complete the beta release. Framework runtime behavior is unchanged from beta.1.
+The public beta started with `0.4.0-beta.1`. Through `0.4.0-beta.7`, the 0.4 beta series has added the modernized font engine (`fontless` + `fontaine` zero-CLS metrics, local/multi-provider fonts, semantic named weights), the modular icon system (`<Icon>`, CSS/SVG modes, compile-time SVG inlining, offline collections), native View Transitions API integration (`useViewTransition`), FOUC-free route CSS preloading, critical `<meta>` tag ordering and reactive `useHead` descriptors, hero video page-ready poster persistence, and `.env.local` / `.env` loading in the CLI and Halal Core.
 
 Try the beta:
 
@@ -25,7 +25,7 @@ npm run dev
 For repeatable testing, pin the exact release:
 
 ```sh
-npx create-resuxjs@0.4.0-beta.2 my-app
+npx create-resuxjs@0.4.0-beta.7 my-app
 ```
 
 ## What the beta is good for

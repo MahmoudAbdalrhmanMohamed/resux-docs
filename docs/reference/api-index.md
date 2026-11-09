@@ -8,7 +8,7 @@ The root entry re-exports the application-facing runtime surface, including:
 
 - reactivity: `ref`, `reactive`, `computed`, `watch`, `watchEffect`, `readonly`, conversion/check helpers, and `nextTick`;
 - state/data: `useState`, `useGlobalState`, `useAsyncData`, `useFetch`, `$fetch`, and `apiURL`;
-- routing: `useRoute`, `useRouter`, `navigateTo`, and `abortNavigation`;
+- routing: `useRoute`, `useRouter`, `navigateTo`, `abortNavigation`, and `useViewTransition`;
 - app/config: `useRuntimeConfig`, `useResuxApp`, and application/plugin/module factories;
 - head/errors: `useHead`, `useSeoMeta`, `useError`, `createError`, `showError`, and `clearError`;
 - server helpers, package/client-enhancement helpers, device/i18n helpers, and `useResuxImage()`.
@@ -73,13 +73,13 @@ Primary docs: [UI component catalog](/components/) and [UI Package API](./ui.md)
 
 ## `resuxjs/icons`
 
-Optional Vue SVG icon package with a local path registry, Iconify-compatible client fetching, request caching/deduplication, lazy remote loading, module configuration, and helper types/functions.
+Optional modular icon system (`<Icon>` / `<ResuxIcon>`, `useIcon`) with Nuxt Icon syntax parity, compile-time static SVG inlining, `svg` and `css` rendering modes, offline `@iconify-json/*` collection loading, custom local SVGs, and bounded LRU caching.
 
 Primary docs: [Icons](/icons/), [Usage and Registry](/icons/usage), [Configuration](/icons/configuration), and [Runtime Loading](/icons/runtime).
 
 ## `resuxjs/fonts`
 
-Google Fonts stylesheet-loader module and typed `googleFont()` family helper.
+Modern font engine (`fontless` automatic CSS/template scanning, `fontaine` zero-CLS fallback metric overrides, Google Fonts, local self-hosted fonts via `localFont()`, `googleFont()`, semantic named weights, and variable font axes).
 
 Primary docs: [Fonts](/fonts/), [Configuration](/fonts/configuration), and [Performance and CSP](/fonts/performance).
 

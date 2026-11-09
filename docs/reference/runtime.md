@@ -99,7 +99,7 @@ The package also publishes focused runtime subpaths for integrations that do not
 | Import | Primary surface |
 | --- | --- |
 | `resuxjs/runtime/core` | Browser enhancement scheduling and trigger types |
-| `resuxjs/runtime/router` | Same-origin navigation classification, URL normalization, and history navigation |
+| `resuxjs/runtime/router` | Same-origin navigation classification, URL normalization, history navigation, route CSS preloading (`preloadRouteHeadStyles`, `preloadRouteStyle`), and View Transitions helpers (`useViewTransition`, `executeViewTransition`, `shouldPerformViewTransition`, `isViewTransitionSupported`, `prefersReducedMotion`) |
 | `resuxjs/runtime/reactivity` | Runtime-focused re-export of standalone Resux reactivity |
 | `resuxjs/runtime/resume` | Lazy resumable-handler registry/loading and resume bootstrap utilities |
 | `resuxjs/runtime/streaming` | Streaming eligibility, async HTML streaming, buffering, and Web `ReadableStream` creation |

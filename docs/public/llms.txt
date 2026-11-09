@@ -8,7 +8,7 @@ Package: resuxjs
 Node requirement in current source: >=20.19.0
 Release channels: stable 0.3 via npm latest; public beta 0.4 via npm next
 First public-beta milestone: 0.4.0-beta.1
-Current public beta: 0.4.0-beta.2
+Current public beta: 0.4.0-beta.7
 
 Source code and tests are the documentation source of truth. Do not assume npm latest permanently matches source documentation.
 
@@ -125,8 +125,12 @@ Important facts:
 - Normal Resux components do not hydrate through Vue.
 - `resuxjs/ui` components and `resuxjs/icons` Icon/ResuxIcon are Vue runtime components; use explicit Vue/client contexts.
 - `ResuxImg`, `ResuxPicture`, and `ResuxVideo` are handled by the Resux renderer and are not `resuxjs/ui` Vue components.
-- The current fonts module is Google-Fonts-only; it does not implement local/self-host font management.
-- The current icon module defaults to `collections: []` and `lazy: false`; remote unknown icons load on the client.
+- `resuxjs/fonts` supports Google Fonts, local self-hosted fonts (`localFont()`), `fontless` automatic CSS/template scanning (`autoScan: true`), `fontaine` zero-CLS fallback metric overrides, semantic named weights, and variable font axes.
+- `resuxjs/icons` provides `<Icon>` / `<ResuxIcon>` and `useIcon` with Nuxt Icon syntax (`lucide:check`, `custom:logo`), compile-time SVG inlining, `svg` and `css` rendering modes, offline `@iconify-json/*` collections, and bounded LRU caching.
+- `useViewTransition()` and native View Transitions API integration (`router.viewTransition`, `:view-transition` on `<ResuxLink>`, `definePageMeta({ viewTransition })`) automatically respect `prefers-reduced-motion: reduce`.
+- Route navigation preloads route-specific stylesheets (`preloadRouteHeadStyles`) before swapping the DOM to prevent FOUC.
+- Critical `<meta>` tags (`charset`, `http-equiv`, `viewport`) are emitted at the top of `<head>` before preloads and stylesheets, and `useHead({ style })` supports `textContent`, `children`, or `innerHTML` plus reactive refs/getters.
+- CLI and Halal Core policy loaders automatically load project `.env.local` and `.env` files without overwriting existing process environment variables or interfering with Vite mode-aware `VITE_*` variables.
 - `RxReveal` is mount-triggered, not viewport-triggered; the `vAnime`/`vAnimate` directive is the viewport-observed UI API.
 - `RxAutoAnimate` currently runs one mount animation and does not observe child/layout mutations.
 - `useFetch` returns an AsyncDataResource with data/value/pending/error refs.

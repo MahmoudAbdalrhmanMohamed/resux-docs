@@ -45,7 +45,7 @@ features:
 
 <div class="resux-home-section">
   <p class="resux-home-eyebrow">Public beta</p>
-  <h2 class="resux-home-title">Current beta: 0.4.0-beta.2</h2>
+  <h2 class="resux-home-title">Current beta: 0.4.0-beta.7</h2>
   <p class="resux-home-lead">Resux 0.4 is available for public testing. It is a good fit for learning, demos, compatibility testing, and non-critical applications. Because Resux is still pre-1.0, pin your version and test upgrades before using it in an important production system.</p>
 
   <div class="resux-home-grid">
@@ -125,7 +125,7 @@ npm run dev
 For repeatable beta testing, pin the exact version:
 
 ```sh
-npx create-resuxjs@0.4.0-beta.2 my-app
+npx create-resuxjs@0.4.0-beta.7 my-app
 ```
 
 <div class="resux-home-section">

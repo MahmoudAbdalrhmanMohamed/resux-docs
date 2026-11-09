@@ -126,7 +126,7 @@ function loadProjectPolicy(
 ): Promise<ResuxHalalPolicy>
 ```
 
-`loadProjectPolicy()` combines supported main-config context with the first found `resux.halal.config.ts|js|mjs`, then validates the result.
+`loadProjectPolicy()` combines supported main-config context with the first found `resux.halal.config.ts|js|mjs`, then validates the result. Both loaders automatically read `.env.local` and `.env` from `appRoot` without overwriting existing process environment variables or `VITE_*` keys, and transpile TypeScript config files via a temporary root-level module that is cleaned up immediately.
 
 ## Project scanner and rule evaluator
 

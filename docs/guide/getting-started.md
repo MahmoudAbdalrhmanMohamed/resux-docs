@@ -21,7 +21,7 @@ Resux currently has two npm channels:
 - `latest` → stable 0.3.x releases
 - `next` → public-beta 0.4.x prereleases
 
-The current public beta is **0.4.0-beta.2**.
+The current public beta is **0.4.0-beta.7**.
 
 ## Create an application
 
@@ -40,7 +40,7 @@ npx create-resuxjs@next my-app
 If you want a repeatable beta setup, pin the exact release:
 
 ```sh
-npx create-resuxjs@0.4.0-beta.2 my-app
+npx create-resuxjs@0.4.0-beta.7 my-app
 ```
 
 Then start the project:

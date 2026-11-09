@@ -128,7 +128,7 @@ When paired with View Transitions, the browser silently prerenders the target ro
 
 ## Route CSS preloading without FOUC
 
-When swapping routes, Resux automatically preloads and mounts the next route's required CSS stylesheets before executing the DOM swap. This guarantees zero Flash of Unstyled Content (FOUC) while preserving persistent layout styles.
+When swapping routes, Resux automatically preloads and mounts the next route's required CSS stylesheets (`preloadRouteHeadStyles`) before executing the DOM swap. This includes any transitive stylesheet dependencies listed in `imports` / `data-imports`, skips disabled or non-matching `media` links, and enforces a bounded 4000 ms timeout fallback so navigation never hangs on an unreachable stylesheet. This guarantees zero Flash of Unstyled Content (FOUC) while preserving persistent layout styles.
 
 ## Smooth route loader
 

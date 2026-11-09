@@ -171,6 +171,8 @@ export default defineResuxHalalPolicy({
 
 Policy configuration may make enforcement stricter. Core blocking behavior is not intended to be disabled through project configuration.
 
+When loading `resux.config.ts` or `resux.halal.config.ts`, Halal Core and the Resux CLI automatically load `.env.local` and `.env` from the application root (`.env.local` takes precedence over `.env`, existing process environment variables are never overwritten, `export ` prefixes and unquoted `#` inline comments are stripped, and `VITE_*` variables are left to Vite's mode-aware `.env.<mode>` resolution). Temporary transpiled config files are resolved in the project root and cleaned up immediately without creating `.resux/server` prematurely.
+
 ## Optional AI-assisted classification
 
 The default evaluator is local-first. Optional remote AI classification must be explicitly configured.
