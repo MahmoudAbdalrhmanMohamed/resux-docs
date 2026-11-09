@@ -18,6 +18,7 @@ const applicationGuide = [
   { text: 'State and Reactivity', link: '/guide/state' },
   { text: 'Async Data', link: '/guide/async-data' },
   { text: 'Routing', link: '/guide/routing' },
+  { text: 'View Transitions', link: '/guide/view-transitions' },
   { text: 'Layouts', link: '/guide/layouts' },
   { text: 'Head and SEO', link: '/guide/head-seo' },
   { text: 'Runtime Config', link: '/guide/runtime-config' }
@@ -64,12 +65,15 @@ const operationsGuide = [
 const componentPages = [
   { text: 'Overview', link: '/components/' },
   { text: 'Component Anatomy', link: '/components/component-anatomy' },
+  { text: 'Teleport', link: '/components/teleport' },
+  { text: 'Transition', link: '/components/transition' },
   { text: 'Button', link: '/components/button' },
   { text: 'Input', link: '/components/input' },
   { text: 'Textarea', link: '/components/textarea' },
   { text: 'Select', link: '/components/select' },
   { text: 'DatePicker', link: '/components/date-picker' },
   { text: 'Switch', link: '/components/switch' },
+  { text: 'VerificationCode', link: '/components/verification-code' },
   { text: 'Card', link: '/components/card' },
   { text: 'Badge', link: '/components/badge' },
   { text: 'Avatar', link: '/components/avatar' },

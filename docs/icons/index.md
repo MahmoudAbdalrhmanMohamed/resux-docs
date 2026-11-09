@@ -1,118 +1,108 @@
 # Icons
 
-`resuxjs/icons` provides a Vue SVG icon component, an exported local SVG-path registry, optional Iconify-compatible remote fetching, request caching/deduplication, and visibility-based lazy fetching.
+`resuxjs/icons` is Resux's modular icon system with **Nuxt Icon parity**, compile-time SVG inlining, offline icon packages, CSS mode, and custom local SVG support.
 
-::: warning Vue runtime boundary
-`Icon` / `ResuxIcon` are Vue components. Use them inside a [Vue island](/guide/vue-islands) or another explicit Vue runtime context. This package does not turn a normal Resux template subtree into a resumable icon component automatically.
-:::
+## Key Features
+
+- **Nuxt Icon Parity:** Use any icon from 200,000+ icons across 150+ icon sets using standard Iconify syntax: `<Icon name="lucide:check" />`, `<Icon name="ph:check-circle" />`, or built-in shortcuts like `<Icon name="check" />`.
+- **Compile-Time Inlining:** When icons are statically named and available at build time, Resux's Vite plugin compiles them directly into static inline `<svg>` markup with **0 B runtime JavaScript**.
+- **Offline Collections:** Install `@iconify-json/<collection>` packages (e.g. `@iconify-json/lucide`) to serve icons completely offline without making external network calls.
+- **Pure CSS Mode:** Support for `mode="css"`, which renders icons using CSS `mask` and `background-color: currentColor`. This produces ultra-lightweight DOM nodes with zero inline SVG overhead.
+- **Custom Local SVGs:** Drop custom `.svg` files into your project's `./assets/icons/` directory and use them instantly via `<Icon name="custom:my-logo" />`.
+- **Universal Component:** Auto-imported `<Icon>` (with alias `<ResuxIcon>`) that renders seamlessly during server-side rendering and client interaction.
 
 ## Basic usage
 
 ```vue
-<script setup lang="ts">
-import { Icon } from 'resuxjs/icons'
-</script>
-
 <template>
-  <Icon name="check" size="1.25rem" />
+  <!-- Iconify collection icon -->
+  <Icon name="lucide:mail" size="1.5rem" />
+
+  <!-- Pure CSS mask mode -->
+  <Icon name="lucide:sparkles" mode="css" />
+
+  <!-- Custom local SVG from ./assets/icons/logo.svg -->
+  <Icon name="custom:logo" size="2rem" />
+
+  <!-- Built-in shortcut alias -->
+  <Icon name="check" />
 </template>
 ```
 
-`ResuxIcon` from `resuxjs/icons` is an alias of `Icon`.
+## Enable the module
 
-::: info Different from `resuxjs/ui`
-`resuxjs/ui` also exports an `RxIcon` / `ResuxIcon` placeholder primitive that renders text such as `[check]`. For actual SVG registry/provider behavior, import from `resuxjs/icons`.
-:::
-
-## Local registry first
-
-If `name` matches an entry in the exported `iconRegistry`, the component renders that SVG data directly. Built-in/local registry icons do not need a remote fetch.
+Enable `resuxjs/icons` in your `resux.config.ts`:
 
 ```ts
-import { iconRegistry } from 'resuxjs/icons'
-
-iconRegistry['company:mark'] = {
-  viewBox: '0 0 32 32',
-  paths: [
-    { d: 'M…' },
-    { d: 'M…', opacity: '0.7' }
-  ]
-}
-```
-
-See [Usage and Registry](./usage.md).
-
-## Remote icons
-
-When a name is not found locally, the component can fetch icon data from its resolved Iconify-compatible API provider. Remote behavior is client-side: built-in registry data can render immediately, while an unknown/remote icon initially has fallback SVG data until the client fetch succeeds.
-
-```vue
-<Icon name="ph:check-circle" />
-```
-
-See [Runtime Loading](./runtime.md) for caching, lazy fetching, SSR behavior, and failure handling.
-
-## Module configuration
-
-```ts
+// resux.config.ts
 export default defineResuxConfig({
   modules: [
     ['resuxjs/icons', {
-      component: 'Icon',
-      mode: 'svg',
-      apiProvider: 'https://api.iconify.design',
-      collections: ['ph', 'mdi'],
-      lazy: false
+      defaultSize: '1.25rem',
+      mode: 'svg', // 'svg' or 'css'
+      collections: ['lucide', 'ph'],
+      aliases: {
+        github: 'lucide:github',
+        twitter: 'lucide:twitter',
+      }
     }]
   ]
 })
 ```
 
-The current defaults are:
+## Rendering Modes: SVG vs CSS
 
-- `collections: []`
-- `component: 'Icon'`
-- `mode: 'svg'`
-- default Iconify-compatible provider
-- `lazy: false`
+Resux supports two distinct rendering modes:
 
-See [Configuration](./configuration.md) before assuming every module option changes component rendering; some options are exposed as runtime/module metadata while the current component has its own prop defaults.
+### 1. SVG Mode (`mode="svg"`, Default)
 
-## Accessibility default
-
-The rendered SVG sets `aria-hidden="true"` by default, which is appropriate for decorative icons paired with visible text.
+Renders full SVG elements with paths, strokes, and fills. Ideal for multi-color icons, gradients, and precise vector geometry.
 
 ```vue
-<button type="button">
-  <Icon name="check" />
-  Confirm
-</button>
+<Icon name="ph:heart" mode="svg" />
 ```
 
-For a standalone semantic icon, supply a real accessible name through surrounding markup or explicit SVG attributes and test it. Attributes are forwarded to the SVG, so an explicit `aria-hidden`/role/label can override the default when intentionally supplied.
+### 2. CSS Mode (`mode="css"`)
 
-## Styling
-
-The component renders an inline SVG with:
-
-- `fill="currentColor"`
-- inline size styles
-- baseline classes including inline/shrink/vertical alignment helpers plus your `class`
-
-Set color through normal CSS/currentColor:
+Renders a lightweight `<span>` using CSS `mask-image` and `background-color: currentColor`. Perfect for monochromatic UI icons where minimal DOM footprint and color inheritance are desired.
 
 ```vue
-<Icon name="check" class="success-icon" />
+<Icon name="lucide:arrow-right" mode="css" />
 ```
 
-```css
-.success-icon { color: #16a34a; }
+## Offline Collections (`@iconify-json/*`)
+
+To use icons without relying on the public Iconify API at runtime:
+
+1. Install the collection package as a dependency:
+   ```sh
+   npm install -D @iconify-json/lucide
+   ```
+2. Resux automatically loads icon data directly from the installed package during compilation and SSR.
+
+## Custom Local SVG Icons
+
+Place SVG files into your project's icon directory (defaults to `./assets/icons/`):
+
+```txt
+assets/icons/
+  logo.svg
+  brand/
+    mark.svg
 ```
+
+Reference them in templates:
+
+```vue
+<Icon name="custom:logo" />
+<Icon name="custom:brand/mark" />
+```
+
+Resux parses the local SVG file, preserves viewBox and clean vector attributes, and inlines it safely.
 
 ## Related
 
 - [Usage and Registry](./usage.md)
 - [Configuration](./configuration.md)
-- [Runtime Loading](./runtime.md)
-- [Button](/components/button)
-- [Vue Islands](/guide/vue-islands)
+- [Runtime Loading and SSR](./runtime.md)
+- [UI Icon Primitive](/components/icon)

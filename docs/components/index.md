@@ -75,6 +75,7 @@ Every `Rx*` component has a matching `Resux*` alias that points to the same comp
 | [Select](./select.md) | Small custom option picker | Custom keyboard handling; see accessibility limitations |
 | [DatePicker](./date-picker.md) | Native date selection | Renders `<input type="date">` |
 | [Switch](./switch.md) | Boolean on/off state | Button semantics plus `role="switch"` |
+| [VerificationCode](./verification-code.md) | Pin-entry verification code | Animated cells with numeric/alphanumeric modes, collapsing phase, and status indicator |
 
 ## Content and feedback
 
@@ -108,6 +109,15 @@ Every `Rx*` component has a matching `Resux*` alias that points to the same comp
 | [AutoAnimate](./auto-animate.md) | Runs a one-time `scale-in` animation on mount; it does not observe child-list/layout changes |
 | [`useAnimate()`](/reference/ui#useanimate-element-options) | Imperative Web Animations helper |
 | [`vAnime` / `vAnimate`](/reference/ui#vanime-vanimate) | IntersectionObserver-based Vue directive |
+
+## Built-in Resumable Framework Components
+
+These components are core framework primitives built directly into Resux that run with zero full-hydration cost:
+
+| Component | Use it for | Resumable Behavior |
+| --- | --- | --- |
+| [Teleport](./teleport.md) | Moving DOM elements outside hierarchy (e.g. `body`, `#modals`) | Server-rendered boundary markers with deferred client attachment and reactive `:disabled` |
+| [Transition](./transition.md) | CSS enter and leave transitions | Vue-compatible lifecycle classes (`fade-enter-active`, etc.) without Vue runtime overhead |
 
 ## UI icon primitive
 

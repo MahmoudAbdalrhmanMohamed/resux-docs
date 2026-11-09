@@ -1,99 +1,120 @@
-# Font Performance and CSP
+# Font Performance, Zero-CLS, and CSP
 
-Font loading affects render timing, layout stability, privacy, and Content Security Policy. `resuxjs/fonts` gives you explicit loading strategies, but choosing a strategy still requires understanding the browser/network trade-off.
+Font loading affects Core Web Vitals (specifically Cumulative Layout Shift and Largest Contentful Paint), render timing, privacy, and Content Security Policy. `resuxjs/fonts` provides built-in tools to achieve zero-CLS layout stability and fast delivery.
 
-## `eager` (default)
+## Zero-CLS with Fontaine Metric Overrides
 
-The module adds a normal stylesheet link:
+When web fonts load, the browser initially renders text using a local fallback font (such as Arial or Georgia). Because fallback fonts have different character widths, ascents, and descents, swapping to the loaded web font causes the page layout to shift—negatively impacting **Cumulative Layout Shift (CLS)**.
+
+Resux solves this by integrating **`fontaine`**. When you declare `fallbacks` on a font family:
+
+```ts
+// resux.config.ts
+export default defineResuxConfig({
+  modules: [
+    ['resuxjs/fonts', {
+      families: [
+        {
+          name: 'Inter',
+          weights: [400, 700],
+          fallbacks: ['Arial', 'sans-serif'],
+          variable: '--font-inter',
+        }
+      ]
+    }]
+  ]
+})
+```
+
+At build time, Resux analyzes the exact metrics of `Inter` and emits a metric-adjusted fallback `@font-face`:
+
+```css
+@font-face {
+  font-family: 'Inter fallback: Arial';
+  src: local('Arial');
+  ascent-override: 90.49%;
+  descent-override: 22.62%;
+  line-gap-override: 0%;
+  size-adjust: 107.41%;
+}
+```
+
+Because the fallback font occupies the exact same bounding box as the web font, **Cumulative Layout Shift is virtually eliminated (CLS = 0)**.
+
+## Self-Hosting with `fontless` (`autoScan`)
+
+By default, `autoScan: true` is enabled via `fontless`. It automatically scans your components and CSS for `font-family` references, downloads web fonts into your build assets, and generates local `@font-face` definitions.
+
+Benefits of local self-hosting:
+- Eliminates third-party network connections and DNS lookups to external font providers.
+- Fully GDPR / privacy compliant (no user IP addresses leaked to external CDNs).
+- Works completely offline and in air-gapped environments.
+- Protects against external CDN downtime.
+
+## Loading strategies
+
+### `eager` (default)
+
+Adds a standard stylesheet link or `@font-face` declaration:
 
 ```html
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?...">
 ```
 
-Use eager for families needed by the initial page when simplicity and early availability matter.
+Use eager for families needed by the initial viewport when early availability matters.
 
-## `preload`
+### `preload`
 
-The module adds both:
+Preloads the font file or stylesheet with high priority:
 
 ```html
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?...">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?...">
 ```
 
-The preload hints that the stylesheet is important; the stylesheet link still applies the CSS. Do not describe `preload` as deferred loading.
+Preloading tells the browser to fetch the resource immediately, reducing the time before the primary web font is rendered.
 
-Use it selectively. Preloading too many styles competes with critical CSS, images, and scripts.
+### `lazy`
 
-## `lazy`
+Defers font stylesheet attachment until after the `window.load` event. Use this exclusively for secondary or below-the-fold typography.
 
-The lazy/deferred path adds a stylesheet preload and an inline script that installs the stylesheet after the window `load` event. If the document is already complete, it attaches immediately.
+## Preconnect hints
 
-This can keep non-critical fonts out of the initial critical path, but it has consequences:
+When remote Google fonts are used, Resux automatically adds preconnect resource hints:
 
-- it requires browser JavaScript;
-- text will initially use fallback fonts;
-- font swapping can change metrics/layout;
-- strict CSP can block the inline loader;
-- a failure after page load can leave the fallback in use.
-
-Use lazy for genuinely secondary typography, not as a blanket optimization.
-
-## Weight budget
-
-Request only weights you use:
-
-```ts
-{ name: 'Inter', weights: [400, 600, 700] }
+```html
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 ```
 
-Variable ranges such as `100..900` can be appropriate when the family/provider returns an efficient variable font, but “one range” is not automatically smaller than a carefully selected set for every family/browser/provider response. Measure real transfer sizes.
+This establishes early TCP and TLS connections to Google's font servers before stylesheet requests begin.
 
-## `display`
+## Content Security Policy (CSP)
 
-For many interfaces, `swap` is a reasonable default because text remains visible while the web font loads. `optional` can be useful when avoiding late swaps matters more than always using the web font. The right choice depends on typography and product requirements.
-
-## CSP
-
-Google-hosted fonts usually require policy access comparable to:
+If using remote Google fonts, your CSP must permit connections to Google domains:
 
 ```txt
 style-src https://fonts.googleapis.com
 font-src https://fonts.gstatic.com
 ```
 
-The lazy/deferred strategy also relies on an inline script. Under a strict CSP, use a nonce/hash-compatible setup or choose an eager/preload path that does not require the inline loader. Do **not** weaken the entire application's CSP with a broad `unsafe-inline` just for fonts.
+With `autoScan: true` or local self-hosting (`provider: 'local'`), all font assets are served directly from your application's origin, allowing strict `self` CSP rules:
 
-## Privacy and offline use
+```txt
+style-src 'self'
+font-src 'self'
+```
 
-This module's current design makes browser requests to Google-hosted font infrastructure. If policy requires no third-party requests:
+## Checklist for Optimal Font Performance
 
-1. self-host the font files as application assets;
-2. declare your own `@font-face` in CSS;
-3. preload only the critical local files you actually need;
-4. do not enable the Google Fonts module for those families.
-
-That is an application pattern today, not an undocumented local-provider feature of `resuxjs/fonts`.
-
-## Layout stability
-
-The module does not currently generate fallback font metrics. If font swapping causes visible layout changes, choose fallback fonts with similar metrics, consider local/self-hosted strategies, and measure CLS on real pages.
-
-## Checklist
-
-- Configure only used families/weights.
-- Keep `preconnect` unless you already manage it or do not use Google families.
-- Use eager for initial typography unless measurement supports another choice.
-- Preload selectively.
-- Use lazy only for secondary typography.
-- Set a deliberate `display` value.
-- Verify CSP in production, not just dev mode.
-- Measure font transfer, FCP/LCP, and CLS.
-- Self-host when privacy/offline/reliability requirements demand it.
+1. **Use Fontaine Fallbacks:** Specify `fallbacks: ['Arial', ...]` on all key families to eliminate layout shifts (CLS).
+2. **Self-Host Production Fonts:** Rely on `autoScan: true` or `provider: 'local'` for maximum privacy and zero third-party latency.
+3. **Limit Weights:** Specify only the weights your designs actually utilize (`['regular', 'bold']`).
+4. **Use `font-display: swap`:** Ensure text remains readable immediately while web fonts load.
+5. **Preload Critical Fonts:** Use `strategy: 'preload'` for your hero or primary heading typography.
 
 ## Related
 
 - [Fonts overview](./index.md)
 - [Configuration](./configuration.md)
 - [CSS and Tailwind](/guide/css-tailwind)
-- [Security and Caching](/guide/security-caching)

@@ -1,22 +1,36 @@
 # Fonts
 
-`resuxjs/fonts` is Resux's built-in **Google Fonts stylesheet loader**. It builds Google Fonts CSS URLs, adds optional preconnect hints, groups families by loading strategy, and exposes resolved non-secret metadata through public runtime config.
+`resuxjs/fonts` is Resux's modern font engine. It combines zero-config automatic font scanning, local self-hosting, Fontaine-powered zero-CLS fallback metric overrides, semantic named weights, variable font axes, and multi-provider font delivery.
 
-::: warning Current scope
-The current first-party module supports **Google Fonts only**. It does not download/self-host font files, scan local fonts, generate `@font-face`, calculate fallback metrics, provide multiple font providers, or cache provider assets locally. Those are capabilities of other font systems—not current `resuxjs/fonts` behavior.
-:::
+## Key Capabilities
+
+- **Zero-CLS Metric Overrides:** Integrates `fontaine` to calculate and emit fallback `@font-face` rules with `size-adjust`, `ascent-override`, and `descent-override` so your fallback font occupies the exact same dimensions as your web font—eliminating Cumulative Layout Shift (CLS).
+- **Zero-Config Scanning (`autoScan`):** Integrates `fontless` to automatically discover `font-family` declarations in your CSS and templates, downloading and self-hosting the necessary font files during the Vite build.
+- **Semantic Named Weights:** Normalizes semantic weight strings (e.g. `'thin'`, `'light'`, `'regular'`, `'semibold'`, `'bold'`, `'black'`) alongside numeric values (100–900) and range strings (`'100..900'`).
+- **Variable Font Axes:** Full support for arbitrary variable font axes (`axes: { wght: 700, wdth: 100 }`).
+- **Multi-Provider Architecture:** Seamlessly supports Google Fonts, local self-hosted files, and provider integrations (Google, Bunny, Fontshare, Fontsource, local).
 
 ## Enable the module
 
 ```ts
+// resux.config.ts
 export default defineResuxConfig({
   modules: [
     ['resuxjs/fonts', {
-      google: [
+      autoScan: true, // Automatically scan and self-host fonts with fontless
+      families: [
         {
           name: 'Inter',
-          weights: ['100..900'],
-          display: 'swap'
+          weights: ['regular', 'bold'], // Semantic named weights
+          fallbacks: ['Arial', 'sans-serif'], // Fontaine zero-CLS metrics
+          variable: '--font-inter',
+        },
+        {
+          name: 'CustomBrand',
+          provider: 'local',
+          src: '/fonts/custom-brand.woff2',
+          weight: 'normal',
+          style: 'normal',
         }
       ]
     }]
@@ -24,70 +38,90 @@ export default defineResuxConfig({
 })
 ```
 
-Then use the family through normal CSS:
+Then use the family in normal CSS:
 
 ```css
 :root {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--font-inter, 'Inter', 'Inter fallback: Arial', system-ui, sans-serif);
 }
 ```
 
-Resux does not scan CSS to discover families. The family must be configured in the module.
+## Fontaine Zero-CLS Fallbacks
+
+When `fallbacks` are specified on a font family:
+
+```ts
+{
+  name: 'Inter',
+  weights: [400, 700],
+  fallbacks: ['Arial']
+}
+```
+
+Resux invokes `fontaine` at build time to inspect the font metrics of the primary font and generate an adjusted fallback `@font-face` rule:
+
+```css
+@font-face {
+  font-family: 'Inter fallback: Arial';
+  src: local('Arial');
+  ascent-override: 90.49%;
+  descent-override: 22.62%;
+  line-gap-override: 0%;
+  size-adjust: 107.41%;
+}
+```
+
+This prevents layout shifts and content jumping while web fonts load over the network.
+
+## Semantic Named Weights
+
+You can specify font weights using numbers, range strings, or semantic names:
+
+| Semantic Name | Numeric Weight |
+| --- | --- |
+| `'thin'`, `'hairline'` | `100` |
+| `'extralight'`, `'extra-light'`, `'ultralight'` | `200` |
+| `'light'` | `300` |
+| `'normal'`, `'regular'` | `400` |
+| `'medium'` | `500` |
+| `'semibold'`, `'semi-bold'`, `'demibold'` | `600` |
+| `'bold'` | `700` |
+| `'extrabold'`, `'extra-bold'`, `'ultrabold'` | `800` |
+| `'black'`, `'heavy'` | `900` |
 
 ## Loading strategies
 
-The module supports:
+For remote and Google fonts, the module supports:
 
 | Strategy | Result |
 | --- | --- |
-| `eager` | Adds the Google Fonts stylesheet immediately. Default. |
-| `preload` | Adds `rel="preload" as="style"` **and** the normal stylesheet. |
-| `lazy` | Adds a stylesheet preload and an inline script that attaches the stylesheet after `window.load` (or immediately if already loaded). |
+| `eager` | Adds stylesheet/font links immediately into server head output. Default. |
+| `preload` | Emits `rel="preload" as="style"` alongside normal links for high-priority delivery. |
+| `lazy` | Defers font stylesheet attachment until after `window.load` (or immediately if already loaded). |
 
-See [Configuration](./configuration.md) for precedence and exact options, and [Performance and CSP](./performance.md) before choosing deferred loading.
+## Type-safe family helpers
 
-## Preconnect
-
-When Google families exist, `preconnect` defaults to true and adds:
-
-```html
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-```
-
-Disable it when your application already manages those hints.
-
-## Type-safe family helper
+Resux exports helper functions for type safety when defining families:
 
 ```ts
-import { googleFont } from 'resuxjs/fonts'
+import { googleFont, localFont } from 'resuxjs/fonts'
 
 const inter = googleFont({
   name: 'Inter',
-  weights: ['100..900'],
+  weights: ['regular', 'bold'],
   display: 'swap',
-  strategy: 'preload'
+  fallbacks: ['Arial']
+})
+
+const branding = localFont({
+  name: 'BrandHeading',
+  src: '/fonts/brand.woff2',
+  weight: 'bold'
 })
 ```
-
-`googleFont()` is an identity helper: it returns the family object you pass. Its value is TypeScript guidance/reuse, not hidden runtime processing.
-
-## SSR / build / client boundary
-
-The module participates in Resux setup and adds head entries:
-
-- eager/preload stylesheet links are discoverable in server-generated head output;
-- preconnect links are server-added when enabled;
-- lazy/deferred loading adds an inline browser script, so that strategy depends on client JavaScript and must be compatible with your Content Security Policy;
-- public runtime metadata describes configured family names and resolved strategies, but font CSS itself comes from Google Fonts.
-
-## Privacy and reliability
-
-Because the current module references Google-hosted CSS/fonts, browsers make requests to Google domains. If your requirements demand self-hosting, offline operation, stricter privacy, or no third-party font network dependency, do not claim that the Resux fonts module solves those requirements today. Self-host fonts using normal application CSS/assets or another integration.
 
 ## Related
 
 - [Configuration](./configuration.md)
-- [Performance and CSP](./performance.md)
+- [Performance and Zero-CLS](./performance.md)
 - [CSS and Tailwind](/guide/css-tailwind)
-- [Security and Caching](/guide/security-caching)

@@ -27,18 +27,22 @@ Core:
 - /guide/state
 - /guide/async-data
 - /guide/routing
+- /guide/view-transitions
 - /guide/layouts
 - /guide/head-seo
 - /guide/runtime-config
 
 UI components (`resuxjs/ui`, Vue runtime boundary):
 - /components/
+- /components/teleport
+- /components/transition
 - /components/button
 - /components/input
 - /components/textarea
 - /components/select
 - /components/date-picker
 - /components/switch
+- /components/verification-code
 - /components/card
 - /components/badge
 - /components/avatar

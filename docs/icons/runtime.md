@@ -1,122 +1,91 @@
-# Icon Runtime Loading
+# Icon Runtime Loading and Resolution
 
-The icon component resolves local registry data first and uses remote fetching only when needed.
+Resux uses a tiered resolution strategy that maximizes build-time performance and minimizes client runtime requests:
 
-## Resolution flow
+## Tiered Resolution Architecture
 
-For an icon name:
+When resolving an icon by name:
 
-1. Look in `iconRegistry`.
-2. If registry data exists, render it.
-3. Otherwise resolve the component/runtime API provider.
-4. If eager, start remote loading after the Vue component mounts.
-5. If lazy and `IntersectionObserver` exists, wait until the icon approaches the viewport.
-6. Parse compatible returned SVG/path data into the component's constrained `IconData` representation.
-7. Cache successful data and render the resulting paths.
-8. On failure, keep/fall back safely rather than injecting arbitrary raw remote markup directly as the component template.
-
-## `normalizeIconApiProvider()`
-
-The provider normalizer is also public:
-
-```ts
-import { normalizeIconApiProvider } from 'resuxjs/icons'
-
-const provider = normalizeIconApiProvider(
-  'https://api.iconify.design/'
-)
+```txt
+┌────────────────────────────────────────────────────────┐
+│ 1. Compile-Time Inlining (Vite Plugin)                 │
+│    Transforms static <Icon name="..." /> into inline   │
+│    <svg> markup with 0 B client JavaScript overhead.   │
+└──────────────────────────┬─────────────────────────────┘
+                           │ not static / dynamic
+                           ▼
+┌────────────────────────────────────────────────────────┐
+│ 2. Local SVG Directory (assets/icons/)                 │
+│    Reads custom:* SVG files directly from disk.        │
+└──────────────────────────┬─────────────────────────────┘
+                           │ not custom:*
+                           ▼
+┌────────────────────────────────────────────────────────┐
+│ 3. Offline Collections (@iconify-json/*)               │
+│    Reads installed npm icon packages during SSR.       │
+└──────────────────────────┬─────────────────────────────┘
+                           │ not installed locally
+                           ▼
+┌────────────────────────────────────────────────────────┐
+│ 4. In-Memory Registry (iconRegistry)                   │
+│    Synchronously checks pre-registered icons.          │
+└──────────────────────────┬─────────────────────────────┘
+                           │ not found locally
+                           ▼
+┌────────────────────────────────────────────────────────┐
+│ 5. Client Remote Fetcher (apiProvider)                 │
+│    Fetches from Iconify API, caches, and renders.      │
+└────────────────────────────────────────────────────────┘
 ```
 
-```ts
-function normalizeIconApiProvider(value: unknown): string
-```
+## Client Remote Fetching
 
-It trims/normalizes configured provider input, removes unnecessary trailing slashes, rejects unsafe or malformed provider forms, and falls back to Resux's default Iconify API provider when no usable provider is supplied. The icon component, module setup, and `fetchIconifyIcon()` all use the same normalization path so cache/request identity stays consistent.
+When an icon is not available at compile-time or locally in offline collections:
 
-## `fetchIconifyIcon()`
+1. **Eager Fetch:** If `lazy: false`, fetching starts immediately after component mount.
+2. **Lazy Fetch:** If `lazy: true` or `loading="lazy"`, the component registers an `IntersectionObserver` with a positive root margin, triggering the fetch only when the icon approaches the viewport.
+3. **Request Deduplication:** Concurrent requests for the same icon share a single in-flight Promise.
+4. **Response Caching:** Successful SVG responses are cached in memory. Subsequent renders resolve instantly without network round-trips.
+5. **Stale-Request Protection:** If a dynamic icon name changes rapidly (e.g. in a search filter), obsolete responses are discarded so they never overwrite the active icon.
 
-The package exports the remote helper used by the component:
+## SSR Behavior & Client-Only Icons
 
-```ts
-import { fetchIconifyIcon } from 'resuxjs/icons'
+### Server-Side Rendering
 
-const icon = await fetchIconifyIcon(
-  'ph:check-circle',
-  'https://api.iconify.design'
-)
-```
+By default, any icon that resolves locally (via offline collections, local SVGs, or `iconRegistry`) renders complete SVG markup directly into the server HTML stream.
 
-Use the helper only when you actually need programmatic icon resolution. Component use normally handles this flow.
+### Client-Only Rendering (`:ssr="false"`)
 
-## Cache and request deduplication
-
-The implementation keeps caches keyed by provider + icon name and tracks pending fetches so concurrent requests for the same remote icon/provider can share work rather than issuing identical requests.
-
-Provider identity is part of the key, so the same icon name from two configured providers does not incorrectly share one provider's response.
-
-## Stale-request protection
-
-When component input changes while a request is still in flight, the implementation protects against an older response overwriting a newer name/provider state.
-
-This matters for reactive lists/search results where icon names can change quickly.
-
-## Lazy loading
+For icons that should only render in the browser (e.g. icons in user profile menus or dynamic theme toggles):
 
 ```vue
-<Icon name="ph:image" lazy />
+<Icon name="lucide:user" :ssr="false" />
 ```
 
-or:
+When `ssr: false`, Resux emits a lightweight placeholder element during SSR, then resolves and swaps the icon after client hydration.
 
-```vue
-<Icon name="ph:image" loading="lazy" />
+## Programmatic API
+
+Resux exports the core resolution helpers:
+
+```ts
+import {
+  resolveIconSync,
+  resolveIconAsync,
+  fetchIconifyIcon,
+  loadOfflineIcon,
+  loadLocalSvgIcon
+} from 'resuxjs/icons'
+
+// Synchronous resolution (offline, local, or registry)
+const staticData = resolveIconSync('lucide:check', config)
+
+// Asynchronous resolution (including remote fetch fallback)
+const iconData = await resolveIconAsync('lucide:check', config)
 ```
-
-When lazy and `IntersectionObserver` is available, the component observes its SVG/root region and starts fetching as it approaches the viewport (the implementation uses a positive root margin). Without observer support, it falls back to loading instead of leaving the icon permanently unresolved.
-
-Lazy affects **remote fetching**. A local `iconRegistry` hit already has its path data and does not need a network delay.
-
-## SSR behavior
-
-### Registry icon
-
-A locally registered icon has data available synchronously and can render complete SVG path data through Vue's server-rendering path.
-
-### Remote icon
-
-Remote fetching is a client mount/lazy behavior in the current component. SSR does not make a remote Iconify request to fill an unknown icon before HTML is sent. The server/client output therefore begins from the component's fallback representation until client resolution succeeds.
-
-For important above-the-fold icons, put the required SVG data in `iconRegistry` instead of depending on remote fetch after mount.
-
-## Failure handling
-
-Remote failure should be expected as a normal network condition. Keep critical labels/actions understandable without the icon. For example:
-
-```vue
-<button type="button">
-  <Icon name="remote:set-name" />
-  Continue
-</button>
-```
-
-The text remains useful if the remote icon cannot load.
-
-## Performance
-
-- Prefer local registry entries for frequently used/critical icons.
-- Lazy-load below-the-fold remote icons.
-- Avoid rendering hundreds of unique remote icons at once.
-- Keep icon names stable so caches can be reused.
-- Do not configure a provider that redirects every icon request through a high-latency service without measuring it.
-- Use normal CSS/currentColor instead of duplicating color-specific SVG copies.
-
-## Accessibility
-
-Remote vs local loading must not change the accessible meaning of the control. The SVG defaults to decorative `aria-hidden="true"`; accessible labels should be owned by surrounding text/control semantics.
 
 ## Related
 
 - [Icons overview](./index.md)
 - [Usage and Registry](./usage.md)
 - [Configuration](./configuration.md)
-- [Vue Islands](/guide/vue-islands)

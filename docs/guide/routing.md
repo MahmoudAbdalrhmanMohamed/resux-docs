@@ -76,6 +76,64 @@ Eligible same-origin page links may prefetch their route payload on useful point
 
 Managed image/video asset links keep their media-specific browser/runtime behavior and are not mistaken for page routes.
 
+## View Transitions API
+
+Resux provides native integration with the browser's **View Transitions API** across the router:
+
+```ts
+// resux.config.ts
+export default defineResuxConfig({
+  router: {
+    viewTransition: true // Enable View Transitions globally
+  }
+})
+```
+
+### Controlling transitions
+
+- **Per-link:** Pass `:view-transition="true"` or `:view-transition="false"` to `<ResuxLink>`.
+- **Per-page:** Declare `definePageMeta({ viewTransition: true })`.
+- **Programmatically:** Pass `{ viewTransition: true }` to `navigateTo()`.
+- **Composable:** Use `useViewTransition()` to inspect support and run custom element animations.
+- **Accessibility:** Motion reduction (`prefers-reduced-motion: reduce`) is automatically detected and respected.
+
+See the dedicated [View Transitions Guide](/guide/view-transitions) for complete CSS customization, pseudo-elements, and examples.
+
+## Speculative Route Preloading (Speculation Rules)
+
+In addition to hover-based link prefetching, Resux supports the Chromium **Speculation Rules API** (`<script type="speculationrules">`) for instant, 0 ms prerendering and prefetching:
+
+```vue
+<!-- pages/index.vue -->
+<script setup lang="ts">
+useHead({
+  script: [
+    {
+      type: 'speculationrules',
+      innerHTML: JSON.stringify({
+        prerender: [
+          {
+            where: { and: [{ href_matches: '/*' }, { not: { href_matches: '/api/*' } }] },
+            eagerness: 'moderate'
+          }
+        ]
+      })
+    }
+  ]
+})
+</script>
+```
+
+When paired with View Transitions, the browser silently prerenders the target route in the background; clicking the link activates the prerendered view instantly with smooth CSS view transition animations.
+
+## Route CSS preloading without FOUC
+
+When swapping routes, Resux automatically preloads and mounts the next route's required CSS stylesheets before executing the DOM swap. This guarantees zero Flash of Unstyled Content (FOUC) while preserving persistent layout styles.
+
+## Smooth route loader
+
+Resux includes a smooth route loading indicator that tracks route transition state (`swapping`, `complete`, `error`) without whole-app fading, keeping the active view interactive while the next route payload prepares.
+
 ## One shared route loader
 
 Prefetch and intentional navigation converge on the same internal route-loading primitive. It owns:

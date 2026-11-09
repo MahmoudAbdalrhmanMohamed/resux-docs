@@ -73,6 +73,15 @@ It is a Vue directive, not a native Resux template directive.
 
 These names should not be used to promise behavior the source does not implement.
 
+## Built-in Resumable Transitions and View Transitions
+
+In addition to the Vue-owned `resuxjs/ui` motion primitives, Resux provides two core framework animation layers that operate with zero hydration overhead:
+
+1. **[`<Transition>`](/components/transition):** Built-in resumable component for DOM element entering and leaving lifecycles (`fade-enter-active`, `fade-leave-active`, etc.).
+2. **[View Transitions API](/guide/view-transitions):** Native browser page-to-page transition runner enabled via `router: { viewTransition: true }` or `<ResuxLink :view-transition="true">`.
+
+Both core animation layers automatically respect `prefers-reduced-motion: reduce` without extra application code.
+
 ## Reduced motion
 
 `isReducedMotion()` checks `prefers-reduced-motion: reduce` in browsers. `useAnimate`, `RxMotion`, `RxReveal`, and `RxAutoAnimate` skip their Web Animations path when reduced motion is requested.
