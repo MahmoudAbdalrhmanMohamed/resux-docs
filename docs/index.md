@@ -44,6 +44,12 @@ features:
   - icon: SOURCE
     title: Docs tied to the real framework
     details: Public APIs and examples are checked against the framework source, package exports, and tests.
+  - icon: VT
+    title: Native View Transitions
+    details: Declarative <ResuxLink view-transition>, definePageMeta, and programmatic navigateClient with zero client runtime overhead.
+  - icon: FONT
+    title: Zero-CLS Fonts & Static Icons
+    details: fontless automatic CSS scanning, fontaine metric-adjusted fallback overrides, and compile-time inlined static SVG/CSS icons.
 ---
 
 <div class="resux-home-section">
@@ -100,6 +106,16 @@ features:
       <span class="resux-card-kicker">Help</span>
       <strong>Troubleshoot a problem</strong>
       <span>Work through common development, build, runtime, package, media, and deployment issues.</span>
+    </a>
+    <a class="resux-home-card" href="./guide/view-transitions">
+      <span class="resux-card-kicker">Animation</span>
+      <strong>View Transitions API</strong>
+      <span>Enable smooth native browser page transitions with ResuxLink and definePageMeta.</span>
+    </a>
+    <a class="resux-home-card" href="./fonts/">
+      <span class="resux-card-kicker">Typography</span>
+      <strong>Fonts &amp; Modular Icons</strong>
+      <span>Configure Fontless 1.3.4 zero-CLS metric overrides and compile-time inlined SVG icons.</span>
     </a>
   </div>
 </div>
