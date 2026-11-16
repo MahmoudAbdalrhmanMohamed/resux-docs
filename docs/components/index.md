@@ -4,7 +4,7 @@ Resux ships a complete, dependency-free suite of **25 UI components** in `resuxj
 
 Every component page in this section includes a **Live Interactive UI Preview ("See How It Looks")**, runnable Vue SFC examples, rendered DOM (`rx-*`) inspection, and full TypeScript prop tables.
 
-<RxComponentPreview component="RxButton" title="Interactive UI Suite Preview — Try Variants & Sizes" />
+<RxComponentPreview suite title="Interactive UI Suite Playground — Explore All 25 Components" />
 
 ## Quick Import
 

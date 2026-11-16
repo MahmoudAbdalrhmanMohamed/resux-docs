@@ -703,6 +703,12 @@ body {
   border-color: var(--vp-c-brand-1);
   box-shadow: 0 0 0 3px var(--vp-c-brand-soft);
 }
+.rx-input.is-success {
+  border-color: #10b981;
+}
+.rx-input.is-error {
+  border-color: #ef4444;
+}
 .rx-textarea { min-height: 5rem; resize: vertical; }
 
 .rx-select {
@@ -819,6 +825,8 @@ body {
   box-shadow: var(--resux-shadow-sm);
 }
 .rx-card-elevated { box-shadow: var(--resux-shadow-md); }
+.rx-card-outlined { background: transparent; border: 1.5px solid var(--resux-border); }
+.rx-card-subtle { background: var(--resux-surface-muted); border-color: transparent; }
 
 .rx-badge {
   display: inline-flex;
@@ -830,6 +838,14 @@ body {
   background: var(--resux-surface-muted);
   color: var(--resux-text);
   border: 1px solid var(--resux-border);
+}
+.rx-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: currentColor;
+  margin-right: 5px;
+  display: inline-block;
 }
 .rx-badge-primary { background: var(--vp-c-brand-soft); color: var(--vp-c-brand-1); border-color: rgba(109, 93, 252, 0.3); }
 .rx-badge-success { background: rgba(16, 185, 129, 0.14); color: #10b981; border-color: rgba(16, 185, 129, 0.3); }
