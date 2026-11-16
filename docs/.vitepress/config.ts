@@ -247,6 +247,7 @@ export default defineConfig({
       { text: 'Reference', link: '/reference/api-index' },
       { text: 'Examples', link: '/examples/' },
       { text: 'All Docs', link: '/all-pages' },
+      { text: '💼 Hire Me', link: '/#hire-me' },
       {
         text: 'Ecosystem',
         items: [

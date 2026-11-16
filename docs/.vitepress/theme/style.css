@@ -1023,3 +1023,157 @@ body {
   border: 1px solid var(--resux-border);
   box-shadow: var(--resux-shadow-md);
 }
+
+
+/* ==========================================================================
+   Hire Me Section Styling (Obvious & Modern)
+   ========================================================================== */
+.resux-hire-card {
+  position: relative;
+  overflow: hidden;
+  margin-top: 24px;
+  padding: 38px 34px;
+  border-radius: 20px;
+  border: 1.5px solid color-mix(in srgb, var(--vp-c-brand-1) 36%, var(--resux-border));
+  background: radial-gradient(circle at top right, rgba(109, 93, 252, 0.12), transparent 60%), var(--resux-surface);
+  box-shadow: 0 12px 36px rgba(109, 93, 252, 0.09), var(--resux-shadow-md);
+}
+
+.dark .resux-hire-card {
+  background: radial-gradient(circle at top right, rgba(168, 156, 255, 0.14), transparent 60%), var(--resux-surface-strong);
+  border-color: color-mix(in srgb, var(--vp-c-brand-1) 40%, var(--resux-border));
+}
+
+.resux-hire-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: rgba(16, 185, 129, 0.14);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  margin-bottom: 16px;
+}
+
+.resux-hire-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: #10b981;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  animation: resux-pulse 2s infinite;
+}
+
+@keyframes resux-pulse {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 7px rgba(16, 185, 129, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.resux-hire-services {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: 28px 0;
+}
+
+.resux-hire-service-item {
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid var(--resux-border);
+  background: var(--resux-surface-muted);
+  transition: transform 0.18s ease, border-color 0.18s ease;
+}
+
+.resux-hire-service-item:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--vp-c-brand-1) 36%, var(--resux-border));
+}
+
+.resux-hire-service-item strong {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1rem;
+  color: var(--vp-c-text-1);
+  margin-bottom: 8px;
+}
+
+.resux-hire-service-item p {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--vp-c-text-2);
+}
+
+.resux-hire-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin-top: 24px;
+  padding-top: 22px;
+  border-top: 1px solid var(--resux-border);
+}
+
+.resux-hire-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  background: var(--vp-c-brand-1);
+  color: #ffffff !important;
+  text-decoration: none !important;
+  box-shadow: 0 4px 14px rgba(109, 93, 252, 0.35);
+  transition: all 0.18s ease;
+}
+
+.resux-hire-btn-primary:hover {
+  background: var(--vp-c-brand-2);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(109, 93, 252, 0.45);
+}
+
+.resux-hire-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  background: var(--resux-surface-muted);
+  color: var(--vp-c-text-1) !important;
+  border: 1px solid var(--resux-border);
+  text-decoration: none !important;
+  transition: all 0.18s ease;
+}
+
+.resux-hire-btn-secondary:hover {
+  border-color: var(--vp-c-brand-1);
+  transform: translateY(-2px);
+}
+
+.resux-hire-meta {
+  font-size: 0.85rem;
+  color: var(--vp-c-text-3);
+  margin-left: auto;
+}
+
+@media (max-width: 959px) {
+  .resux-hire-services {
+    grid-template-columns: 1fr;
+  }
+  .resux-hire-meta {
+    margin-left: 0;
+    width: 100%;
+  }
+}
