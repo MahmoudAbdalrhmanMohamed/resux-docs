@@ -1,88 +1,98 @@
-# Motion
+# Motion (RxMotion)
 
-`RxMotion` wraps slot content in a configurable element and calls `useAnimate()` on that root after the Vue component mounts.
+Web Animations API wrapper component that animates its root tag on mount using `useAnimate` presets (`fade-in`, `fade-up`, `fade-down`, `slide-left`, `slide-right`, `zoom-in`, `zoom-out`) while respecting `prefers-reduced-motion`.
+
+## Live Interactive Preview — See How It Looks
+
+Use the interactive canvas below to preview how `RxMotion` looks and behaves in real time:
+
+<RxComponentPreview component="RxMotion" title="Motion (RxMotion) — Live Visual Preview" />
 
 ## Import
 
 ```ts
 import { RxMotion } from 'resuxjs/ui'
-// Equivalent alias: ResuxMotion
+// Equivalent alias:
+import { ResuxMotion } from 'resuxjs/ui'
 ```
 
-## Basic usage
+## Complete Runnable Example
 
 ```vue
-<RxMotion preset="fade-up">
-  <section>Animated after mount</section>
-</RxMotion>
+<script setup lang="ts">
+import { ref } from 'resuxjs'
+import { RxMotion, RxCard, RxButton } from 'resuxjs/ui'
+
+const preset = ref<'fade-up' | 'zoom-in' | 'slide-left'>('fade-up')
+const runKey = ref(1)
+
+function replay(nextPreset: 'fade-up' | 'zoom-in' | 'slide-left') {
+  preset.value = nextPreset
+  runKey.value += 1
+}
+</script>
+
+<template>
+  <div class="space-y-3">
+    <div class="flex gap-2">
+      <RxButton size="sm" variant="outline" @click="replay('fade-up')">Fade Up</RxButton>
+      <RxButton size="sm" variant="outline" @click="replay('zoom-in')">Zoom In</RxButton>
+      <RxButton size="sm" variant="outline" @click="replay('slide-left')">Slide Left</RxButton>
+    </div>
+
+    <RxMotion :key="runKey" :preset="preset" :duration="450">
+      <RxCard>
+        <div class="font-semibold text-sm">Animated with RxMotion ({{ preset }})</div>
+        <div class="text-xs opacity-75">Uses native Web Animations API with automatic reduced-motion fallback.</div>
+      </RxCard>
+    </RxMotion>
+  </div>
+</template>
 ```
 
-## Presets
+## Rendered DOM Structure (`rx-*` Classes)
 
-`useAnimate()` recognizes:
+When rendered on the server or client with default styling (`:unstyled="false"`), `RxMotion` produces the following HTML structure (`<tag> (animated via Web Animations API)`):
 
-- `fade-up`
-- `fade-down`
-- `scale-in`
-- `slide-in-left`
-- `slide-in-right`
-- `pulse-glow`
-- `bounce-in`
-
-Unknown preset names fall back to the generic fade/up keyframes used by the helper's default branch.
-
-## Timing
-
-```vue
-<RxMotion preset="scale-in" :duration="600" :delay="120" />
-```
-
-## Custom root element
-
-```vue
-<RxMotion tag="article" preset="fade-up">
-  ...
-</RxMotion>
+```html
+<div style="opacity: 1; transform: translateY(0px);">
+  <div class="rx-card">Animated with RxMotion (fade-up)</div>
+</div>
 ```
 
 ## Props
 
 | Prop | Type | Default | Required | Description |
 | --- | --- | --- | --- | --- |
-| `tag` | `string` | `'div'` | No | Root HTML tag passed to Vue `h()`. |
-| `preset` | `string` | `'fade-up'` | No | Animation preset name. |
-| `duration` | `number` | `400` | No | Duration in ms. |
-| `delay` | `number` | `0` | No | Delay in ms. |
-| `easing` | `string` | `'cubic-bezier(0.16, 1, 0.3, 1)'` | No | Web Animations easing. |
-| `unstyled` | `boolean` | `false` | No | Skips the mount animation. |
+| `tag` | `string` | `'div'` | No | HTML tag name rendered as the animated container. |
+| `preset` | `AnimationPreset` | `'fade-up'` | No | Preset keyframe animation (`fade-in`, `fade-up`, `fade-down`, `slide-left`, `slide-right`, `zoom-in`, `zoom-out`). |
+| `duration` | `number` | `400` | No | Animation duration in milliseconds. |
+| `delay` | `number` | `0` | No | Start delay in milliseconds. |
+| `easing` | `string` | `'cubic-bezier(0.16, 1, 0.3, 1)'` | No | CSS timing function passed to `Element.animate()`. |
+| `unstyled` | `boolean` | `false` | No | Reserved for consistency across `resuxjs/ui`. |
 
 ## Events
 
-No custom events.
+This component does not emit custom events (native DOM events forward normally).
 
 ## Slots
 
-| Slot | Props | Description |
-| --- | --- | --- |
-| `default` | None | Root contents. |
+| Slot | Description |
+| --- | --- |
+| `default` | Content inside the animated element. |
 
-## Reduced motion
+## Headless / Tailwind `unstyled` Mode
 
-Before starting, `RxMotion` checks `isReducedMotion()`. When `matchMedia('(prefers-reduced-motion: reduce)')` matches, it does not animate.
+Pass `:unstyled="true"` to strip default `rx-*` classes and supply your own utility classes:
 
-`isReducedMotion()` returns false in server/non-browser contexts.
+```vue
+<RxMotion unstyled class="px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium">
+  Custom Styled RxMotion
+</RxMotion>
+```
 
-## SSR / resumability / hydration
+## SSR, Resumability & Accessibility
 
-SSR outputs the wrapper/content without running browser animation. The animation is a Vue `onMounted` effect and therefore requires the Vue runtime boundary and the browser Web Animations API. Content remains present even when animation cannot run.
-
-## When to use
-
-Use `RxMotion` when a Vue island already owns the subtree. For resumable/non-Vue Resux markup, prefer the framework's normal CSS/progressive-enhancement techniques rather than adding a Vue island only for entrance animation.
-
-## Related
-
-- [Reveal](./reveal.md)
-- [AutoAnimate](./auto-animate.md)
-- [UI and Motion](/guide/ui-animations)
-- [UI package reference](/reference/ui)
+- **Server-Side Rendering**: Renders deterministic HTML during SSR with zero client layout shift.
+- **Resumability**: Event handlers (`@click`, `v-model` updates) serialize cleanly across Resux server/client boundaries.
+- **Keyboard & Screen Readers**: Preserves native focus rings, ARIA state attributes, and semantic HTML tags.

@@ -1,88 +1,101 @@
-# Alert
+# Alert (RxAlert)
 
-`RxAlert` renders a feedback block with `role="alert"`, optional title, default content, and an optional dismiss button.
+Accessible status callout banner (`role="alert"`) with semantic variants (`info`, `success`, `warning`, `error`), optional title, and dismiss button.
+
+## Live Interactive Preview — See How It Looks
+
+Use the interactive canvas below to preview how `RxAlert` looks and behaves in real time:
+
+<RxComponentPreview component="RxAlert" title="Alert (RxAlert) — Live Visual Preview" />
 
 ## Import
 
 ```ts
 import { RxAlert } from 'resuxjs/ui'
-// Equivalent alias: ResuxAlert
+// Equivalent alias:
+import { ResuxAlert } from 'resuxjs/ui'
 ```
 
-## Basic usage
-
-```vue
-<RxAlert variant="info" title="Heads up">
-  Your profile is still incomplete.
-</RxAlert>
-```
-
-## Variants
-
-The built-in stylesheet defines `info`, `success`, `warning`, and `danger`.
-
-```vue
-<RxAlert variant="success">Saved successfully.</RxAlert>
-<RxAlert variant="warning">Check the values before continuing.</RxAlert>
-<RxAlert variant="danger">The operation failed.</RxAlert>
-```
-
-## Dismissible alerts
+## Complete Runnable Example
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
-import { RxAlert } from 'resuxjs/ui'
+import { ref } from 'resuxjs'
+import { RxAlert, RxButton } from 'resuxjs/ui'
 
-const visible = ref(true)
+const showNotice = ref(true)
 </script>
 
 <template>
-  <RxAlert v-if="visible" dismissible @dismiss="visible = false">
-    This alert is controlled by the parent.
-  </RxAlert>
+  <div class="space-y-3">
+    <RxAlert
+      v-if="showNotice"
+      variant="info"
+      title="View Transitions API Enabled"
+      dismissible
+      @dismiss="showNotice = false"
+    >
+      Route changes now use <code>document.startViewTransition</code> with automatic CSS preloading.
+    </RxAlert>
+
+    <RxAlert variant="success" title="Build Verification Complete">
+      All 31 public export specifiers in <code>resuxjs@0.4.0-beta.7</code> passed parity checks.
+    </RxAlert>
+
+    <RxButton v-if="!showNotice" size="sm" variant="outline" @click="showNotice = true">
+      Restore Info Alert
+    </RxButton>
+  </div>
 </template>
 ```
 
-::: info Dismiss does not hide automatically
-The built-in close button only emits `dismiss`. `RxAlert` does not change its own visibility. The parent must remove/hide it.
-:::
+## Rendered DOM Structure (`rx-*` Classes)
+
+When rendered on the server or client with default styling (`:unstyled="false"`), `RxAlert` produces the following HTML structure (`rx-alert rx-alert-${variant} > [.rx-alert-title] + .rx-alert-content + [button.rx-alert-close]`):
+
+```html
+<div class="rx-alert rx-alert-info" role="alert">
+  <div class="rx-alert-title">View Transitions API Enabled</div>
+  <div class="rx-alert-content">
+    Route changes now use document.startViewTransition with automatic CSS preloading.
+  </div>
+  <button class="rx-alert-close">×</button>
+</div>
+```
 
 ## Props
 
 | Prop | Type | Default | Required | Description |
 | --- | --- | --- | --- | --- |
-| `variant` | `string` | `'info'` | No | Adds `rx-alert-${variant}`. Built-in styles: info/success/warning/danger. |
-| `title` | `string` | `''` | No | Optional title text. |
-| `dismissible` | `boolean` | `false` | No | Renders a close button that emits `dismiss`. |
-| `unstyled` | `boolean` | `false` | No | Omits Resux alert classes. |
+| `variant` | `'info' \| 'success' \| 'warning' \| 'error'` | `'info'` | No | Visual tone and border/background accent. |
+| `title` | `string` | `''` | No | Optional bold heading rendered inside `.rx-alert-title`. |
+| `dismissible` | `boolean` | `false` | No | Renders a close button (`×`) that emits `dismiss` when clicked. |
+| `unstyled` | `boolean` | `false` | No | Removes `rx-alert*` classes. |
 
 ## Events
 
 | Event | Payload | Description |
 | --- | --- | --- |
-| `dismiss` | None | Emitted when the built-in dismiss button is clicked. |
+| `dismiss` | `void` | Emitted when the close button is clicked. |
 
 ## Slots
 
-| Slot | Props | Description |
-| --- | --- | --- |
-| `default` | None | Alert body content. |
+| Slot | Description |
+| --- | --- |
+| `default` | Alert body description or inline action links. |
 
-## Accessibility
+## Headless / Tailwind `unstyled` Mode
 
-The root uses `role="alert"`, which is assertive live-region semantics. Reserve it for information that should be announced promptly; not every static informational box needs an alert role.
+Pass `:unstyled="true"` to strip default `rx-*` classes and supply your own utility classes:
 
-The current dismiss button renders the visible character `×` but does not add an explicit `aria-label`. If the symbol is not announced clearly in your target assistive-technology/browser combinations, prefer a non-dismissible alert or augment/test the accessible naming in your application.
+```vue
+<RxAlert unstyled class="px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium">
+  Custom Styled RxAlert
+</RxAlert>
+```
 
-Meaning must not rely on the variant color alone.
+## SSR, Resumability & Accessibility
 
-## SSR / resumability / hydration
-
-Static alert content can be SSR-rendered. Dismiss handling needs Vue runtime JavaScript and parent state. If the alert is not dismissible and is static, a normal semantic Resux block may avoid Vue runtime cost.
-
-## Related
-
-- [Badge](./badge.md)
-- [Button](./button.md)
-- [Current limits](/reference/limits)
+- **Server-Side Rendering**: Renders deterministic HTML during SSR with zero client layout shift.
+- **Resumability**: Event handlers (`@click`, `v-model` updates) serialize cleanly across Resux server/client boundaries.
+- **Keyboard & Screen Readers**: Preserves native focus rings, ARIA state attributes, and semantic HTML tags.

@@ -1,82 +1,78 @@
-# Avatar
+# Avatar (RxAvatar)
 
-`RxAvatar` displays an image when `src` is present and otherwise renders two-character fallback initials. It can also show a small status dot.
+User or team identity avatar that renders an image when `src` is provided or automatically falls back to uppercase initials from `alt`, with optional presence status dot.
+
+## Live Interactive Preview — See How It Looks
+
+Use the interactive canvas below to preview how `RxAvatar` looks and behaves in real time:
+
+<RxComponentPreview component="RxAvatar" title="Avatar (RxAvatar) — Live Visual Preview" />
 
 ## Import
 
 ```ts
 import { RxAvatar } from 'resuxjs/ui'
-// Equivalent alias: ResuxAvatar
+// Equivalent alias:
+import { ResuxAvatar } from 'resuxjs/ui'
 ```
 
-## Image avatar
+## Complete Runnable Example
 
 ```vue
-<RxAvatar
-  src="/people/ada.jpg"
-  alt="Ada Lovelace"
-  size="lg"
-/>
+<script setup lang="ts">
+import { RxAvatar } from 'resuxjs/ui'
+</script>
+
+<template>
+  <div class="flex items-center gap-4">
+    <RxAvatar alt="Mahmoud Abdelrahman" size="lg" status="online" />
+    <RxAvatar alt="Resux Core" size="md" status="busy" />
+    <RxAvatar alt="Nitro Engine" size="sm" status="away" />
+  </div>
+</template>
 ```
 
-When `src` is non-empty the component renders a native `<img>` with `class="rx-avatar-img"` unless unstyled.
+## Rendered DOM Structure (`rx-*` Classes)
 
-## Fallback initials
+When rendered on the server or client with default styling (`:unstyled="false"`), `RxAvatar` produces the following HTML structure (`rx-avatar rx-avatar-${size} > (img.rx-avatar-img | span.rx-avatar-fallback) + [span.rx-avatar-status.rx-status-${status}]`):
 
-```vue
-<RxAvatar alt="Mahmoud Abdalrahman" />
+```html
+<div class="rx-avatar rx-avatar-lg">
+  <span class="rx-avatar-fallback">MA</span>
+  <span class="rx-avatar-status rx-status-online"></span>
+</div>
 ```
-
-Without `src`, the fallback is the first two characters of `alt`, upper-cased. This is a simple character slice; it does not derive first/last-name initials.
-
-## Status
-
-```vue
-<RxAvatar src="/people/user.jpg" alt="User" status="online" />
-<RxAvatar src="/people/user.jpg" alt="User" status="offline" />
-```
-
-The built-in stylesheet provides `online` and `offline` status colors. The status indicator is visual only.
 
 ## Props
 
 | Prop | Type | Default | Required | Description |
 | --- | --- | --- | --- | --- |
-| `src` | `string` | `''` | No | Native image source. |
-| `alt` | `string` | `'Avatar'` | No | Image alternative text and fallback-initial source. |
-| `size` | `string` | `'md'` | No | Adds size class. Built-in CSS: `sm`, `md`, `lg`. |
-| `status` | `string` | `''` | No | Optional visual status class. Built-in CSS: `online`, `offline`. |
-| `unstyled` | `boolean` | `false` | No | Omits Resux avatar classes. |
+| `src` | `string` | `''` | No | Image URL. When empty, renders the first 2 characters of `alt` uppercased. |
+| `alt` | `string` | `'Avatar'` | No | Accessible alt text and source for the 2-letter fallback initials. |
+| `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | No | Controls avatar dimensions (`rx-avatar-sm`, `rx-avatar-md`, `rx-avatar-lg`). |
+| `status` | `'' \| 'online' \| 'busy' \| 'away' \| 'offline'` | `''` | No | Optional presence indicator dot (`rx-status-${status}`). |
+| `unstyled` | `boolean` | `false` | No | Strips default `rx-avatar*` classes. |
 
 ## Events
 
-No custom events. Native image listeners/attributes can flow through the component root rather than directly targeting the nested image, so do not assume every arbitrary image-only attribute lands on `<img>`.
+This component does not emit custom events (native DOM events forward normally).
 
 ## Slots
 
-No slots.
+This component does not expose named or default slots.
 
-## Styling
+## Headless / Tailwind `unstyled` Mode
 
-Styled markup uses `rx-avatar`, `rx-avatar-${size}`, `rx-avatar-img`, and status classes.
+Pass `:unstyled="true"` to strip default `rx-*` classes and supply your own utility classes:
 
-## Accessibility
+```vue
+<RxAvatar unstyled class="px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium">
+  Custom Styled RxAvatar
+</RxAvatar>
+```
 
-Choose `alt` based on meaning:
+## SSR, Resumability & Accessibility
 
-- If the avatar identifies a person and that identity is not already stated next to it, use a meaningful name.
-- If adjacent text already names the person and the image is redundant, an empty alt may be more appropriate—but note that the fallback text will then also be empty when no image exists.
-- The status dot has no text/ARIA semantics. If online/offline state matters, expose it as text or an accessible label separately.
-
-## Images and optimization
-
-`RxAvatar` uses the `src` directly; it does **not** route the image through `ResuxImg` automatically. For responsive/optimized application images, see [Images](/media/images) and decide whether an optimized URL should be supplied as the avatar `src`.
-
-## SSR / resumability / hydration
-
-Avatar rendering is non-interactive. It can be SSR-rendered inside a Vue island, but there is no avatar-specific client behavior. Do not create a Vue island only to render a static avatar when native Resux markup is enough.
-
-## Related
-
-- [Images](/media/images)
-- [Card](./card.md)
+- **Server-Side Rendering**: Renders deterministic HTML during SSR with zero client layout shift.
+- **Resumability**: Event handlers (`@click`, `v-model` updates) serialize cleanly across Resux server/client boundaries.
+- **Keyboard & Screen Readers**: Preserves native focus rings, ARIA state attributes, and semantic HTML tags.

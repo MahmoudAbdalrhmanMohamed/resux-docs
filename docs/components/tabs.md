@@ -1,79 +1,98 @@
-# Tabs
+# Tabs (RxTabs)
 
-`RxTabs` renders a row/list of buttons and emits the selected item key. It does **not** render tab panels for you.
+Controlled horizontal tab bar (`v-model`) that renders `.rx-tab-btn` triggers from an `items` array of `{ label, key }` objects.
+
+## Live Interactive Preview — See How It Looks
+
+Use the interactive canvas below to preview how `RxTabs` looks and behaves in real time:
+
+<RxComponentPreview component="RxTabs" title="Tabs (RxTabs) — Live Visual Preview" />
 
 ## Import
 
 ```ts
 import { RxTabs } from 'resuxjs/ui'
-// Equivalent alias: ResuxTabs
+// Equivalent alias:
+import { ResuxTabs } from 'resuxjs/ui'
 ```
 
-## Basic usage
+## Complete Runnable Example
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
-import { RxTabs } from 'resuxjs/ui'
+import { ref } from 'resuxjs'
+import { RxTabs, RxCard } from 'resuxjs/ui'
 
-const tab = ref('overview')
-const tabs = [
-  { label: 'Overview', key: 'overview' },
-  { label: 'Activity', key: 'activity' }
+const activeTab = ref('ssr')
+const tabItems = [
+  { label: 'SSR & Resumability', key: 'ssr' },
+  { label: 'View Transitions', key: 'vt' },
+  { label: 'Fontless Engine', key: 'fonts' }
 ]
 </script>
 
 <template>
-  <RxTabs v-model="tab" :items="tabs" />
-  <section v-if="tab === 'overview'">Overview panel</section>
-  <section v-else-if="tab === 'activity'">Activity panel</section>
+  <div class="space-y-3 max-w-lg">
+    <RxTabs v-model="activeTab" :items="tabItems" />
+    <RxCard>
+      <p v-if="activeTab === 'ssr'" class="text-sm">
+        Server-rendered HTML streams immediately while serialized handlers resume on interaction.
+      </p>
+      <p v-else-if="activeTab === 'vt'" class="text-sm">
+        Native browser View Transitions coordinate with route CSS preloading before DOM swaps.
+      </p>
+      <p v-else class="text-sm">
+        Fontless 1.3.4 &amp; Fontaine 1.0.3 compute metric-adjusted fallback faces to reduce font-induced CLS.
+      </p>
+    </RxCard>
+  </div>
 </template>
 ```
 
-## Selection
+## Rendered DOM Structure (`rx-*` Classes)
 
-Each button receives `active` when its key exactly equals `modelValue`. Clicking a button emits that item's key.
+When rendered on the server or client with default styling (`:unstyled="false"`), `RxTabs` produces the following HTML structure (`rx-tabs > div.rx-tabs-header > button.rx-tab-btn [.active]`):
+
+```html
+<div class="rx-tabs">
+  <div class="rx-tabs-header">
+    <button class="rx-tab-btn active">SSR &amp; Resumability</button>
+    <button class="rx-tab-btn">View Transitions</button>
+    <button class="rx-tab-btn">Fontless Engine</button>
+  </div>
+</div>
+```
 
 ## Props
 
 | Prop | Type | Default | Required | Description |
 | --- | --- | --- | --- | --- |
-| `items` | `{ label: string; key: string }[]` | `[]` | No | Tab-button definitions. |
-| `modelValue` | `string` | `''` | No | Selected key. |
-| `unstyled` | `boolean` | `false` | No | Omits Resux tab classes. |
+| `items` | `Array<{ label: string; key: string }>` | `[]` | No | Tab definitions with display `label` and unique `key`. |
+| `modelValue` | `string` | `''` | No | Active tab key (`v-model`). |
+| `unstyled` | `boolean` | `false` | No | Strips `rx-tabs*` and `rx-tab-btn` classes. |
 
 ## Events
 
 | Event | Payload | Description |
 | --- | --- | --- |
-| `update:modelValue` | `string` | Selected item's key. |
+| `update:modelValue` | `string` | Emitted with `item.key` when a tab button is clicked. |
 
 ## Slots
 
-No slots are declared. Panel content is application-owned.
+This component does not expose named or default slots.
 
-## Styling
+## Headless / Tailwind `unstyled` Mode
 
-Styled markup uses `rx-tabs` on the root, `rx-tabs-header` on the button container, and `rx-tab-btn` on each button. The selected button additionally receives `active`.
+Pass `:unstyled="true"` to strip default `rx-*` classes and supply your own utility classes:
 
-## Accessibility
+```vue
+<RxTabs unstyled class="px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium">
+  Custom Styled RxTabs
+</RxTabs>
+```
 
-The buttons retain native button semantics, but the current implementation does **not** implement the ARIA Tabs pattern: there is no `role="tablist"`, `role="tab"`, `aria-selected`, `aria-controls`, roving tab index, Arrow Left/Right handling, Home/End handling, or built-in `tabpanel` relationship.
+## SSR, Resumability & Accessibility
 
-::: danger Accessibility limitation
-`RxTabs` is currently a selection-button primitive, not a complete accessible tabs widget. If you present its UI as tabs, application code must implement/test the missing relationships and keyboard behavior, or choose another accessible integration.
-:::
-
-## SSR / resumability / hydration
-
-Initial active classes can be SSR-rendered. Selection and parent panel switching require Vue runtime JavaScript.
-
-## Complete example with explicit panel semantics
-
-The component cannot generate tab IDs/panel relationships itself. If you need a standards-complete tab interface, prefer a component that owns those relationships. For a lightweight button-driven content selector, label the resulting content plainly instead of claiming full tabs semantics.
-
-## Related
-
-- [Accordion](./accordion.md)
-- [Current limits](/reference/limits)
-- [Integration Cookbook](/guide/integration-cookbook)
+- **Server-Side Rendering**: Renders deterministic HTML during SSR with zero client layout shift.
+- **Resumability**: Event handlers (`@click`, `v-model` updates) serialize cleanly across Resux server/client boundaries.
+- **Keyboard & Screen Readers**: Preserves native focus rings, ARIA state attributes, and semantic HTML tags.

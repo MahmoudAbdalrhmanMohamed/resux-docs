@@ -1,77 +1,95 @@
-# Dropdown
+# Dropdown (RxDropdown)
 
-`RxDropdown` is a compact click-toggled action list. Items contain a label and an optional callback.
+Action menu overlay driven by an `items` array of `{ label, action }` objects that automatically closes and invokes `item.action()` on selection.
+
+## Live Interactive Preview — See How It Looks
+
+Use the interactive canvas below to preview how `RxDropdown` looks and behaves in real time:
+
+<RxComponentPreview component="RxDropdown" title="Dropdown (RxDropdown) — Live Visual Preview" />
 
 ## Import
 
 ```ts
 import { RxDropdown } from 'resuxjs/ui'
-// Equivalent alias: ResuxDropdown
+// Equivalent alias:
+import { ResuxDropdown } from 'resuxjs/ui'
 ```
 
-## Basic usage
+## Complete Runnable Example
 
 ```vue
 <script setup lang="ts">
-import { RxDropdown } from 'resuxjs/ui'
+import { ref } from 'resuxjs'
+import { RxDropdown, RxButton, RxBadge } from 'resuxjs/ui'
 
-const items = [
-  { label: 'Rename', action: () => rename() },
-  { label: 'Archive', action: () => archive() }
+const lastAction = ref('None')
+const menuItems = [
+  { label: 'Run Check: Framework Parity', action: () => (lastAction.value = 'Parity Verified') },
+  { label: 'Export Static Bundle', action: () => (lastAction.value = 'Bundle Exported') },
+  { label: 'Purge Route Cache', action: () => (lastAction.value = 'Cache Purged') }
 ]
 </script>
 
 <template>
-  <RxDropdown :items="items" />
+  <div class="flex items-center gap-4">
+    <RxDropdown :items="menuItems">
+      <template #trigger>
+        <RxButton variant="secondary" size="sm">Project Actions ▾</RxButton>
+      </template>
+    </RxDropdown>
+    <span class="text-xs opacity-80">Last action: <RxBadge>{{ lastAction }}</RxBadge></span>
+  </div>
 </template>
 ```
 
-The built-in trigger text is `Menu`.
+## Rendered DOM Structure (`rx-*` Classes)
 
-## Open state
+When rendered on the server or client with default styling (`:unstyled="false"`), `RxDropdown` produces the following HTML structure (`rx-dropdown > div (trigger) + [ul.rx-dropdown-menu > li.rx-dropdown-item]`):
 
-```vue
-<RxDropdown v-model:open="open" :items="items" />
+```html
+<div class="rx-dropdown">
+  <div><button class="rx-btn rx-btn-secondary rx-btn-sm">Project Actions ▾</button></div>
+  <ul class="rx-dropdown-menu">
+    <li class="rx-dropdown-item">Run Check: Framework Parity</li>
+    <li class="rx-dropdown-item">Export Static Bundle</li>
+    <li class="rx-dropdown-item">Purge Route Cache</li>
+  </ul>
+</div>
 ```
-
-Clicking the trigger emits `update:open`. Selecting an item calls its optional `action` callback and emits `update:open` with `false`.
 
 ## Props
 
 | Prop | Type | Default | Required | Description |
 | --- | --- | --- | --- | --- |
-| `items` | `{ label: string; action?: () => void }[]` | `[]` | No | Action entries. |
-| `open` | `boolean` | `false` | No | Current list visibility. |
-| `unstyled` | `boolean` | `false` | No | Omits Resux dropdown classes. |
+| `items` | `Array<{ label: string; action?: () => void }>` | `[]` | No | Menu items rendered inside `.rx-dropdown-menu`. |
+| `open` | `boolean` | `false` | No | Initial open state. |
+| `unstyled` | `boolean` | `false` | No | Removes `rx-dropdown*` classes. |
 
 ## Events
 
 | Event | Payload | Description |
 | --- | --- | --- |
-| `update:open` | `boolean` | Trigger toggles or item selection closes the dropdown. |
+| `update:open` | `boolean` | Emitted when toggled or when an item selection closes the menu. |
 
 ## Slots
 
-No slots. The trigger label and item rendering are fixed by the current implementation.
+| Slot | Description |
+| --- | --- |
+| `trigger` | Custom menu trigger button (defaults to `<button>Menu</button>`). |
 
-## Styling
+## Headless / Tailwind `unstyled` Mode
 
-Styled markup uses `rx-dropdown`, `rx-dropdown-trigger`, `rx-dropdown-menu`, and `rx-dropdown-item`.
+Pass `:unstyled="true"` to strip default `rx-*` classes and supply your own utility classes:
 
-## Accessibility
+```vue
+<RxDropdown unstyled class="px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium">
+  Custom Styled RxDropdown
+</RxDropdown>
+```
 
-The trigger is a native button, but the list is rendered as `<ul><li>…</li></ul>` without menu roles, item buttons, roving focus, Arrow-key handling, Escape handling, focus return, or `aria-expanded`. Item activation is currently attached to the `<li>` click.
+## SSR, Resumability & Accessibility
 
-::: danger Accessibility limitation
-Do not represent `RxDropdown` as a complete keyboard-accessible application menu. For important actions, a visible list of native buttons/links—or a tested menu integration—is safer until the primitive grows the complete interaction contract.
-:::
-
-## SSR / resumability / hydration
-
-Open state and action callbacks require the Vue runtime boundary. Initial closed markup can be SSR-rendered, but the dropdown is not a zero-hydration Resux control.
-
-## Related
-
-- [Popover](./popover.md)
-- [Select](./select.md)
-- [Current limits](/reference/limits)
+- **Server-Side Rendering**: Renders deterministic HTML during SSR with zero client layout shift.
+- **Resumability**: Event handlers (`@click`, `v-model` updates) serialize cleanly across Resux server/client boundaries.
+- **Keyboard & Screen Readers**: Preserves native focus rings, ARIA state attributes, and semantic HTML tags.

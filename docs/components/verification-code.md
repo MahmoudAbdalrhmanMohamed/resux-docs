@@ -1,83 +1,140 @@
-# VerificationCode
+# VerificationCode (RxVerificationCode)
 
-`RxVerificationCode` (with alias `ResuxVerificationCode`) is an interactive pin-code input component exported by `resuxjs/ui`. It provides an animated, accessible pin-entry interface with numeric or alphanumeric input masking, smooth collapsing state transitions, verifying pulse indicators, and error shake animations.
+Interactive multi-cell OTP / 2FA verification code input (`1..12` cells) with numeric/alphanumeric filtering, paste handling, masking, and choreographed `verifying` / `success` / `error` status transitions.
 
-::: warning Vue runtime boundary
-`RxVerificationCode` is part of `resuxjs/ui` and belongs inside a [Vue island](/guide/vue-islands) or an explicit Vue runtime context.
-:::
+## Live Interactive Preview — See How It Looks
 
-## Basic usage
+Use the interactive canvas below to preview how `RxVerificationCode` looks and behaves in real time:
+
+<RxComponentPreview component="RxVerificationCode" title="VerificationCode (RxVerificationCode) — Live Visual Preview" />
+
+## Import
+
+```ts
+import { RxVerificationCode } from 'resuxjs/ui'
+// Equivalent alias:
+import { ResuxVerificationCode } from 'resuxjs/ui'
+```
+
+## Complete Runnable Example
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
-import { RxVerificationCode, type VerificationCodeStatus } from 'resuxjs/ui'
+import { ref } from 'resuxjs'
+import { RxVerificationCode, RxButton, RxBadge } from 'resuxjs/ui'
+import type { VerificationCodeStatus } from 'resuxjs/ui'
 
 const code = ref('')
 const status = ref<VerificationCodeStatus>('idle')
+const masked = ref(false)
 
-async function handleComplete(completedCode: string) {
+async function verifyCode(val: string) {
   status.value = 'verifying'
-  try {
-    const response = await fetch('/api/verify-code', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code: completedCode })
-    })
-    if (response.ok) {
-      status.value = 'success'
-    } else {
-      status.value = 'error'
-    }
-  } catch {
-    status.value = 'error'
-  }
+  await new Promise((r) => setTimeout(r, 900))
+  status.value = val === '2026' ? 'success' : 'error'
+}
+
+function resetFlow() {
+  code.value = ''
+  status.value = 'idle'
 }
 </script>
 
 <template>
-  <RxVerificationCode
-    v-model="code"
-    :length="6"
-    mode="numeric"
-    :status="status"
-    @complete="handleComplete"
-  />
+  <div class="space-y-4 max-w-md">
+    <div class="flex items-center justify-between">
+      <span class="text-sm font-medium">Enter 4-digit security code (Try <code>2026</code>)</span>
+      <RxBadge :variant="status === 'success' ? 'success' : status === 'error' ? 'error' : 'default'">
+        {{ status }}
+      </RxBadge>
+    </div>
+
+    <RxVerificationCode
+      v-model="code"
+      :length="4"
+      :status="status"
+      :mask="masked"
+      verifying-text="Validating token with Halal Guard..."
+      success-text="Session verified and resumed"
+      error-text="Invalid code — try entering 2026"
+      @complete="verifyCode"
+    />
+
+    <div class="flex flex-wrap gap-2 pt-1">
+      <RxButton size="sm" variant="secondary" @click="masked = !masked">
+        {{ masked ? 'Show Digits' : 'Mask Digits' }}
+      </RxButton>
+      <RxButton size="sm" variant="outline" @click="resetFlow">Reset</RxButton>
+    </div>
+  </div>
 </template>
+```
+
+## Rendered DOM Structure (`rx-*` Classes)
+
+When rendered on the server or client with default styling (`:unstyled="false"`), `RxVerificationCode` produces the following HTML structure (`rx-verification-code > input + .rx-verification-code-cells (.rx-verification-code-cell) | .rx-verification-code-status`):
+
+```html
+<div
+  class="rx-verification-code is-focused"
+  data-phase="idle"
+  data-status="idle"
+  data-disabled="false"
+  data-length="4"
+  style="--rx-otp-length: 4"
+>
+  <div class="rx-verification-code-cells" aria-hidden="true">
+    <span class="rx-verification-code-cell is-filled" data-filled="true">2</span>
+    <span class="rx-verification-code-cell is-filled" data-filled="true">0</span>
+    <span class="rx-verification-code-cell is-active" data-active="true"></span>
+    <span class="rx-verification-code-cell"></span>
+  </div>
+</div>
 ```
 
 ## Props
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `modelValue` | `string` | `''` | Current verification code string. Supports `v-model`. |
-| `length` | `number` | `6` | Total number of code input cells (typically 4, 6, or 8). |
-| `mode` | `'numeric' \| 'alphanumeric'` | `'numeric'` | Input validation mode. `'numeric'` accepts digits `0-9`; `'alphanumeric'` accepts `A-Z, a-z, 0-9`. |
-| `status` | `'idle' \| 'verifying' \| 'success' \| 'error'` | `'idle'` | Interactive status controlling animation states and status indicators. |
-| `autofocus` | `boolean` | `false` | Automatically focus the first input cell on mount. |
-| `disabled` | `boolean` | `false` | Disables input interaction and darkens cell borders. |
-| `unstyled` | `boolean` | `false` | Omits default theme styling for custom CSS implementations. |
-| `ariaLabel` | `string` | `'Verification code'` | Accessible label for screen readers. |
-| `errorText` | `string` | `'The verification code is invalid'` | Accessible error message displayed and announced when `status="error"`. |
+| Prop | Type | Default | Required | Description |
+| --- | --- | --- | --- | --- |
+| `modelValue` | `string` | `''` | No | Current verification code value (`v-model`). |
+| `length` | `number` | `4` | No | Number of character cells (clamped between `1` and `12`). |
+| `status` | `'idle' \| 'verifying' \| 'success' \| 'error'` | `'idle'` | No | Controls cell collapse choreography, status orb, and error alert. |
+| `mode` | `'numeric' \| 'alphanumeric'` | `'numeric'` | No | Restricts input to digits (`0-9`) or alphanumeric characters (`A-Z0-9`). |
+| `mask` | `boolean` | `false` | No | Masks filled characters with `•` bullets for privacy. |
+| `autoFocus` | `boolean` | `false` | No | Automatically focuses the hidden OTP input on mount. |
+| `disabled` | `boolean` | `false` | No | Disables input interaction. |
+| `verifyingText` | `string` | `'Verifying...'` | No | Status message announced and displayed when `status === 'verifying'`. |
+| `successText` | `string` | `'Verified and secure'` | No | Status message announced and displayed when `status === 'success'`. |
+| `errorText` | `string` | `'The verification code is invalid'` | No | Alert message displayed below cells when `status === 'error'`. |
+| `ariaLabel` | `string` | `'Verification code'` | No | Accessible label for the hidden `<input autocomplete="one-time-code">`. |
+| `unstyled` | `boolean` | `false` | No | Removes default `rx-verification-code*` classes. |
 
 ## Events
 
 | Event | Payload | Description |
 | --- | --- | --- |
-| `update:modelValue` | `(value: string)` | Emitted whenever the code string changes. |
-| `change` | `(value: string)` | Emitted when an input cell updates. |
-| `complete` | `(value: string)` | Emitted when all cells are filled. Use this to trigger automated verification requests. |
+| `update:modelValue` | `string` | Emitted whenever sanitized characters change. |
+| `change` | `string` | Emitted alongside `update:modelValue`. |
+| `complete` | `string` | Emitted automatically once all `length` cells are filled. |
+| `focus` | `FocusEvent` | Emitted when the OTP input receives focus. |
+| `blur` | `FocusEvent` | Emitted when the OTP input loses focus. |
 
-## Interactive Animation States
+## Slots
 
-1. **Cell Fill & Active Cell**:
-   - As digits are entered, cells animate with a subtle fill gradient.
-   - The active cell highlights with an accent border.
-2. **Collapsing Phase**:
-   - When transitioning into `'verifying'`, cells smoothly collapse together before revealing the status orb.
-3. **Verifying Orb**:
-   - A pulsing orb with a spinning loader indicates that the verification request is pending.
-4. **Success State**:
-   - The status orb transitions into a green checkmark (`✓`) with a confirmation message.
-5. **Error Shake**:
-   - On verification failure (`status="error"`), the input cells shake horizontally, highlight in red, and reveal the error text. Focus returns to the input cells so the user can easily re-type.
+This component does not expose named or default slots.
+
+## Headless / Tailwind `unstyled` Mode
+
+Pass `:unstyled="true"` to strip default `rx-*` classes and supply your own utility classes:
+
+```vue
+<RxVerificationCode unstyled class="px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium">
+  Custom Styled RxVerificationCode
+</RxVerificationCode>
+```
+
+## SSR, Resumability & Accessibility
+
+- **Server-Side Rendering**: Renders deterministic HTML during SSR with zero client layout shift.
+- **Resumability**: Event handlers (`@click`, `v-model` updates) serialize cleanly across Resux server/client boundaries.
+- **Keyboard & Screen Readers**: Preserves native focus rings, ARIA state attributes, and semantic HTML tags.

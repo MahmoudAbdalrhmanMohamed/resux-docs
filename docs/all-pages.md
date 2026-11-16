@@ -150,6 +150,7 @@ The site navigation and CI are expected to keep every documentation page discove
 - [Blog Routes](/examples/blog)
 - [API and Fetch](/examples/api-and-fetch)
 - [Auth Middleware](/examples/auth-middleware)
+- [OTP Verification Flow](/examples/otp-verification-flow)
 - [Error Handling](/examples/errors)
 - [Device Detection](/examples/device-detection)
 - [Vue Island](/examples/vue-island)

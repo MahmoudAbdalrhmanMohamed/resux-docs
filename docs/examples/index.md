@@ -12,6 +12,7 @@ This section turns real Resux Lab regression pages into focused recipes you can 
 | [API and Fetch](./api-and-fetch.md) | Server API calls and async data | Existing example |
 | [Blog Routes](./blog.md) | File routes and dynamic pages | Existing example |
 | [Auth Middleware](./auth-middleware.md) | Route middleware | Existing example |
+| [OTP Verification Flow](./otp-verification-flow.md) | Interactive 2FA verification with choreographed states & masking | UI example |
 | [Error Handling](./errors.md) | `useError()` and `createError()` | `pages/features/errors.vue` |
 | [Device Detection](./device-detection.md) | `useDevice()` and `parseUserAgent()` | `pages/features/device.vue` |
 

@@ -150,6 +150,7 @@ const examplePages = [
   { text: 'Blog Routes', link: '/examples/blog' },
   { text: 'API and Fetch', link: '/examples/api-and-fetch' },
   { text: 'Auth Middleware', link: '/examples/auth-middleware' },
+  { text: 'OTP Verification Flow', link: '/examples/otp-verification-flow' },
   { text: 'Error Handling', link: '/examples/errors' },
   { text: 'Device Detection', link: '/examples/device-detection' },
   { text: 'Vue Island', link: '/examples/vue-island' },

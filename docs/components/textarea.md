@@ -1,100 +1,97 @@
-# Textarea
+# Textarea (RxTextarea)
 
-`RxTextarea` renders a native `<textarea>` with Vue `v-model` support.
+Multi-line text input primitive with configurable row height, `v-model` binding, and shared `rx-input rx-textarea` styling.
+
+## Live Interactive Preview — See How It Looks
+
+Use the interactive canvas below to preview how `RxTextarea` looks and behaves in real time:
+
+<RxComponentPreview component="RxTextarea" title="Textarea (RxTextarea) — Live Visual Preview" />
 
 ## Import
 
 ```ts
 import { RxTextarea } from 'resuxjs/ui'
-// Equivalent alias: ResuxTextarea
+// Equivalent alias:
+import { ResuxTextarea } from 'resuxjs/ui'
 ```
 
-## Basic usage
+## Complete Runnable Example
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
-import { RxTextarea } from 'resuxjs/ui'
+import { ref, computed } from 'resuxjs'
+import { RxTextarea, RxBadge, RxButton } from 'resuxjs/ui'
 
-const bio = ref('')
+const releaseNotes = ref('Feat: Added native browser View Transitions API, Fontless 1.3.4 zero-CLS metrics, and compile-time SVG icon inlining.')
+const charCount = computed(() => releaseNotes.value.length)
 </script>
 
 <template>
-  <RxTextarea v-model="bio" :rows="5" placeholder="About you" />
+  <div class="space-y-2 max-w-lg">
+    <div class="flex items-center justify-between">
+      <label class="text-sm font-medium">Release Changelog Summary</label>
+      <RxBadge :variant="charCount > 280 ? 'warning' : 'default'">
+        {{ charCount }} / 280 chars
+      </RxBadge>
+    </div>
+    <RxTextarea
+      v-model="releaseNotes"
+      :rows="4"
+      placeholder="Describe what changed in this release..."
+    />
+    <div class="flex justify-end gap-2">
+      <RxButton variant="ghost" size="sm" @click="releaseNotes = ''">Clear</RxButton>
+      <RxButton variant="primary" size="sm">Save Changelog</RxButton>
+    </div>
+  </div>
 </template>
+```
+
+## Rendered DOM Structure (`rx-*` Classes)
+
+When rendered on the server or client with default styling (`:unstyled="false"`), `RxTextarea` produces the following HTML structure (`rx-input rx-textarea`):
+
+```html
+<textarea
+  rows="4"
+  placeholder="Describe what changed in this release..."
+  class="rx-input rx-textarea"
+>Feat: Added native browser View Transitions API...</textarea>
 ```
 
 ## Props
 
 | Prop | Type | Default | Required | Description |
 | --- | --- | --- | --- | --- |
-| `modelValue` | `string` | `''` | No | Textarea value. |
-| `rows` | `number` | `3` | No | Native `rows`. |
-| `placeholder` | `string` | `''` | No | Native placeholder. |
-| `disabled` | `boolean` | `false` | No | Native disabled state. |
-| `unstyled` | `boolean` | `false` | No | Omits Resux-generated classes. |
+| `modelValue` | `string` | `''` | No | Bound multi-line string value (`v-model`). |
+| `rows` | `number` | `3` | No | Visible text row count. |
+| `placeholder` | `string` | `''` | No | Placeholder text when empty. |
+| `disabled` | `boolean` | `false` | No | Disables user input. |
+| `unstyled` | `boolean` | `false` | No | Omits `rx-input rx-textarea` classes. |
 
 ## Events
 
 | Event | Payload | Description |
 | --- | --- | --- |
-| `update:modelValue` | `string` | Emitted with `HTMLTextAreaElement.value` from the native input event. |
+| `update:modelValue` | `string` | Emitted on `input` with the updated textarea string. |
 
 ## Slots
 
-No slots. The value is controlled through `modelValue`, not textarea child text.
+This component does not expose named or default slots.
 
-## Native attributes
+## Headless / Tailwind `unstyled` Mode
 
-Attributes such as `name`, `required`, `maxlength`, `autocomplete`, `aria-describedby`, and event listeners are forwarded.
-
-```vue
-<RxTextarea
-  v-model="message"
-  name="message"
-  required
-  maxlength="1000"
-  aria-describedby="message-help"
-/>
-```
-
-## Styling
-
-The root receives both `rx-input` and `rx-textarea` unless `unstyled` is true. The current built-in stylesheet defines the shared `rx-input` rules; use your own CSS for textarea-specific behavior such as resize policy or minimum height.
-
-## Accessibility
-
-Native textarea keyboard and screen-reader semantics are preserved. Provide a visible/programmatic label and expose validation messages explicitly. Placeholder text is not a replacement for a label.
-
-## SSR / resumability / hydration
-
-The server can render the textarea through Vue SSR, while `v-model` synchronization requires the Vue runtime boundary. For a plain HTML form that does not need reactive Vue state, a native Resux template `<textarea>` is cheaper.
-
-## Complete example
+Pass `:unstyled="true"` to strip default `rx-*` classes and supply your own utility classes:
 
 ```vue
-<script setup lang="ts">
-import { computed, ref } from 'vue'
-import { RxTextarea } from 'resuxjs/ui'
-
-const feedback = ref('')
-const remaining = computed(() => 500 - feedback.value.length)
-</script>
-
-<template>
-  <label for="feedback">Feedback</label>
-  <RxTextarea
-    id="feedback"
-    v-model="feedback"
-    :rows="6"
-    maxlength="500"
-    aria-describedby="feedback-count"
-  />
-  <p id="feedback-count">{{ remaining }} characters remaining</p>
-</template>
+<RxTextarea unstyled class="px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium">
+  Custom Styled RxTextarea
+</RxTextarea>
 ```
 
-## Related
+## SSR, Resumability & Accessibility
 
-- [Input](./input.md)
-- [Vue Islands](/guide/vue-islands)
+- **Server-Side Rendering**: Renders deterministic HTML during SSR with zero client layout shift.
+- **Resumability**: Event handlers (`@click`, `v-model` updates) serialize cleanly across Resux server/client boundaries.
+- **Keyboard & Screen Readers**: Preserves native focus rings, ARIA state attributes, and semantic HTML tags.

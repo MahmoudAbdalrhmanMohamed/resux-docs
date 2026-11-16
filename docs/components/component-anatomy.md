@@ -224,7 +224,16 @@ This is why the docs explicitly call out behavior such as:
 
 When state synchronization matters, verify the exact component page/source rather than assuming patterns from another design system.
 
-## `unstyled`
+## `unstyled` and Built-in `rx-*` Classes
+
+Every component exported from `resuxjs/ui` follows a predictable contract:
+
+1. **Dual Naming Convention (`Rx*` and `Resux*`)**: Every component can be imported as `RxButton` or `ResuxButton` (`RxButton === ResuxButton`).
+2. **Semantic `rx-*` Classes**: By default (`unstyled: false`), each component applies clean, low-specificity `rx-*` classes (`rx-btn`, `rx-input`, `rx-card`, `rx-verification-code`, etc.) that adapt to light and dark themes.
+3. **Headless `unstyled` Mode**: Passing `:unstyled="true"` strips all default `rx-*` classes so you can style the underlying semantic HTML element directly with Tailwind CSS or custom CSS modules.
+4. **Attribute Fallthrough**: Form inputs (`RxInput`, `RxTextarea`, `RxSelect`, `RxDatePicker`, `RxSwitch`, `RxVerificationCode`) set `inheritAttrs: false` and forward native attributes (`id`, `name`, `aria-*`, `data-*`, `autocomplete`) directly to the interactive control.
+
+<RxComponentPreview component="RxCard" title="Styled vs. Elevated Surface Anatomy" />
 
 Many UI components expose:
 

@@ -1,67 +1,85 @@
-# API and Fetch Example
+# Example: Server API & `$fetch` with Runtime Validation
 
-## Handler
+Demonstrates `defineServerHandler` with strict runtime POST body validation (`400` on missing/malformed `title`) paired with `useAsyncData` and dedicated submission error handling on the client.
 
 ```ts
 // server/api/tasks.ts
-export default defineEventHandler(async (event) => {
+import { defineServerHandler, readBody, setHeader } from 'resuxjs/server'
+
+interface Task {
+  id: number
+  title: string
+  done: boolean
+}
+
+const tasksStore: Task[] = [
+  { id: 1, title: 'Upgrade fonts engine to fontless 1.3.4', done: true },
+  { id: 2, title: 'Add interactive UI previews to resux-docs', done: false }
+]
+
+export default defineServerHandler(async (event) => {
   if (event.method === 'GET') {
-    return [{ id: 1, title: 'Learn Resux', done: false }]
+    return tasksStore
   }
 
   if (event.method === 'POST') {
-    let body: unknown
-    try {
-      body = await readBody(event)
-    } catch {
-      return new Response('Invalid request body', { status: 400 })
-    }
+    const body = await readBody< unknown >(event)
+    const rawTitle =
+      body && typeof body === 'object' && 'title' in body && typeof (body as { title?: unknown }).title === 'string'
+        ? (body as { title: string }).title.trim()
+        : ''
 
-    if (
-      !body ||
-      typeof body !== 'object' ||
-      Array.isArray(body) ||
-      !('title' in body) ||
-      typeof body.title !== 'string' ||
-      !body.title.trim()
-    ) {
-      return new Response('Title is required', { status: 400 })
+    if (!rawTitle) {
+      return new Response(JSON.stringify({ error: 'A non-empty string title is required' }), {
+        status: 400,
+        headers: { 'content-type': 'application/json' }
+      })
     }
 
     setHeader(event, 'cache-control', 'no-store')
-    return { id: Date.now(), title: body.title.trim(), done: false }
+    const created: Task = { id: Date.now(), title: rawTitle, done: false }
+    tasksStore.push(created)
+    return created
   }
 
-  return new Response('Method not allowed', { status: 405 })
+  return new Response('Method Not Allowed', { status: 405 })
 })
 ```
 
-## Page
-
 ```vue
+<!-- pages/tasks.vue -->
 <script setup lang="ts">
-const tasks = await useFetch<Array<{ id: number; title: string; done: boolean }>>('/api/tasks')
-const title = useState('new-task-title', () => '')
+import { ref } from 'resuxjs'
+import { useAsyncData, $fetch } from 'resuxjs/runtime'
+import { RxCard, RxInput, RxButton, RxAlert, RxBadge } from 'resuxjs/ui'
+
+interface Task {
+  id: number
+  title: string
+  done: boolean
+}
+
+const tasks = await useAsyncData<Task[]>('tasks-list', ({ signal }) =>
+  $fetch('/api/tasks', { signal })
+)
+
+const title = ref('')
 const saving = ref(false)
-const submissionError = ref('')
+const submitError = ref('')
 
 async function addTask() {
   if (!title.value.trim() || saving.value) return
-
-  submissionError.value = ''
   saving.value = true
-
+  submitError.value = ''
   try {
-    const created = await $fetch<{ id: number; title: string; done: boolean }>('/api/tasks', {
+    const created = await $fetch<Task>('/api/tasks', {
       method: 'POST',
       body: { title: title.value }
     })
     tasks.data.value = [...(tasks.data.value ?? []), created]
     title.value = ''
-  } catch (error) {
-    submissionError.value = error instanceof Error
-      ? error.message
-      : 'Unable to add the task'
+  } catch (err) {
+    submitError.value = err instanceof Error ? err.message : 'Failed to create task. Please try again.'
   } finally {
     saving.value = false
   }
@@ -69,18 +87,29 @@ async function addTask() {
 </script>
 
 <template>
-  <form @submit.prevent="addTask">
-    <input v-model="title" />
-    <button :disabled="saving">Add</button>
-  </form>
+  <RxCard class="space-y-4 max-w-lg">
+    <div class="flex items-center justify-between">
+      <h2 class="font-bold text-base">Release Checklist</h2>
+      <RxBadge variant="primary">{{ tasks.data.value?.length ?? 0 }} items</RxBadge>
+    </div>
 
-  <p v-if="submissionError" role="alert">{{ submissionError }}</p>
-  <p v-if="tasks.pending">Loading…</p>
-  <p v-else-if="tasks.error">{{ tasks.error.message }}</p>
-  <ul v-else>
-    <li v-for="task in tasks.data" :key="task.id">{{ task.title }}</li>
-  </ul>
+    <form class="flex gap-2" @submit.prevent="addTask">
+      <RxInput v-model="title" placeholder="Add a release task..." :disabled="saving" />
+      <RxButton type="submit" variant="primary" :disabled="saving">
+        {{ saving ? 'Saving...' : 'Add' }}
+      </RxButton>
+    </form>
+
+    <RxAlert v-if="submitError" variant="error" title="Submission Failed" dismissible @dismiss="submitError = ''">
+      {{ submitError }}
+    </RxAlert>
+
+    <ul class="space-y-2">
+      <li v-for="task in tasks.data.value" :key="task.id" class="flex items-center justify-between text-sm p-2 rounded border border-slate-200/60">
+        <span>{{ task.title }}</span>
+        <RxBadge :variant="task.done ? 'success' : 'default'">{{ task.done ? 'Done' : 'Pending' }}</RxBadge>
+      </li>
+    </ul>
+  </RxCard>
 </template>
 ```
-
-`useFetch` returns refs for resource state. `$fetch` returns the parsed response directly.

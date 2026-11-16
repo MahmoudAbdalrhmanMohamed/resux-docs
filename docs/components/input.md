@@ -1,134 +1,107 @@
-# Input
+# Input (RxInput)
 
-`RxInput` renders a native `<input>` and implements Vue `v-model` through `modelValue` / `update:modelValue`.
+Two-way bound single-line input control (`v-model`) supporting text, email, password, number, search, and url types with `inheritAttrs: false`.
+
+## Live Interactive Preview — See How It Looks
+
+Use the interactive canvas below to preview how `RxInput` looks and behaves in real time:
+
+<RxComponentPreview component="RxInput" title="Input (RxInput) — Live Visual Preview" />
 
 ## Import
 
 ```ts
 import { RxInput } from 'resuxjs/ui'
-// Equivalent alias: ResuxInput
+// Equivalent alias:
+import { ResuxInput } from 'resuxjs/ui'
 ```
 
-## Basic usage
+## Complete Runnable Example
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
-import { RxInput } from 'resuxjs/ui'
+import { ref, computed } from 'resuxjs'
+import { RxInput, RxButton, RxBadge } from 'resuxjs/ui'
 
-const email = ref('')
+const email = ref('mahmoud@resux.dev')
+const projectSlug = ref('resux-cloud-app')
+const isValidEmail = computed(() => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value))
 </script>
 
 <template>
-  <RxInput v-model="email" type="email" placeholder="you@example.com" />
+  <div class="space-y-4 max-w-md">
+    <div class="space-y-1.5">
+      <label class="text-sm font-medium flex items-center justify-between">
+        <span>Developer Email</span>
+        <RxBadge :variant="isValidEmail ? 'success' : 'warning'">
+          {{ isValidEmail ? 'Valid' : 'Check format' }}
+        </RxBadge>
+      </label>
+      <RxInput
+        v-model="email"
+        type="email"
+        placeholder="you@example.com"
+        autocomplete="email"
+      />
+    </div>
+
+    <div class="space-y-1.5">
+      <label class="text-sm font-medium">Project Slug</label>
+      <RxInput
+        v-model="projectSlug"
+        placeholder="my-resux-app"
+      />
+      <p class="text-xs opacity-75">Preview URL: https://{{ projectSlug || 'app' }}.resux.dev</p>
+    </div>
+  </div>
 </template>
 ```
 
-## Input types
+## Rendered DOM Structure (`rx-*` Classes)
 
-`type` is passed to the native input. The component does not implement type-specific validation logic.
+When rendered on the server or client with default styling (`:unstyled="false"`), `RxInput` produces the following HTML structure (`rx-input`):
 
-```vue
-<RxInput v-model="query" type="search" />
-<RxInput v-model="email" type="email" autocomplete="email" />
-<RxInput v-model="count" type="number" min="0" />
-```
-
-::: warning Number values
-The declared `modelValue` prop accepts `string | number`, but the current input handler emits `HTMLInputElement.value`, which is a **string**. It does not use `valueAsNumber`. Parse numeric values in application code if you need a number.
-:::
-
-## Labels and validation
-
-`RxInput` does not render a label, error message, or form-field wrapper. Use native labeling and ARIA attributes explicitly.
-
-```vue
-<label for="email">Email</label>
-<RxInput
-  id="email"
-  v-model="email"
+```html
+<input
   type="email"
-  :aria-invalid="hasError ? 'true' : 'false'"
-  aria-describedby="email-error"
+  value="mahmoud@resux.dev"
+  placeholder="you@example.com"
+  class="rx-input"
 />
-<p v-if="hasError" id="email-error">Enter a valid email address.</p>
 ```
 
 ## Props
 
 | Prop | Type | Default | Required | Description |
 | --- | --- | --- | --- | --- |
-| `modelValue` | `string | number` | `''` | No | Controlled input value. Input events emit strings. |
-| `type` | `string` | `'text'` | No | Native input type. |
-| `placeholder` | `string` | `''` | No | Native placeholder. Do not use it as the only label. |
-| `disabled` | `boolean` | `false` | No | Native disabled state. |
-| `unstyled` | `boolean` | `false` | No | Omits the `rx-input` class. |
+| `modelValue` | `string \| number` | `''` | No | Bound input value (`v-model`). |
+| `type` | `string` | `'text'` | No | Native HTML input type (`text`, `email`, `password`, `number`, `search`). |
+| `placeholder` | `string` | `''` | No | Placeholder hint shown when empty. |
+| `disabled` | `boolean` | `false` | No | Disables editing and form submission. |
+| `unstyled` | `boolean` | `false` | No | Removes `rx-input` class so custom utility classes control appearance. |
 
 ## Events
 
 | Event | Payload | Description |
 | --- | --- | --- |
-| `update:modelValue` | `string` at runtime | Emitted from the native `input` event. |
-
-Other native listeners such as `@change`, `@focus`, and `@blur` can be passed as attributes/listeners.
+| `update:modelValue` | `string` | Emitted on every `input` event with the current target value. |
 
 ## Slots
 
-`RxInput` renders a void `<input>` element and has no slots.
+This component does not expose named or default slots.
 
-## Exposed methods
+## Headless / Tailwind `unstyled` Mode
 
-No methods are explicitly exposed. If you need direct focus control, keep a Vue template ref to the rendered component/element according to your island setup rather than relying on an undocumented exposed API.
-
-## Styling
-
-The styled component receives `rx-input`. The default CSS supplies width, padding, background, border, text color, radius, and a focus border color.
+Pass `:unstyled="true"` to strip default `rx-*` classes and supply your own utility classes:
 
 ```vue
-<RxInput unstyled class="app-input" v-model="value" />
+<RxInput unstyled class="px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium">
+  Custom Styled RxInput
+</RxInput>
 ```
 
-## Accessibility
+## SSR, Resumability & Accessibility
 
-The native input preserves standard semantics and keyboard behavior. Application code remains responsible for a programmatic label, validation messaging, autocomplete hints, input purpose, and any `aria-*` state appropriate to the form.
-
-## SSR / resumability / hydration
-
-The input can be included in Vue SSR output, but `v-model` is Vue-owned runtime behavior. A user can see the server-rendered control before Vue starts, but synchronization back to Vue state requires the Vue island/runtime.
-
-For forms that can submit through normal HTML without Vue state, consider a native Resux template form to preserve the lowest runtime cost.
-
-## Complete example
-
-```vue
-<script setup lang="ts">
-import { computed, ref } from 'vue'
-import { RxInput } from 'resuxjs/ui'
-
-const username = ref('')
-const invalid = computed(() => username.value.length > 0 && username.value.length < 3)
-</script>
-
-<template>
-  <div>
-    <label for="username">Username</label>
-    <RxInput
-      id="username"
-      v-model="username"
-      autocomplete="username"
-      :aria-invalid="invalid ? 'true' : 'false'"
-      aria-describedby="username-help"
-    />
-    <p id="username-help">
-      {{ invalid ? 'Use at least 3 characters.' : 'Choose your public name.' }}
-    </p>
-  </div>
-</template>
-```
-
-## Related
-
-- [Textarea](./textarea.md)
-- [Select](./select.md)
-- [Switch](./switch.md)
-- [Vue Islands](/guide/vue-islands)
+- **Server-Side Rendering**: Renders deterministic HTML during SSR with zero client layout shift.
+- **Resumability**: Event handlers (`@click`, `v-model` updates) serialize cleanly across Resux server/client boundaries.
+- **Keyboard & Screen Readers**: Preserves native focus rings, ARIA state attributes, and semantic HTML tags.

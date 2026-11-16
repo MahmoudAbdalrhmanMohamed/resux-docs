@@ -1,269 +1,94 @@
-# Card
+# Card (RxCard)
 
-`RxCard` is a **non-interactive visual container**. It renders a `<div>` around the default slot and applies Resux card classes unless `unstyled` is enabled.
+Surface container primitive for grouping metrics, forms, and settings panels with optional visual variants (`default`, `elevated`, `outlined`, `subtle`).
 
-The component deliberately does not choose document semantics for you. A “card” in a design can represent an article, product, settings group, dashboard tile, navigation target, or pure visual surface; those are not the same semantic object.
+## Live Interactive Preview — See How It Looks
 
-## When to use it
+Use the interactive canvas below to preview how `RxCard` looks and behaves in real time:
 
-Use `RxCard` when you are already inside a Vue UI boundary and want a consistent Resux UI surface around content such as:
-
-- dashboard metrics,
-- settings groups,
-- product summaries,
-- profile information,
-- callouts that do not need alert semantics,
-- grouped content in a grid.
-
-Use native semantic markup instead when the content has a stronger element available—for example `<article>`, `<section>`, `<aside>`, or `<fieldset>`.
+<RxComponentPreview component="RxCard" title="Card (RxCard) — Live Visual Preview" />
 
 ## Import
 
 ```ts
 import { RxCard } from 'resuxjs/ui'
-// Equivalent alias: ResuxCard
+// Equivalent alias:
+import { ResuxCard } from 'resuxjs/ui'
 ```
 
-## Basic usage
+## Complete Runnable Example
 
 ```vue
-<RxCard>
-  <h2>Project status</h2>
-  <p>All systems operational.</p>
-</RxCard>
+<script setup lang="ts">
+import { RxCard, RxBadge, RxButton } from 'resuxjs/ui'
+</script>
+
+<template>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <RxCard variant="default">
+      <div class="flex items-center justify-between mb-2">
+        <span class="font-semibold">SSR Bundle Budget</span>
+        <RxBadge variant="success">Passed</RxBadge>
+      </div>
+      <p class="text-2xl font-bold">4.8 KB <span class="text-xs font-normal opacity-70">gzipped</span></p>
+      <p class="text-xs opacity-75 mt-1">Zero hydration overhead on static routes.</p>
+    </RxCard>
+
+    <RxCard variant="elevated">
+      <div class="flex items-center justify-between mb-2">
+        <span class="font-semibold">Fontaine Metrics</span>
+        <RxBadge variant="primary">v1.0.3</RxBadge>
+      </div>
+      <p class="text-sm opacity-80 mb-3">Metric-adjusted fallback @font-face rules generated at build time.</p>
+      <RxButton size="sm" variant="outline">Inspect CSS</RxButton>
+    </RxCard>
+  </div>
+</template>
 ```
 
-Conceptually:
+## Rendered DOM Structure (`rx-*` Classes)
+
+When rendered on the server or client with default styling (`:unstyled="false"`), `RxCard` produces the following HTML structure (`rx-card [rx-card-${variant}]`):
 
 ```html
 <div class="rx-card">
-  <h2>Project status</h2>
-  <p>All systems operational.</p>
+  <div class="flex items-center justify-between mb-2">
+    <span class="font-semibold">SSR Bundle Budget</span>
+    <span class="rx-badge rx-badge-success">Passed</span>
+  </div>
+  <p class="text-2xl font-bold">4.8 KB</p>
 </div>
 ```
-
-## Glass variant
-
-The current built-in stylesheet includes a `glass` modifier:
-
-```vue
-<RxCard variant="glass">
-  <h2>Preview</h2>
-  <p>Translucent card content.</p>
-</RxCard>
-```
-
-`variant` is implemented as a string prop. `default` and `glass` are the variants verified in current built-in CSS. Another string can create a modifier class without automatically receiving a framework style.
 
 ## Props
 
 | Prop | Type | Default | Required | Description |
 | --- | --- | --- | --- | --- |
-| `variant` | `string` | `'default'` | No | Non-default values add `rx-card-${variant}`. Current built-in extra style: `glass`. |
-| `unstyled` | `boolean` | `false` | No | Omits Resux-generated card classes while preserving application attributes/classes. |
-
-There is no built-in `href`, `clickable`, `header`, `footer`, `title`, or `elevation` prop in the current primitive. Compose those needs with normal markup.
-
-## Native attributes
-
-The component root is a `<div>`, and attributes can be forwarded to it:
-
-```vue
-<RxCard
-  id="billing-summary"
-  class="billing-card"
-  data-plan="pro"
->
-  ...
-</RxCard>
-```
-
-Because the root is generic, adding attributes does not automatically make it an interactive or semantic region.
+| `variant` | `string` | `'default'` | No | Appends `rx-card-${variant}` when not `'default'` (e.g., `'elevated'`, `'outlined'`, `'subtle'`). |
+| `unstyled` | `boolean` | `false` | No | Renders a plain `<div>` without `rx-card` classes. |
 
 ## Events
 
-No custom events are declared.
-
-A native listener could be passed through the Vue component/root, but making a generic `<div>` card clickable creates keyboard/semantics problems unless you deliberately implement the complete interactive pattern.
-
-If the entire surface navigates somewhere, prefer a proper link composition. If it performs an action, prefer a button. Avoid turning `RxCard` itself into a fake control merely because it has a convenient visual box.
+This component does not emit custom events (native DOM events forward normally).
 
 ## Slots
 
-| Slot | Props | Description |
-| --- | --- | --- |
-| `default` | None | All card content. |
+| Slot | Description |
+| --- | --- |
+| `default` | Card header, body, metrics, and footer actions. |
 
-There are no dedicated `header`, `body`, or `footer` slots in the current component. Create structure inside the default slot:
+## Headless / Tailwind `unstyled` Mode
+
+Pass `:unstyled="true"` to strip default `rx-*` classes and supply your own utility classes:
 
 ```vue
-<RxCard>
-  <header>
-    <h2>Team plan</h2>
-    <RxBadge variant="success">Active</RxBadge>
-  </header>
-
-  <p>Up to 20 members.</p>
-
-  <footer>
-    <RxButton>Manage plan</RxButton>
-  </footer>
+<RxCard unstyled class="px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium">
+  Custom Styled RxCard
 </RxCard>
 ```
 
-## Styling
+## SSR, Resumability & Accessibility
 
-Default markup uses `rx-card`; a non-default variant contributes its modifier class.
-
-Add application styling normally:
-
-```vue
-<RxCard class="dashboard-panel">...</RxCard>
-```
-
-Or use the structural component without Resux classes:
-
-```vue
-<RxCard unstyled class="surface-panel">...</RxCard>
-```
-
-`unstyled` does not change the root element or slot structure.
-
-## Semantic structure
-
-The component intentionally renders a generic `<div>` because “card” is a visual pattern, not one universal HTML semantic.
-
-Choose semantics **inside** or around the card according to content.
-
-### Article-like card
-
-If the content can stand independently, native `<article>` may be a better root than `RxCard`:
-
-```html
-<article class="article-card">
-  <h2>Architecture Deep Dive</h2>
-  <p>Understand compiler, server, and browser ownership.</p>
-</article>
-```
-
-### Settings group
-
-A heading and section relationship may be more appropriate:
-
-```vue
-<RxCard>
-  <section aria-labelledby="security-heading">
-    <h2 id="security-heading">Security</h2>
-    ...
-  </section>
-</RxCard>
-```
-
-### Form controls
-
-If the card groups related form controls, consider whether `<fieldset>`/`<legend>` gives stronger semantics than a generic card container.
-
-## Accessibility
-
-Do not add roles mechanically just because the component is visually prominent.
-
-- `role="group"` is not required for every card.
-- `role="region"` should generally have a useful accessible name and represent a meaningful region.
-- `article` semantics should be used when the content is independently distributable/self-contained.
-- clickable cards need real keyboard/focus semantics, ideally through native links/buttons rather than a click listener on the `<div>`.
-- headings inside repeated cards should preserve a logical document outline.
-
-The visual border/background does not supply semantics by itself.
-
-## SSR / resumability / hydration
-
-`RxCard` has no internal reactive state, custom events, or mount behavior. Its markup can be server-rendered inside a Vue island and adds very little component-specific client work.
-
-However, the package boundary still matters: `RxCard` is a Vue `defineComponent()` export from `resuxjs/ui`. If the rest of the page is normal Resux, using a native semantic container can avoid creating a Vue runtime boundary solely for a surface style.
-
-For example, this normal Resux markup may be preferable:
-
-```html
-<article class="card">
-  <h2>Architecture Deep Dive</h2>
-  <p>...</p>
-</article>
-```
-
-Read [Component Anatomy](./component-anatomy.md) and [Vue Islands](/guide/vue-islands).
-
-## Recipe: dashboard metric
-
-```vue
-<RxCard>
-  <p class="metric-label">Successful builds</p>
-  <strong class="metric-value">128</strong>
-  <RxBadge variant="success">+12%</RxBadge>
-</RxCard>
-```
-
-The card supplies the visual surface. Application markup owns the meaning of the label/value/trend.
-
-## Recipe: action card without fake click semantics
-
-Instead of:
-
-```vue
-<!-- Avoid making the generic div itself the only control -->
-<RxCard @click="openProject">
-  <h3>Resux docs</h3>
-</RxCard>
-```
-
-prefer an explicit action:
-
-```vue
-<RxCard>
-  <h3>Resux docs</h3>
-  <p>Framework documentation.</p>
-  <RxButton @click="openProject">Open project</RxButton>
-</RxCard>
-```
-
-Or use a real `<a>` as the appropriate navigational element.
-
-## Recipe: unstyled/headless surface
-
-```vue
-<RxCard
-  unstyled
-  class="rounded-xl border border-slate-700 bg-slate-900 p-6"
->
-  <h2>Custom card</h2>
-  <p>Application-owned styling.</p>
-</RxCard>
-```
-
-This is useful inside a Vue UI subtree when you want the component structure/API but not the built-in theme.
-
-## Common mistakes
-
-### Assuming Card is interactive
-
-It is a `<div>` and declares no custom action API.
-
-### Assuming arbitrary variants are styled
-
-Only documented built-in variants are verified by the current CSS.
-
-### Using a generic card where native semantics are stronger
-
-Prefer `article`, `section`, `fieldset`, link, or button semantics when they accurately describe the content/action.
-
-### Creating a Vue island for static presentation only
-
-Normal Resux/native markup is usually the smaller boundary.
-
-## Related
-
-- [Badge](./badge.md)
-- [Avatar](./avatar.md)
-- [Divider](./divider.md)
-- [Button](./button.md)
-- [Component Anatomy](./component-anatomy.md)
-- [Vue Islands](/guide/vue-islands)
+- **Server-Side Rendering**: Renders deterministic HTML during SSR with zero client layout shift.
+- **Resumability**: Event handlers (`@click`, `v-model` updates) serialize cleanly across Resux server/client boundaries.
+- **Keyboard & Screen Readers**: Preserves native focus rings, ARIA state attributes, and semantic HTML tags.

@@ -1,80 +1,107 @@
-# Transition
+# Transition (Built-in Framework Primitive)
 
-Resux includes a built-in resumable `<Transition>` component that coordinates CSS enter and leave animations when elements enter or leave the DOM conditionally (e.g. via `v-if` or `v-show`).
+Built-in `<Transition>` primitive applying CSS enter/leave classes (`{name}-enter-from`, `{name}-enter-active`, `{name}-leave-to`) when child elements are inserted/removed via `v-if` or have their display state toggled via `v-show`.
 
-Resux's `<Transition>` uses standard Vue-compatible CSS transition classes and integrates with the resumable runtime to manage CSS transitions without requiring the full Vue runtime.
+## Live Interactive Preview — See How It Looks
 
-## Basic usage
+Use the interactive canvas below to preview how `Transition` looks and behaves in real time:
+
+<RxComponentPreview component="Transition" title="Transition (Built-in Framework Primitive) — Live Visual Preview" />
+
+## Import
+
+```vue
+<!-- Built-in Resux template primitive (no import required in .vue templates) -->
+<Transition>...</Transition>
+```
+
+## Complete Runnable Example
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'resux'
+import { ref } from 'resuxjs'
+import { RxButton, RxCard, RxBadge } from 'resuxjs/ui'
 
-const isVisible = ref(true)
+const visible = ref(true)
 </script>
 
 <template>
-  <button type="button" @click="isVisible = !isVisible">
-    Toggle Content
-  </button>
+  <div class="space-y-3">
+    <RxButton size="sm" variant="secondary" @click="visible = !visible">
+      Toggle Transition ({{ visible ? 'Visible' : 'Hidden' }})
+    </RxButton>
 
-  <Transition name="fade">
-    <p v-if="isVisible" class="content-box">
-      This element fades in and out smoothly.
-    </p>
-  </Transition>
+    <Transition name="fade" mode="out-in">
+      <RxCard v-if="visible" key="active">
+        <div class="flex items-center justify-between">
+          <span class="text-sm font-medium">Active Panel (v-if DOM insertion/removal)</span>
+          <RxBadge variant="success">Mounted</RxBadge>
+        </div>
+      </RxCard>
+    </Transition>
+  </div>
 </template>
 
 <style scoped>
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.3s ease;
+  transition: opacity 0.22s ease, transform 0.22s ease;
 }
-
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+  transform: translateY(6px);
 }
 </style>
 ```
 
-## Props
+## Rendered DOM Structure (`rx-*` Classes)
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `name` | `string` | `'v'` | Used to automatically generate transition CSS class names. For example, `name="fade"` generates `.fade-enter-active`, etc. |
-| `appear` | `boolean` | `false` | Whether to apply transition classes on the initial server-to-client mount. |
-| `enterActiveClass` | `string` | `undefined` | Custom CSS class applied during the entire enter phase. |
-| `enterFromClass` | `string` | `undefined` | Custom CSS class applied at the start of the enter phase. |
-| `enterToClass` | `string` | `undefined` | Custom CSS class applied at the end of the enter phase. |
-| `leaveActiveClass` | `string` | `undefined` | Custom CSS class applied during the entire leave phase. |
-| `leaveFromClass` | `string` | `undefined` | Custom CSS class applied at the start of the leave phase. |
-| `leaveToClass` | `string` | `undefined` | Custom CSS class applied at the end of the leave phase. |
+When rendered on the server or client with default styling (`:unstyled="false"`), `Transition` produces the following HTML structure (`${name}-enter-active / ${name}-leave-active`):
 
-## Transition lifecycle CSS classes
-
-For `<Transition name="fade">`, Resux applies the following classes during state changes:
-
-1. **Enter phase**:
-   - `fade-enter-from`: Added before the element is inserted, removed one frame after insertion.
-   - `fade-enter-active`: Applied throughout the entire entering phase; use this to configure CSS `transition` properties.
-   - `fade-enter-to`: Added one frame after insertion (when `fade-enter-from` is removed); removed when the transition completes.
-2. **Leave phase**:
-   - `fade-leave-from`: Added immediately when a leave transition is triggered.
-   - `fade-leave-active`: Applied throughout the entire leave phase; use this to configure CSS `transition` properties.
-   - `fade-leave-to`: Added one frame after a leave transition is triggered; element is removed from the DOM when the transition completes.
-
-## Accessibility: Reduced Motion
-
-Resux's transition runtime automatically respects user motion preferences:
-
-```css
-@media (prefers-reduced-motion: reduce) {
-  .fade-enter-active,
-  .fade-leave-active {
-    transition: none !important;
-  }
-}
+```html
+<div class="rx-card fade-enter-active">
+  <div class="flex items-center justify-between">
+    <span class="text-sm font-medium">Active Panel (v-if DOM insertion/removal)</span>
+    <span class="rx-badge rx-badge-success">Mounted</span>
+  </div>
+</div>
 ```
 
-When `(prefers-reduced-motion: reduce)` matches, DOM insertions and removals complete immediately without waiting for transition events, ensuring an accessible experience.
+## Props
+
+| Prop | Type | Default | Required | Description |
+| --- | --- | --- | --- | --- |
+| `name` | `string` | `'v'` | No | Prefix for generated CSS transition classes (`fade-enter-from`, `fade-leave-to`, etc.). |
+| `mode` | `'in-out' \| 'out-in' \| 'default'` | `'default'` | No | Controls timing sequence between outgoing and incoming elements. |
+| `appear` | `boolean` | `false` | No | Applies the enter transition on initial client mount. |
+
+## Events
+
+| Event | Payload | Description |
+| --- | --- | --- |
+| `before-enter` | `Element` | Called before enter transition starts. |
+| `after-enter` | `Element` | Called when enter transition completes. |
+| `after-leave` | `Element` | Called when leave transition completes. |
+
+## Slots
+
+| Slot | Description |
+| --- | --- |
+| `default` | Single root element controlled by `v-if` (DOM insertion/removal) or `v-show` (display state toggle). |
+
+## Headless / Tailwind `unstyled` Mode
+
+Pass `:unstyled="true"` to strip default `rx-*` classes and supply your own utility classes:
+
+```vue
+<Transition unstyled class="px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium">
+  Custom Styled Transition
+</Transition>
+```
+
+## SSR, Resumability & Accessibility
+
+- **Server-Side Rendering**: Renders deterministic HTML during SSR with zero client layout shift.
+- **Resumability**: Event handlers (`@click`, `v-model` updates) serialize cleanly across Resux server/client boundaries.
+- **Keyboard & Screen Readers**: Preserves native focus rings, ARIA state attributes, and semantic HTML tags.

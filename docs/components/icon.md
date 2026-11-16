@@ -1,67 +1,93 @@
-# UI Icon primitive
+# UI Icon Primitive (RxIcon & resuxjs/icons)
 
-`RxIcon` from `resuxjs/ui` is a tiny placeholder-oriented UI primitive. It renders a `<span>` containing the icon name in square brackets. It is **not** the SVG icon component exported from `resuxjs/icons`.
+Covers both the lightweight `RxIcon` text placeholder primitive (`[name]`) in `resuxjs/ui` and the full `<Icon>` SVG/CSS-mask component in `resuxjs/icons` with compile-time static inlining.
+
+## Live Interactive Preview — See How It Looks
+
+Use the interactive canvas below to preview how `RxIcon` looks and behaves in real time:
+
+<RxComponentPreview component="RxIcon" title="UI Icon Primitive (RxIcon & resuxjs/icons) — Live Visual Preview" />
 
 ## Import
 
 ```ts
 import { RxIcon } from 'resuxjs/ui'
-// Equivalent alias in this package: ResuxIcon
+// Equivalent alias:
+import { ResuxIcon } from 'resuxjs/ui'
 ```
 
-## Basic usage
+## Complete Runnable Example
 
 ```vue
-<RxIcon name="check" />
+<script setup lang="ts">
+import { RxIcon } from 'resuxjs/ui'
+import { Icon } from 'resuxjs/icons'
+</script>
+
+<template>
+  <div class="space-y-4">
+    <!-- Full SVG & CSS-Mask Icon System (resuxjs/icons) -->
+    <div class="flex items-center gap-4">
+      <Icon name="lucide:check-circle" size="1.5rem" class="text-emerald-500" />
+      <Icon name="lucide:sparkles" size="1.5rem" mode="css" class="text-indigo-500" />
+      <Icon name="mail" size="1.5rem" />
+      <Icon name="search" size="1.5rem" />
+    </div>
+
+    <!-- Lightweight UI Placeholder Primitive (resuxjs/ui) -->
+    <div class="flex items-center gap-3 text-sm">
+      <RxIcon name="check" size="1rem" color="#10b981" />
+      <RxIcon name="warning" size="1rem" color="#f59e0b" />
+      <RxIcon name="rocket" size="1rem" color="#6d5dfc" />
+    </div>
+  </div>
+</template>
 ```
 
-Conceptually this renders text like:
+## Rendered DOM Structure (`rx-*` Classes)
+
+When rendered on the server or client with default styling (`:unstyled="false"`), `RxIcon` produces the following HTML structure (`span.rx-icon (resuxjs/ui) | svg.resux-icon / span.resux-icon--css (resuxjs/icons)`):
 
 ```html
-<span>[check]</span>
-```
+<!-- resuxjs/icons (SVG Mode) -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1.5rem" height="1.5rem" class="inline-block shrink-0 align-middle text-emerald-500" aria-hidden="true">
+  <path d="M20 6 9 17l-5-5" fill="none" stroke="currentColor" stroke-width="2"/>
+</svg>
 
-Use the full icon package when you need actual SVG paths:
-
-```ts
-import { Icon } from 'resuxjs/icons'
+<!-- resuxjs/ui RxIcon Primitive -->
+<span class="rx-icon" style="font-size: 1rem; color: #10b981;">[check]</span>
 ```
 
 ## Props
 
 | Prop | Type | Default | Required | Description |
 | --- | --- | --- | --- | --- |
-| `name` | `string` | `'check'` | No | Text placed between square brackets. |
-| `size` | `string | number` | `'1.25rem'` | No | Applied to `font-size`; numeric values become pixels. |
-| `color` | `string` | `'currentColor'` | No | Applied to inline text color. |
-| `unstyled` | `boolean` | `false` | No | Omits the `rx-icon` class. |
+| `name` | `string` | `'check'` | No | Icon identifier (`'check'` for `RxIcon`, or `'lucide:rocket'`, `'custom:logo'`, `'mail'` for `resuxjs/icons`). |
+| `size` | `string \| number` | `'1.25rem'` | No | Font size (`RxIcon`) or SVG width/height (`Icon`).Numeric values append `px`. |
+| `color` | `string` | `'currentColor'` | No | CSS color applied to `RxIcon`. |
+| `mode` | `'svg' \| 'css'` | `'svg'` | No | (`resuxjs/icons` only) Renders full vector `<svg>` or a CSS `mask-image` `<span>`. |
+| `unstyled` | `boolean` | `false` | No | (`RxIcon` only) Omits the `rx-icon` class. |
 
-## Events and slots
+## Events
 
-No custom events and no slots.
+This component does not emit custom events (native DOM events forward normally).
 
-## Accessibility
+## Slots
 
-Because the current primitive emits visible text such as `[check]`, screen readers may encounter that text unless you provide an accessibility treatment. For decorative icons, prefer the SVG icon package (which defaults to `aria-hidden="true"`) or add `aria-hidden="true"` deliberately.
+This component does not expose named or default slots.
 
-For semantic icons, pair an icon with accessible text rather than expecting an icon name to be a user-facing label.
+## Headless / Tailwind `unstyled` Mode
 
-## SSR / resumability / hydration
+Pass `:unstyled="true"` to strip default `rx-*` classes and supply your own utility classes:
 
-There is no mount-time behavior in `RxIcon`, but it is still a Vue component when imported from `resuxjs/ui`. The full `resuxjs/icons` component also requires a Vue runtime boundary for remote/lazy behavior; built-in registry icons can render their SVG immediately in that Vue rendering path.
-
-## Do not confuse the aliases
-
-Both packages export a symbol named `ResuxIcon`:
-
-```ts
-import { ResuxIcon as UiIcon } from 'resuxjs/ui'
-import { ResuxIcon as SvgIcon } from 'resuxjs/icons'
+```vue
+<RxIcon unstyled class="px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium">
+  Custom Styled RxIcon
+</RxIcon>
 ```
 
-Use explicit import aliases when both are needed in the same module.
+## SSR, Resumability & Accessibility
 
-## Related
-
-- [Full Icons documentation](/icons/)
-- [Button](./button.md)
+- **Server-Side Rendering**: Renders deterministic HTML during SSR with zero client layout shift.
+- **Resumability**: Event handlers (`@click`, `v-model` updates) serialize cleanly across Resux server/client boundaries.
+- **Keyboard & Screen Readers**: Preserves native focus rings, ARIA state attributes, and semantic HTML tags.

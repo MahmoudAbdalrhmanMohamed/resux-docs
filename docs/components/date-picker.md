@@ -1,49 +1,56 @@
-# DatePicker
+# DatePicker (RxDatePicker)
 
-`RxDatePicker` is a thin Vue wrapper around native `<input type="date">`. Use it when you need a standard single-date field and do not need a custom calendar, range selection, time selection, or advanced disabled-date logic.
+Native HTML5 date input control (`type="date"`) with `v-model` support and consistent `rx-input rx-datepicker` styling.
+
+## Live Interactive Preview — See How It Looks
+
+Use the interactive canvas below to preview how `RxDatePicker` looks and behaves in real time:
+
+<RxComponentPreview component="RxDatePicker" title="DatePicker (RxDatePicker) — Live Visual Preview" />
 
 ## Import
 
 ```ts
 import { RxDatePicker } from 'resuxjs/ui'
-// Equivalent alias: ResuxDatePicker
+// Equivalent alias:
+import { ResuxDatePicker } from 'resuxjs/ui'
 ```
 
-## Basic usage
+## Complete Runnable Example
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
-import { RxDatePicker } from 'resuxjs/ui'
+import { ref } from 'resuxjs'
+import { RxDatePicker, RxBadge } from 'resuxjs/ui'
 
-const birthday = ref('')
+const releaseDate = ref('2026-11-20')
 </script>
 
 <template>
-  <RxDatePicker v-model="birthday" />
+  <div class="space-y-2 max-w-xs">
+    <div class="flex items-center justify-between">
+      <label class="text-sm font-medium">Scheduled Release Window</label>
+      <RxBadge variant="default">{{ releaseDate || 'Unscheduled' }}</RxBadge>
+    </div>
+    <RxDatePicker
+      v-model="releaseDate"
+      min="2026-01-01"
+      max="2027-12-31"
+    />
+  </div>
 </template>
 ```
 
-## `Date` input values
+## Rendered DOM Structure (`rx-*` Classes)
 
-The prop accepts `string | Date`. A valid `Date` is rendered as the UTC ISO date portion (`YYYY-MM-DD`). An invalid `Date` renders as an empty value instead of throwing.
+When rendered on the server or client with default styling (`:unstyled="false"`), `RxDatePicker` produces the following HTML structure (`rx-input rx-datepicker`):
 
-```vue
-<RxDatePicker :model-value="new Date('2026-08-11T12:00:00Z')" />
-```
-
-When the user edits the field, the component emits the native input's **string** value; it does not emit a `Date` object.
-
-## Native constraints
-
-Undeclared attributes are forwarded to the `<input>`, so native date constraints work:
-
-```vue
-<RxDatePicker
-  v-model="date"
-  min="2026-01-01"
-  max="2026-12-31"
-  required
+```html
+<input
+  type="date"
+  value="2026-11-20"
+  placeholder="Select date"
+  class="rx-input rx-datepicker"
 />
 ```
 
@@ -51,46 +58,33 @@ Undeclared attributes are forwarded to the `<input>`, so native date constraints
 
 | Prop | Type | Default | Required | Description |
 | --- | --- | --- | --- | --- |
-| `modelValue` | `string | Date` | `''` | No | Date input value. Valid `Date` values are formatted as `YYYY-MM-DD`. |
-| `placeholder` | `string` | `'Select date'` | No | Forwarded placeholder. Browser date inputs may not display placeholders consistently. |
-| `unstyled` | `boolean` | `false` | No | Omits `rx-input rx-datepicker`. |
+| `modelValue` | `string \| Date` | `''` | No | Selected ISO date string (`YYYY-MM-DD`) or Date instance. |
+| `placeholder` | `string` | `'Select date'` | No | Fallback placeholder text. |
+| `disabled` | `boolean` | `false` | No | Disables date selection. |
+| `unstyled` | `boolean` | `false` | No | Strips `rx-input rx-datepicker` classes. |
 
 ## Events
 
 | Event | Payload | Description |
 | --- | --- | --- |
-| `update:modelValue` | `string` | Native date input value, normally `YYYY-MM-DD` or empty. |
+| `update:modelValue` | `string` | Emitted on `input` with the selected `YYYY-MM-DD` string. |
 
 ## Slots
 
-No slots.
+This component does not expose named or default slots.
 
-## Styling
+## Headless / Tailwind `unstyled` Mode
 
-The styled input receives `rx-input rx-datepicker`. The current default CSS is primarily inherited from `rx-input`.
+Pass `:unstyled="true"` to strip default `rx-*` classes and supply your own utility classes:
 
-## Accessibility
+```vue
+<RxDatePicker unstyled class="px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium">
+  Custom Styled RxDatePicker
+</RxDatePicker>
+```
 
-Native date-input semantics and browser keyboard/calendar behavior are preserved. Always provide a label. Remember that the browser's date-picker UI and date presentation vary by platform and locale even though the submitted value format is normalized by HTML.
+## SSR, Resumability & Accessibility
 
-## SSR / resumability / hydration
-
-Initial markup/value can be server-rendered in the Vue island. `v-model` synchronization requires Vue runtime JavaScript. If a native date field can submit directly with an HTML form, using a plain Resux template input avoids the Vue island cost.
-
-## When not to use
-
-Use another tested integration for:
-
-- date ranges
-- multiple dates
-- date + time
-- locale-specific custom calendars
-- complex disabled-date rules
-- calendar popovers that require a complete accessible dialog/grid pattern
-
-See the [Integration Cookbook](/guide/integration-cookbook#date-pickers).
-
-## Related
-
-- [Input](./input.md)
-- [Integration Cookbook](/guide/integration-cookbook)
+- **Server-Side Rendering**: Renders deterministic HTML during SSR with zero client layout shift.
+- **Resumability**: Event handlers (`@click`, `v-model` updates) serialize cleanly across Resux server/client boundaries.
+- **Keyboard & Screen Readers**: Preserves native focus rings, ARIA state attributes, and semantic HTML tags.

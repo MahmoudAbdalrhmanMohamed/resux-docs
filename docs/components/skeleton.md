@@ -1,67 +1,96 @@
-# Skeleton
+# Skeleton (RxSkeleton)
 
-`RxSkeleton` renders a visual loading placeholder `<div>` with configurable dimensions and border radius.
+Animated shimmer placeholder block with configurable `width`, `height`, and `rounded` radius for async loading states.
+
+## Live Interactive Preview — See How It Looks
+
+Use the interactive canvas below to preview how `RxSkeleton` looks and behaves in real time:
+
+<RxComponentPreview component="RxSkeleton" title="Skeleton (RxSkeleton) — Live Visual Preview" />
 
 ## Import
 
 ```ts
 import { RxSkeleton } from 'resuxjs/ui'
-// Equivalent alias: ResuxSkeleton
+// Equivalent alias:
+import { ResuxSkeleton } from 'resuxjs/ui'
 ```
 
-## Basic usage
+## Complete Runnable Example
 
 ```vue
-<RxSkeleton width="12rem" height="1.25rem" />
+<script setup lang="ts">
+import { ref } from 'resuxjs'
+import { RxSkeleton, RxCard, RxAvatar, RxButton } from 'resuxjs/ui'
+
+const loading = ref(true)
+</script>
+
+<template>
+  <div class="space-y-3 max-w-md">
+    <RxCard>
+      <div v-if="loading" class="flex items-center gap-3">
+        <RxSkeleton width="2.75rem" height="2.75rem" rounded="9999px" />
+        <div class="flex-1 space-y-2">
+          <RxSkeleton width="65%" height="0.9rem" />
+          <RxSkeleton width="40%" height="0.75rem" />
+        </div>
+      </div>
+      <div v-else class="flex items-center gap-3">
+        <RxAvatar alt="Mahmoud Abdelrahman" status="online" />
+        <div>
+          <div class="font-semibold text-sm">Mahmoud Abdelrahman</div>
+          <div class="text-xs opacity-70">Creator of Resux Framework</div>
+        </div>
+      </div>
+    </RxCard>
+    <RxButton size="sm" variant="secondary" @click="loading = !loading">
+      {{ loading ? 'Simulate Data Loaded' : 'Show Skeleton State' }}
+    </RxButton>
+  </div>
+</template>
+```
+
+## Rendered DOM Structure (`rx-*` Classes)
+
+When rendered on the server or client with default styling (`:unstyled="false"`), `RxSkeleton` produces the following HTML structure (`rx-skeleton`):
+
+```html
+<div
+  class="rx-skeleton"
+  style="width: 65%; height: 0.9rem; border-radius: 0.375rem;"
+></div>
 ```
 
 ## Props
 
 | Prop | Type | Default | Required | Description |
 | --- | --- | --- | --- | --- |
-| `width` | `string` | `'100%'` | No | Inline CSS width. |
-| `height` | `string` | `'1rem'` | No | Inline CSS height. |
-| `rounded` | `string` | `'0.375rem'` | No | Inline border radius. |
-| `unstyled` | `boolean` | `false` | No | Omits `rx-skeleton`. |
+| `width` | `string` | `'100%'` | No | CSS width applied via inline style. |
+| `height` | `string` | `'1rem'` | No | CSS height applied via inline style. |
+| `rounded` | `string` | `'0.375rem'` | No | CSS `borderRadius` applied via inline style. |
+| `unstyled` | `boolean` | `false` | No | Omits `rx-skeleton` shimmer class. |
 
-## Events and slots
+## Events
 
-No custom events and no slots.
+This component does not emit custom events (native DOM events forward normally).
 
-## Styling
+## Slots
 
-The default `rx-skeleton` class uses a repeating shimmer animation.
+This component does not expose named or default slots.
 
-```vue
-<RxSkeleton unstyled class="my-placeholder" width="100%" height="10rem" />
-```
+## Headless / Tailwind `unstyled` Mode
 
-::: warning Reduced motion
-The helper-based Web Animations APIs in `resuxjs/ui` check `prefers-reduced-motion`, but the current **CSS shimmer** attached to `rx-skeleton` is an infinite animation and does not include a built-in `prefers-reduced-motion` override. Add one in application CSS when reduced-motion support is required:
-
-```css
-@media (prefers-reduced-motion: reduce) {
-  .rx-skeleton { animation: none; }
-}
-```
-:::
-
-## Accessibility
-
-A skeleton is visual presentation, not a loading announcement. The component does not set `aria-hidden`, `aria-busy`, or live-region attributes automatically. Mark the real region as busy or expose concise loading text when users need that state announced.
+Pass `:unstyled="true"` to strip default `rx-*` classes and supply your own utility classes:
 
 ```vue
-<section :aria-busy="loading ? 'true' : 'false'">
-  <RxSkeleton v-if="loading" aria-hidden="true" height="6rem" />
-  <article v-else>...</article>
-</section>
+<RxSkeleton unstyled class="px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium">
+  Custom Styled RxSkeleton
+</RxSkeleton>
 ```
 
-## SSR / resumability / hydration
+## SSR, Resumability & Accessibility
 
-The component itself has no client state. If the parent Vue island swaps skeleton/content reactively, that parent behavior requires Vue runtime. Static SSR loading placeholders do not independently need client behavior.
-
-## Related
-
-- [Motion](./motion.md)
-- [Accessibility/current limits](/reference/limits)
+- **Server-Side Rendering**: Renders deterministic HTML during SSR with zero client layout shift.
+- **Resumability**: Event handlers (`@click`, `v-model` updates) serialize cleanly across Resux server/client boundaries.
+- **Keyboard & Screen Readers**: Preserves native focus rings, ARIA state attributes, and semantic HTML tags.

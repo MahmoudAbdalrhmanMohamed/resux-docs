@@ -1,116 +1,110 @@
-# Switch
+# Switch (RxSwitch)
 
-`RxSwitch` is a boolean control rendered as a native `<button type="button">` with `role="switch"` and `aria-checked`.
+Accessible WAI-ARIA toggle switch (`role="switch"`) with `aria-checked`, `data-state="checked|unchecked"`, and animated thumb element.
+
+## Live Interactive Preview — See How It Looks
+
+Use the interactive canvas below to preview how `RxSwitch` looks and behaves in real time:
+
+<RxComponentPreview component="RxSwitch" title="Switch (RxSwitch) — Live Visual Preview" />
 
 ## Import
 
 ```ts
 import { RxSwitch } from 'resuxjs/ui'
-// Equivalent alias: ResuxSwitch
+// Equivalent alias:
+import { ResuxSwitch } from 'resuxjs/ui'
 ```
 
-## Basic usage
+## Complete Runnable Example
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
-import { RxSwitch } from 'resuxjs/ui'
+import { ref } from 'resuxjs'
+import { RxSwitch, RxCard, RxBadge } from 'resuxjs/ui'
 
-const enabled = ref(false)
+const viewTransitions = ref(true)
+const preloadCss = ref(true)
+const strictHalalGuard = ref(false)
 </script>
 
 <template>
-  <RxSwitch v-model="enabled" aria-label="Enable notifications" />
+  <RxCard class="space-y-4 max-w-md">
+    <div class="flex items-center justify-between">
+      <div>
+        <div class="font-medium text-sm">Router View Transitions</div>
+        <div class="text-xs opacity-70">Animate page swaps via document.startViewTransition</div>
+      </div>
+      <RxSwitch v-model="viewTransitions" />
+    </div>
+
+    <div class="flex items-center justify-between">
+      <div>
+        <div class="font-medium text-sm">Preload Route CSS</div>
+        <div class="text-xs opacity-70">Warm destination stylesheets before DOM swap</div>
+      </div>
+      <RxSwitch v-model="preloadCss" />
+    </div>
+
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="font-medium text-sm">Strict Halal Production Guard</span>
+        <RxBadge :variant="strictHalalGuard ? 'success' : 'default'">
+          {{ strictHalalGuard ? 'Enforced' : 'Optional' }}
+        </RxBadge>
+      </div>
+      <RxSwitch v-model="strictHalalGuard" />
+    </div>
+  </RxCard>
 </template>
 ```
 
-## Labeled switch
+## Rendered DOM Structure (`rx-*` Classes)
 
-Prefer a visible label when practical:
+When rendered on the server or client with default styling (`:unstyled="false"`), `RxSwitch` produces the following HTML structure (`rx-switch [checked] > span.rx-switch-thumb`):
 
-```vue
-<div class="setting-row">
-  <span id="email-label">Email notifications</span>
-  <RxSwitch v-model="emailEnabled" aria-labelledby="email-label" />
-</div>
+```html
+<button
+  type="button"
+  role="switch"
+  aria-checked="true"
+  data-state="checked"
+  class="rx-switch checked"
+>
+  <span class="rx-switch-thumb" aria-hidden="true"></span>
+</button>
 ```
-
-## Disabled
-
-```vue
-<RxSwitch v-model="enabled" disabled aria-label="Feature unavailable" />
-```
-
-The component does not emit a new value while disabled, and the native button is disabled.
 
 ## Props
 
 | Prop | Type | Default | Required | Description |
 | --- | --- | --- | --- | --- |
-| `modelValue` | `boolean` | `false` | No | Current switch state. |
-| `disabled` | `boolean` | `false` | No | Native disabled state and interaction guard. |
-| `unstyled` | `boolean` | `false` | No | Omits Resux switch classes. |
+| `modelValue` | `boolean` | `false` | No | Checked state bound via `v-model`. |
+| `disabled` | `boolean` | `false` | No | Prevents toggling and dims the control. |
+| `unstyled` | `boolean` | `false` | No | Omits `rx-switch` and `rx-switch-thumb` classes. |
 
 ## Events
 
 | Event | Payload | Description |
 | --- | --- | --- |
-| `update:modelValue` | `boolean` | Emits the negated current value when activated. |
+| `update:modelValue` | `boolean` | Emitted with `!modelValue` when clicked. |
 
 ## Slots
 
-No slots. The rendered button contains the switch thumb span.
+This component does not expose named or default slots.
 
-## Markup
+## Headless / Tailwind `unstyled` Mode
 
-The root includes:
-
-```html
-<button type="button" role="switch" aria-checked="false">
-  <span></span>
-</button>
-```
-
-Styled state adds `checked` to the root and uses `rx-switch` / `rx-switch-thumb` classes.
-
-## Accessibility
-
-The native button supplies focus and Enter/Space activation. `role="switch"` and `aria-checked` communicate the boolean state. The component does not generate a label, so provide `aria-label`, `aria-labelledby`, or a surrounding labeling pattern.
-
-Do not communicate state only through thumb position/color; keep the accessible name clear and, when useful, expose state text nearby.
-
-## SSR / resumability / hydration
-
-The initial checked state can be SSR-rendered, but toggling and `v-model` updates require the Vue island/runtime. For server-submitted forms, remember that this component is a button and does not automatically create a named form value like a native checkbox.
-
-## Complete example
+Pass `:unstyled="true"` to strip default `rx-*` classes and supply your own utility classes:
 
 ```vue
-<script setup lang="ts">
-import { ref } from 'vue'
-import { RxSwitch } from 'resuxjs/ui'
-
-const reducedData = ref(false)
-</script>
-
-<template>
-  <section aria-labelledby="data-title">
-    <h2 id="data-title">Data usage</h2>
-    <div>
-      <div id="reduced-data-label">Reduce media data</div>
-      <p id="reduced-data-help">Prefer lighter media when possible.</p>
-      <RxSwitch
-        v-model="reducedData"
-        aria-labelledby="reduced-data-label"
-        aria-describedby="reduced-data-help"
-      />
-    </div>
-  </section>
-</template>
+<RxSwitch unstyled class="px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium">
+  Custom Styled RxSwitch
+</RxSwitch>
 ```
 
-## Related
+## SSR, Resumability & Accessibility
 
-- [Input](./input.md)
-- [Accessibility limits](/reference/limits)
-- [Vue Islands](/guide/vue-islands)
+- **Server-Side Rendering**: Renders deterministic HTML during SSR with zero client layout shift.
+- **Resumability**: Event handlers (`@click`, `v-model` updates) serialize cleanly across Resux server/client boundaries.
+- **Keyboard & Screen Readers**: Preserves native focus rings, ARIA state attributes, and semantic HTML tags.

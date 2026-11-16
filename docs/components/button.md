@@ -1,155 +1,110 @@
-# Button
+# Button (RxButton)
 
-`RxButton` renders a native `<button>` with Resux UI classes. Use it for actions inside a Vue runtime boundary.
+Accessible action button primitive with semantic variants, three sizes, disabled state handling, and optional unstyled mode.
+
+## Live Interactive Preview — See How It Looks
+
+Use the interactive canvas below to preview how `RxButton` looks and behaves in real time:
+
+<RxComponentPreview component="RxButton" title="Button (RxButton) — Live Visual Preview" />
 
 ## Import
 
 ```ts
 import { RxButton } from 'resuxjs/ui'
-// Equivalent alias: ResuxButton
+// Equivalent alias:
+import { ResuxButton } from 'resuxjs/ui'
 ```
 
-## Basic usage
+## Complete Runnable Example
 
 ```vue
-<RxButton @click="save">Save</RxButton>
+<script setup lang="ts">
+import { ref } from 'resuxjs'
+import { RxButton, RxBadge } from 'resuxjs/ui'
+import { Icon } from 'resuxjs/icons'
+
+const saving = ref(false)
+const deployCount = ref(3)
+
+async function triggerDeploy() {
+  if (saving.value) return
+  saving.value = true
+  await new Promise((r) => setTimeout(r, 600))
+  deployCount.value += 1
+  saving.value = false
+}
+</script>
+
+<template>
+  <div class="flex flex-wrap items-center gap-3">
+    <RxButton variant="primary" size="md" :disabled="saving" @click="triggerDeploy">
+      <Icon name="lucide:rocket" size="1rem" />
+      <span>{{ saving ? 'Deploying...' : 'Deploy Production' }}</span>
+      <RxBadge variant="default">{{ deployCount }}</RxBadge>
+    </RxButton>
+
+    <RxButton variant="secondary" size="md">Preview Branch</RxButton>
+    <RxButton variant="outline" size="sm">View Logs</RxButton>
+    <RxButton variant="ghost" size="sm">Cancel</RxButton>
+    <RxButton variant="primary" disabled>Locked</RxButton>
+  </div>
+</template>
 ```
 
-The default `type` is `button`, so placing an `RxButton` inside a form does not submit the form unless you request `type="submit"`.
+## Rendered DOM Structure (`rx-*` Classes)
 
-## Variants
+When rendered on the server or client with default styling (`:unstyled="false"`), `RxButton` produces the following HTML structure (`rx-btn rx-btn-${variant} rx-btn-${size}`):
 
-The built-in stylesheet defines these variants:
-
-```vue
-<RxButton variant="primary">Primary</RxButton>
-<RxButton variant="secondary">Secondary</RxButton>
-<RxButton variant="outline">Outline</RxButton>
-<RxButton variant="ghost">Ghost</RxButton>
-```
-
-`variant` is typed by Vue as a string, not a closed TypeScript union. The four names above are the variants that currently have built-in CSS.
-
-## Sizes
-
-```vue
-<RxButton size="sm">Small</RxButton>
-<RxButton size="md">Medium</RxButton>
-<RxButton size="lg">Large</RxButton>
-```
-
-The built-in stylesheet defines `sm`, `md`, and `lg`.
-
-## Disabled
-
-```vue
-<RxButton :disabled="saving">
-  {{ saving ? 'Saving…' : 'Save' }}
-</RxButton>
-```
-
-`disabled` is forwarded to the native button. There is no built-in `loading` prop or spinner; model loading state explicitly in your content and application logic.
-
-## Native attributes and events
-
-Attributes not declared as props are forwarded to the `<button>`, so native attributes/listeners can be used:
-
-```vue
-<RxButton
-  name="intent"
-  value="publish"
-  aria-describedby="publish-help"
-  @focus="onFocus"
-  @click="publish"
->
-  Publish
-</RxButton>
+```html
+<button type="button" class="rx-btn rx-btn-primary rx-btn-md">
+  Deploy Production
+</button>
+<button type="button" class="rx-btn rx-btn-secondary rx-btn-md">
+  Preview Branch
+</button>
+<button type="button" class="rx-btn rx-btn-outline rx-btn-sm">
+  View Logs
+</button>
+<button type="button" class="rx-btn rx-btn-ghost rx-btn-sm">
+  Cancel
+</button>
 ```
 
 ## Props
 
 | Prop | Type | Default | Required | Description |
 | --- | --- | --- | --- | --- |
-| `variant` | `string` | `'primary'` | No | Adds `rx-btn-${variant}` when styled. Built-in CSS: `primary`, `secondary`, `outline`, `ghost`. |
-| `size` | `string` | `'md'` | No | Adds `rx-btn-${size}`. Built-in CSS: `sm`, `md`, `lg`. |
-| `type` | `string` | `'button'` | No | Native button `type`. |
-| `disabled` | `boolean` | `false` | No | Native disabled state. |
-| `unstyled` | `boolean` | `false` | No | Omits Resux-generated button classes. |
+| `variant` | `'primary' \| 'secondary' \| 'outline' \| 'ghost'` | `'primary'` | No | Visual button style variant. |
+| `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | No | Controls padding, height, and font size. |
+| `type` | `'button' \| 'submit' \| 'reset'` | `'button'` | No | Native HTML button type attribute. |
+| `disabled` | `boolean` | `false` | No | Disables pointer interaction and applies muted styling. |
+| `unstyled` | `boolean` | `false` | No | Strips default `rx-btn*` classes for custom Tailwind/CSS styling. |
 
 ## Events
 
-`RxButton` declares no custom emits. Native button listeners such as `@click`, `@focus`, and `@blur` are forwarded through Vue attributes.
+| Event | Payload | Description |
+| --- | --- | --- |
+| `click` | `MouseEvent` | Forwarded native click event when not disabled. |
 
 ## Slots
 
-| Slot | Props | Description |
-| --- | --- | --- |
-| `default` | None | Button contents. |
+| Slot | Description |
+| --- | --- |
+| `default` | Button label, leading/trailing icons, or status badges. |
 
-## Exposed methods
+## Headless / Tailwind `unstyled` Mode
 
-No component methods are explicitly exposed.
-
-## Styling
-
-With default styles enabled the root receives `rx-btn`, `rx-btn-${variant}`, and `rx-btn-${size}` plus your own class.
+Pass `:unstyled="true"` to strip default `rx-*` classes and supply your own utility classes:
 
 ```vue
-<RxButton class="save-action">Save</RxButton>
-<RxButton unstyled class="my-headless-button">Save</RxButton>
+<RxButton unstyled class="px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium">
+  Custom Styled RxButton
+</RxButton>
 ```
 
-Built-in CSS uses fixed primitive values. `tokens` configured on the UI module are exposed in runtime config but are not automatically converted into arbitrary CSS variables by this component.
+## SSR, Resumability & Accessibility
 
-## Accessibility
-
-Because the component renders a native `<button>`, browser keyboard activation, focusability, disabled semantics, and button role are inherited from the platform. Keep visible text or an accessible name when the content is icon-only.
-
-```vue
-<RxButton aria-label="Close dialog">×</RxButton>
-```
-
-Do not use the `disabled` prop when you only want a visual disabled style—the native disabled state also removes normal activation behavior.
-
-## SSR / resumability / hydration
-
-The button markup can be server-rendered by Vue, but `RxButton` belongs to `resuxjs/ui`, so event listeners such as `@click` need the Vue island/runtime that owns the component. It is not a zero-JavaScript Resux event primitive.
-
-For a navigation action that does not require Vue state, prefer an ordinary Resux link/template pattern rather than hydrating a button only to navigate.
-
-## Complete example
-
-```vue
-<script setup lang="ts">
-import { ref } from 'vue'
-import { RxButton } from 'resuxjs/ui'
-
-const saving = ref(false)
-
-async function save() {
-  saving.value = true
-  try {
-    await fetch('/api/profile', { method: 'POST' })
-  } finally {
-    saving.value = false
-  }
-}
-</script>
-
-<template>
-  <RxButton
-    variant="primary"
-    :disabled="saving"
-    :aria-busy="saving ? 'true' : 'false'"
-    @click="save"
-  >
-    {{ saving ? 'Saving…' : 'Save profile' }}
-  </RxButton>
-</template>
-```
-
-## Related
-
-- [Icon](./icon.md)
-- [Vue Islands](/guide/vue-islands)
-- [UI package reference](/reference/ui)
+- **Server-Side Rendering**: Renders deterministic HTML during SSR with zero client layout shift.
+- **Resumability**: Event handlers (`@click`, `v-model` updates) serialize cleanly across Resux server/client boundaries.
+- **Keyboard & Screen Readers**: Preserves native focus rings, ARIA state attributes, and semantic HTML tags.

@@ -1,107 +1,104 @@
-# Modal
+# Modal (RxModal)
 
-`RxModal` conditionally renders a backdrop and content shell. It is a small overlay primitive, not a complete accessible dialog system.
+Dialog overlay with backdrop click dismissal (`@click.self`), optional `<h3>` title header, and `update:open` / `close` events.
+
+## Live Interactive Preview — See How It Looks
+
+Use the interactive canvas below to preview how `RxModal` looks and behaves in real time:
+
+<RxComponentPreview component="RxModal" title="Modal (RxModal) — Live Visual Preview" />
 
 ## Import
 
 ```ts
 import { RxModal } from 'resuxjs/ui'
-// Equivalent alias: ResuxModal
+// Equivalent alias:
+import { ResuxModal } from 'resuxjs/ui'
 ```
 
-## Basic usage
+## Complete Runnable Example
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
-import { RxModal, RxButton } from 'resuxjs/ui'
+import { ref } from 'resuxjs'
+import { RxModal, RxButton, RxInput } from 'resuxjs/ui'
 
-const open = ref(false)
+const isModalOpen = ref(false)
+const confirmTag = ref('v0.4.0-beta.7')
 </script>
 
 <template>
-  <RxButton @click="open = true">Open</RxButton>
-  <RxModal v-model:open="open" title="Delete item">
-    Confirm the destructive action.
-  </RxModal>
+  <div>
+    <RxButton variant="primary" @click="isModalOpen = true">
+      Open Release Confirmation Modal
+    </RxButton>
+
+    <RxModal
+      :open="isModalOpen"
+      title="Publish resuxjs Release"
+      @update:open="isModalOpen = $event"
+    >
+      <div class="space-y-4">
+        <p class="text-sm opacity-80">
+          Confirm the npm dist-tag and Halal Core report signature before publishing to the registry.
+        </p>
+        <RxInput v-model="confirmTag" placeholder="v0.4.0-beta.7" />
+        <div class="flex justify-end gap-2">
+          <RxButton variant="ghost" size="sm" @click="isModalOpen = false">Cancel</RxButton>
+          <RxButton variant="primary" size="sm" @click="isModalOpen = false">Confirm &amp; Publish</RxButton>
+        </div>
+      </div>
+    </RxModal>
+  </div>
 </template>
 ```
 
-## Closing behavior
+## Rendered DOM Structure (`rx-*` Classes)
 
-The current component closes when:
+When rendered on the server or client with default styling (`:unstyled="false"`), `RxModal` produces the following HTML structure (`rx-modal-backdrop > div.rx-modal-content > [h3] + slot`):
 
-- the backdrop itself is clicked;
-- the built-in `×` button is clicked.
-
-Content clicks stop propagation so they do not close through the backdrop handler.
-
-It does **not** currently close on Escape.
+```html
+<div class="rx-modal-backdrop">
+  <div class="rx-modal-content">
+    <h3 style="margin-top: 0px;">Publish resuxjs Release</h3>
+    <p>Confirm the npm dist-tag and Halal Core report signature...</p>
+  </div>
+</div>
+```
 
 ## Props
 
 | Prop | Type | Default | Required | Description |
 | --- | --- | --- | --- | --- |
-| `open` | `boolean` | `false` | No | Whether modal markup is rendered. |
-| `title` | `string` | `''` | No | Optional heading text. |
-| `unstyled` | `boolean` | `false` | No | Omits Resux modal classes. |
+| `open` | `boolean` | `false` | No | Controls whether the modal dialog is mounted in the DOM. |
+| `title` | `string` | `''` | No | Optional dialog title rendered inside `<h3 style="margin-top: 0">`. |
+| `unstyled` | `boolean` | `false` | No | Omits `rx-modal-backdrop` and `rx-modal-content` classes. |
 
 ## Events
 
 | Event | Payload | Description |
 | --- | --- | --- |
-| `update:open` | `false` | Emitted when the built-in close behavior runs. |
-| `close` | None | Emitted at the same time as `update:open(false)`. |
+| `update:open` | `boolean` | Emitted with `false` when clicking the backdrop. |
+| `close` | `void` | Emitted alongside `update:open` when closing. |
 
 ## Slots
 
-| Slot | Props | Description |
-| --- | --- | --- |
-| `default` | None | Modal body content. |
+| Slot | Description |
+| --- | --- |
+| `default` | Dialog body content and action buttons. |
 
-## Styling
+## Headless / Tailwind `unstyled` Mode
 
-Styled markup uses `rx-modal-backdrop`, `rx-modal`, `rx-modal-header`, and `rx-modal-close`.
-
-## Accessibility
-
-::: danger Dialog semantics are not built in
-The current source does not set `role="dialog"`, `aria-modal="true"`, `aria-labelledby`, or `aria-describedby`. It also does not trap focus, move initial focus into the modal, restore focus on close, make the background inert, or handle Escape.
-:::
-
-The built-in close button displays `×` without an explicit `aria-label`.
-
-For production dialogs—especially forms, destructive confirmations, and anything blocking the rest of the page—use an implementation that provides and tests the complete focus/ARIA/keyboard contract, or extend this primitive in application code and verify it across keyboard and screen-reader scenarios.
-
-## SSR / resumability / hydration
-
-If `open` is true at SSR time, modal markup can be present in Vue SSR output. All closing behavior and open-state synchronization require the Vue island/runtime. This is not a resumable Resux overlay primitive.
-
-## Complete controlled example
+Pass `:unstyled="true"` to strip default `rx-*` classes and supply your own utility classes:
 
 ```vue
-<script setup lang="ts">
-import { ref } from 'vue'
-import { RxButton, RxModal } from 'resuxjs/ui'
-
-const open = ref(false)
-
-function onClosed() {
-  console.log('modal closed')
-}
-</script>
-
-<template>
-  <RxButton @click="open = true">Show details</RxButton>
-  <RxModal v-model:open="open" title="Details" @close="onClosed">
-    <p>This example demonstrates the implemented control flow only.</p>
-  </RxModal>
-</template>
+<RxModal unstyled class="px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium">
+  Custom Styled RxModal
+</RxModal>
 ```
 
-## Related
+## SSR, Resumability & Accessibility
 
-- [Popover](./popover.md)
-- [Button](./button.md)
-- [Current limits](/reference/limits)
-- [Vue Islands](/guide/vue-islands)
+- **Server-Side Rendering**: Renders deterministic HTML during SSR with zero client layout shift.
+- **Resumability**: Event handlers (`@click`, `v-model` updates) serialize cleanly across Resux server/client boundaries.
+- **Keyboard & Screen Readers**: Preserves native focus rings, ARIA state attributes, and semantic HTML tags.

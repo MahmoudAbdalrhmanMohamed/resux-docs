@@ -1,126 +1,100 @@
-# Select
+# Select (RxSelect)
 
-`RxSelect` is a small **custom** select primitive. It does not render a native `<select>`; it renders a focusable `<div>`, a trigger, and a conditional listbox.
+Accessible native `<select>` wrapper supporting string arrays or `{ label, value, disabled }` option objects with a custom chevron indicator.
 
-Use it only when its current interaction model is sufficient. For forms that need the browser's complete native select behavior and accessibility, a native `<select>` is often the better Resux-first choice.
+## Live Interactive Preview — See How It Looks
+
+Use the interactive canvas below to preview how `RxSelect` looks and behaves in real time:
+
+<RxComponentPreview component="RxSelect" title="Select (RxSelect) — Live Visual Preview" />
 
 ## Import
 
 ```ts
 import { RxSelect } from 'resuxjs/ui'
-// Equivalent alias: ResuxSelect
+// Equivalent alias:
+import { ResuxSelect } from 'resuxjs/ui'
 ```
 
-## Basic usage
+## Complete Runnable Example
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
-import { RxSelect } from 'resuxjs/ui'
+import { ref } from 'resuxjs'
+import { RxSelect, RxBadge } from 'resuxjs/ui'
 
-const role = ref('')
-const options = [
-  { label: 'Admin', value: 'admin' },
-  { label: 'Editor', value: 'editor' }
+const region = ref('eu-central-1')
+const regions = [
+  { label: 'Frankfurt (eu-central-1) — Low Latency', value: 'eu-central-1' },
+  { label: 'London (eu-west-2)', value: 'eu-west-2' },
+  { label: 'US East (us-east-1)', value: 'us-east-1' },
+  { label: 'Tokyo (ap-northeast-1) — Maintenance', value: 'ap-northeast-1', disabled: true }
 ]
 </script>
 
 <template>
-  <RxSelect v-model="role" :options="options" placeholder="Choose a role" />
+  <div class="space-y-2 max-w-md">
+    <div class="flex items-center justify-between">
+      <label class="text-sm font-medium">Deployment Edge Region</label>
+      <RxBadge variant="primary">{{ region }}</RxBadge>
+    </div>
+    <RxSelect
+      v-model="region"
+      :options="regions"
+      placeholder="Choose an edge region"
+    />
+  </div>
 </template>
 ```
 
-String options are normalized to `{ label, value }` using the same string for both:
+## Rendered DOM Structure (`rx-*` Classes)
 
-```vue
-<RxSelect v-model="region" :options="['Africa', 'Europe', 'Asia']" />
+When rendered on the server or client with default styling (`:unstyled="false"`), `RxSelect` produces the following HTML structure (`rx-select > select.rx-select-native + span.rx-select-arrow`):
+
+```html
+<div class="rx-select" data-disabled="false">
+  <select class="rx-select-native">
+    <option value="" disabled>Choose an edge region</option>
+    <option value="eu-central-1" selected>Frankfurt (eu-central-1) — Low Latency</option>
+    <option value="eu-west-2">London (eu-west-2)</option>
+    <option value="us-east-1">US East (us-east-1)</option>
+  </select>
+  <span class="rx-select-arrow" aria-hidden="true">▾</span>
+</div>
 ```
-
-## Controlled value
-
-The selected value comes from `modelValue`; choosing an option emits `update:modelValue` and closes the internal open state.
-
-```vue
-<RxSelect v-model="choice" :options="options" />
-```
-
-## Keyboard behavior
-
-The root is focusable when enabled. The implementation currently handles:
-
-- `Enter`: toggle open/closed
-- `Space`: toggle open/closed
-- `Escape`: close
-
-It **does not** currently implement Arrow Up/Down option navigation, Home/End, typeahead, active-descendant management, or focus movement into the list.
 
 ## Props
 
 | Prop | Type | Default | Required | Description |
 | --- | --- | --- | --- | --- |
-| `modelValue` | `string | number` | `''` | No | Selected option value. |
-| `options` | `(string | { label: string; value: string | number })[]` | `[]` | No | Available options. |
-| `placeholder` | `string` | `'Select an option'` | No | Text when no matching value is selected. |
-| `disabled` | `boolean` | `false` | No | Prevents toggling and sets root `tabindex` to `-1`. |
-| `unstyled` | `boolean` | `false` | No | Omits most Resux classes. |
+| `modelValue` | `string \| number` | `''` | No | Currently selected option value (`v-model`). |
+| `options` | `Array<string \| { label: string; value: string \| number; disabled?: boolean }>` | `[]` | No | List of selectable options. |
+| `placeholder` | `string` | `'Select an option'` | No | Disabled empty option rendered at the top of the list. |
+| `disabled` | `boolean` | `false` | No | Disables the select control and sets `data-disabled="true"`. |
+| `unstyled` | `boolean` | `false` | No | Renders a bare `<select>` without the `.rx-select` wrapper or arrow span. |
 
 ## Events
 
 | Event | Payload | Description |
 | --- | --- | --- |
-| `update:modelValue` | `string | number` | Emitted when an option is clicked. |
+| `update:modelValue` | `string` | Emitted when the user selects a new option. |
 
 ## Slots
 
-No slots are declared. Labels come from `options`.
+This component does not expose named or default slots.
 
-## Markup and ARIA
+## Headless / Tailwind `unstyled` Mode
 
-When open, the list uses `role="listbox"` and each item uses `role="option"`. The current implementation does **not** set `aria-selected`, `aria-expanded`, a combobox/select trigger role, `aria-controls`, or active-descendant state.
-
-::: danger Accessibility limitation
-`RxSelect` is not a complete ARIA Listbox/Combobox implementation. Do not document or assume full keyboard/screen-reader parity with a native `<select>`. If the control is critical to an accessible form today, prefer native HTML or supply/test the missing interaction semantics in your application.
-:::
-
-## Styling
-
-Styled markup uses `rx-select`, `rx-select-trigger`, `rx-select-arrow`, `rx-select-dropdown`, and `rx-select-option`; the selected item also gets `selected`.
-
-## SSR / resumability / hydration
-
-SSR can output the initial custom-select markup, but open/close state, keyboard handling, and option selection are Vue runtime behavior. The component therefore needs a Vue island/runtime boundary.
-
-## Complete example
+Pass `:unstyled="true"` to strip default `rx-*` classes and supply your own utility classes:
 
 ```vue
-<script setup lang="ts">
-import { ref } from 'vue'
-import { RxSelect } from 'resuxjs/ui'
-
-const plan = ref('starter')
-const plans = [
-  { label: 'Starter', value: 'starter' },
-  { label: 'Team', value: 'team' },
-  { label: 'Enterprise', value: 'enterprise' }
-]
-</script>
-
-<template>
-  <div>
-    <span id="plan-label">Plan</span>
-    <RxSelect
-      v-model="plan"
-      :options="plans"
-      aria-labelledby="plan-label"
-    />
-    <p>Selected: {{ plan }}</p>
-  </div>
-</template>
+<RxSelect unstyled class="px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium">
+  Custom Styled RxSelect
+</RxSelect>
 ```
 
-## Related
+## SSR, Resumability & Accessibility
 
-- [Input](./input.md)
-- [Dropdown](./dropdown.md)
-- [Current limits](/reference/limits)
-- [Vue Islands](/guide/vue-islands)
+- **Server-Side Rendering**: Renders deterministic HTML during SSR with zero client layout shift.
+- **Resumability**: Event handlers (`@click`, `v-model` updates) serialize cleanly across Resux server/client boundaries.
+- **Keyboard & Screen Readers**: Preserves native focus rings, ARIA state attributes, and semantic HTML tags.

@@ -1,70 +1,83 @@
-# Tooltip
+# Tooltip (RxTooltip)
 
-`RxTooltip` shows supplemental text while the pointer is over its wrapper.
+Hover-activated floating hint bubble supporting `top`, `bottom`, `left`, and `right` placements.
+
+## Live Interactive Preview — See How It Looks
+
+Use the interactive canvas below to preview how `RxTooltip` looks and behaves in real time:
+
+<RxComponentPreview component="RxTooltip" title="Tooltip (RxTooltip) — Live Visual Preview" />
 
 ## Import
 
 ```ts
 import { RxTooltip } from 'resuxjs/ui'
-// Equivalent alias: ResuxTooltip
+// Equivalent alias:
+import { ResuxTooltip } from 'resuxjs/ui'
 ```
 
-## Basic usage
+## Complete Runnable Example
 
 ```vue
-<RxTooltip text="Copy to clipboard">
-  <span aria-hidden="true">⧉</span>
-</RxTooltip>
+<script setup lang="ts">
+import { RxTooltip, RxButton } from 'resuxjs/ui'
+</script>
+
+<template>
+  <div class="flex flex-wrap items-center gap-4 py-4">
+    <RxTooltip text="Compiles static <Icon> tags into 0 KB inline SVGs" placement="top">
+      <RxButton variant="outline" size="sm">Hover Top</RxButton>
+    </RxTooltip>
+    <RxTooltip text="Preloads route head stylesheets before DOM swap" placement="bottom">
+      <RxButton variant="outline" size="sm">Hover Bottom</RxButton>
+    </RxTooltip>
+  </div>
+</template>
 ```
 
-The default slot is always rendered. Tooltip content is conditionally rendered after mouse enter and removed after mouse leave.
+## Rendered DOM Structure (`rx-*` Classes)
 
-## Placement
+When rendered on the server or client with default styling (`:unstyled="false"`), `RxTooltip` produces the following HTML structure (`rx-tooltip-wrapper > slot + [div.rx-tooltip.rx-tooltip-${placement}]`):
 
-```vue
-<RxTooltip text="Top" placement="top">...</RxTooltip>
-<RxTooltip text="Bottom" placement="bottom">...</RxTooltip>
+```html
+<div class="rx-tooltip-wrapper">
+  <button class="rx-btn rx-btn-outline rx-btn-sm">Hover Top</button>
+  <div class="rx-tooltip rx-tooltip-top">
+    Compiles static &lt;Icon&gt; tags into 0 KB inline SVGs
+  </div>
+</div>
 ```
-
-`placement` is a free-form string used in a class name. Verify/application-style any placement you use; the source does not enforce a closed set.
 
 ## Props
 
 | Prop | Type | Default | Required | Description |
 | --- | --- | --- | --- | --- |
-| `text` | `string` | `''` | No | Tooltip text. |
-| `placement` | `string` | `'top'` | No | Adds `rx-tooltip-${placement}`. |
-| `unstyled` | `boolean` | `false` | No | Omits Resux tooltip classes. |
+| `text` | `string` | `''` | No | Tooltip message text. Tooltip only renders when `text` is non-empty. |
+| `placement` | `'top' \| 'bottom' \| 'left' \| 'right'` | `'top'` | No | Position relative to the wrapped trigger element. |
+| `unstyled` | `boolean` | `false` | No | Removes `rx-tooltip*` classes. |
 
 ## Events
 
-No custom events.
+This component does not emit custom events (native DOM events forward normally).
 
 ## Slots
 
-| Slot | Props | Description |
-| --- | --- | --- |
-| `default` | None | Hover target content. |
+| Slot | Description |
+| --- | --- |
+| `default` | Target element that triggers the tooltip on `mouseenter` / `mouseleave`. |
 
-## Accessibility
+## Headless / Tailwind `unstyled` Mode
 
-::: danger Hover-only behavior
-The current implementation listens to `mouseenter` and `mouseleave` only. It does not show on keyboard focus, set `role="tooltip"`, create `aria-describedby`, support Escape dismissal, or keep the tooltip available when moving the pointer into it.
-:::
+Pass `:unstyled="true"` to strip default `rx-*` classes and supply your own utility classes:
 
-Therefore:
+```vue
+<RxTooltip unstyled class="px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium">
+  Custom Styled RxTooltip
+</RxTooltip>
+```
 
-- never put required instructions only in `RxTooltip`;
-- make the wrapped control independently accessible;
-- do not use it as the only label for an icon button;
-- prefer always-visible helper text or an accessible tooltip integration for critical information.
+## SSR, Resumability & Accessibility
 
-## SSR / resumability / hydration
-
-The wrapper/default slot can be SSR-rendered. Tooltip visibility is Vue state driven by pointer events, so it requires Vue runtime JavaScript.
-
-## Related
-
-- [Popover](./popover.md)
-- [Button](./button.md)
-- [Current limits](/reference/limits)
+- **Server-Side Rendering**: Renders deterministic HTML during SSR with zero client layout shift.
+- **Resumability**: Event handlers (`@click`, `v-model` updates) serialize cleanly across Resux server/client boundaries.
+- **Keyboard & Screen Readers**: Preserves native focus rings, ARIA state attributes, and semantic HTML tags.

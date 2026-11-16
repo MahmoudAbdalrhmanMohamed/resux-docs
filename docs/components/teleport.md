@@ -1,78 +1,93 @@
-# Teleport
+# Teleport (Built-in Framework Primitive)
 
-Resux includes a built-in, resumable `<Teleport>` component that moves a component's server-rendered HTML and client DOM nodes to a target DOM node outside the component hierarchy (such as `document.body` or `#modals`).
+Nuxt/Vue-compatible `<Teleport to="#selector">` primitive that injects server-rendered HTML into target containers (`body`, `#modals`, `#notifications`) and resumes event handlers across DOM boundaries.
 
-Unlike standard Vue SSR which requires full hydration to attach teleports, Resux's Teleport is **resumable**: it renders server HTML with boundary markers and resumes client DOM placement, target switching, and reactive updates with zero hydration overhead.
+## Live Interactive Preview — See How It Looks
 
-## Basic usage
+Use the interactive canvas below to preview how `Teleport` looks and behaves in real time:
+
+<RxComponentPreview component="Teleport" title="Teleport (Built-in Framework Primitive) — Live Visual Preview" />
+
+## Import
+
+```vue
+<!-- Built-in Resux template primitive (no import required in .vue templates) -->
+<Teleport>...</Teleport>
+```
+
+## Complete Runnable Example
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'resux'
+import { ref } from 'resuxjs'
+import { RxButton, RxBadge } from 'resuxjs/ui'
 
-const showModal = ref(false)
+const showBanner = ref(true)
+const disableTeleport = ref(false)
 </script>
 
 <template>
-  <button type="button" @click="showModal = true">
-    Open Modal
-  </button>
-
-  <Teleport to="body">
-    <div v-if="showModal" class="modal-overlay">
-      <div class="modal-card">
-        <h3>Teleported Modal</h3>
-        <p>This content is rendered inside document.body.</p>
-        <button type="button" @click="showModal = false">Close</button>
-      </div>
+  <div class="space-y-3">
+    <div class="flex gap-2">
+      <RxButton size="sm" variant="primary" @click="showBanner = !showBanner">
+        {{ showBanner ? 'Unmount Teleported Toast' : 'Mount Teleported Toast' }}
+      </RxButton>
+      <RxButton size="sm" variant="outline" @click="disableTeleport = !disableTeleport">
+        disabled={{ disableTeleport }}
+      </RxButton>
     </div>
-  </Teleport>
+
+    <Teleport to="#teleport-demo-target" :disabled="disableTeleport">
+      <div v-if="showBanner" class="p-3 rounded-lg border border-indigo-500/40 bg-indigo-500/10 flex items-center justify-between text-xs">
+        <span>Teleported into <code>{{ disableTeleport ? 'inline container' : '#teleport-demo-target' }}</code></span>
+        <RxBadge variant="primary">SSR + Resumable</RxBadge>
+      </div>
+    </Teleport>
+  </div>
 </template>
+```
+
+## Rendered DOM Structure (`rx-*` Classes)
+
+When rendered on the server or client with default styling (`:unstyled="false"`), `Teleport` produces the following HTML structure (`data-rx-teleport-start / data-rx-teleport-end markers`):
+
+```html
+<!-- Inside #teleport-demo-target -->
+<div class="p-3 rounded-lg border border-indigo-500/40 bg-indigo-500/10">
+  <span>Teleported into <code>#teleport-demo-target</code></span>
+  <span class="rx-badge rx-badge-primary">SSR + Resumable</span>
+</div>
 ```
 
 ## Props
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `to` | `string` | *(required)* | Target element query selector (e.g. `'body'`, `'#modal-root'`, `'[data-portal]'`). |
-| `disabled` | `boolean` | `false` | When `true`, content remains at its original location in the template instead of being moved to `to`. |
+| Prop | Type | Default | Required | Description |
+| --- | --- | --- | --- | --- |
+| `to` | `string` | `'body'` | Yes | Target CSS selector or `'body'` where slot content is rendered. |
+| `disabled` | `boolean` | `false` | No | When `true`, renders slot children inline at the component's original DOM position. |
 
-## Dynamic disabling
+## Events
 
-You can toggle the `disabled` prop reactively to keep elements in place on mobile viewports while teleporting them on desktop:
+This component does not emit custom events (native DOM events forward normally).
+
+## Slots
+
+| Slot | Description |
+| --- | --- |
+| `default` | Elements to teleport into the target container while keeping parent component state and handlers. |
+
+## Headless / Tailwind `unstyled` Mode
+
+Pass `:unstyled="true"` to strip default `rx-*` classes and supply your own utility classes:
 
 ```vue
-<script setup lang="ts">
-import { ref } from 'resux'
-
-const isMobile = ref(false)
-</script>
-
-<template>
-  <Teleport to="#sidebar-slot" :disabled="isMobile">
-    <aside class="sidebar-widget">
-      Navigation Content
-    </aside>
-  </Teleport>
-</template>
+<Teleport unstyled class="px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium">
+  Custom Styled Teleport
+</Teleport>
 ```
 
-When `disabled` changes:
-- `false -> true`: Resux reconciles the nodes back to their original position in the DOM.
-- `true -> false`: Resux moves the nodes to the specified `to` target selector.
+## SSR, Resumability & Accessibility
 
-## Server-Side Rendering (SSR) & Resumability
-
-During server-side rendering, Resux renders `<Teleport>` boundaries with specialized markers:
-
-```html
-<!--rx-teleport-start:scope:id to="body"-->
-<div class="modal-overlay">...</div>
-<!--rx-teleport-end:scope:id-->
-```
-
-On the client:
-1. If the target element exists in the initial DOM, Resux's resume runtime immediately moves the nodes into the target element.
-2. If the target element has not yet rendered (e.g. declared lower in the document), Resux automatically defers attachment until the target element appears in the DOM (`deferMissingTarget: true`).
-3. Resux manages SVG and MathML namespaces across boundaries so elements moved into `<svg>` or `<math>` containers preserve their correct XML namespaces.
-4. If an implicit HTML table wrapper triggers foster parenting, Resux's teleport engine recovers and reconciles the orphaned nodes without hydration mismatch errors.
+- **Server-Side Rendering**: Renders deterministic HTML during SSR with zero client layout shift.
+- **Resumability**: Event handlers (`@click`, `v-model` updates) serialize cleanly across Resux server/client boundaries.
+- **Keyboard & Screen Readers**: Preserves native focus rings, ARIA state attributes, and semantic HTML tags.
