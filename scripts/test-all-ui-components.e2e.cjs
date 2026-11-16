@@ -79,6 +79,23 @@ async function run() {
             const previewTab = await page.$('.rx-mode-tab:has-text("Preview")');
             if (previewTab) await previewTab.click();
           }
+
+          // Real keyboard typing check on verification code
+          if (route === '/components/verification-code') {
+            const otpInput = await page.$('.rx-otp-hidden-native-input');
+            if (!otpInput) {
+              failures.push({ route, issue: 'Missing real .rx-otp-hidden-native-input' });
+            } else {
+              const clearBtn = await page.$('.rx-pill-action:has-text("Clear")');
+              if (clearBtn) await clearBtn.click();
+              await otpInput.type('789', { delay: 40 });
+              await page.keyboard.press('Backspace');
+              const cells = await page.$$eval('.rx-verification-code-cell', els => els.map(el => el.innerText.trim()));
+              if (cells[0] !== '7' || cells[1] !== '8' || cells[2] !== '') {
+                failures.push({ route, issue: `OTP typing & backspace mismatch: ${JSON.stringify(cells)}` });
+              }
+            }
+          }
         }
       }
 

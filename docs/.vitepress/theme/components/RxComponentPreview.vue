@@ -130,14 +130,37 @@ const otpVal = ref('2026')
 const otpStatus = ref<'idle' | 'verifying' | 'success' | 'error'>('idle')
 const otpMask = ref(false)
 const otpDigits = ref(4)
+const otpFocused = ref(false)
+const otpInputRef = ref<HTMLInputElement | null>(null)
+
 const otpCells = computed(() => {
   const chars = otpVal.value.slice(0, otpDigits.value).split('')
   return Array.from({ length: otpDigits.value }).map((_, i) => chars[i] || '')
 })
+
+function focusOtpInput() {
+  otpInputRef.value?.focus()
+  otpFocused.value = true
+}
+
+function handleOtpInput(event: Event) {
+  const target = event.target as HTMLInputElement
+  const sanitized = target.value.replace(/\D/g, '').slice(0, otpDigits.value)
+  otpVal.value = sanitized
+  target.value = sanitized
+  otpStatus.value = 'idle'
+  setFeedback(`Typed code: "${sanitized}" (${sanitized.length}/${otpDigits.value})`)
+  if (sanitized.length === otpDigits.value) {
+    simulateOtpVerify()
+  }
+}
+
 function simulateOtpFill(code: string) {
   otpVal.value = code
   otpStatus.value = 'idle'
+  if (otpInputRef.value) otpInputRef.value.value = code
   setFeedback(`Pasted OTP: "${code}"`)
+  focusOtpInput()
 }
 function simulateOtpVerify() {
   otpStatus.value = 'verifying'
@@ -562,22 +585,65 @@ function copyCode(text: string) {
 
         <!-- ==================== RxVerificationCode (OTP) ==================== -->
         <div v-else-if="currentComp === 'RxVerificationCode'" class="rx-stage-inner rx-center-stage">
-          <div class="rx-verification-code is-focused" :data-status="otpStatus">
-            <div v-if="otpStatus === 'idle' || otpStatus === 'error'" class="rx-verification-code-cells">
+          <div
+            class="rx-verification-code"
+            :class="{ 'is-focused': otpFocused, 'is-error': otpStatus === 'error' }"
+            :data-status="otpStatus"
+            @click="focusOtpInput"
+          >
+            <!-- Real interactive native input capturing typing, backspace & paste -->
+            <input
+              ref="otpInputRef"
+              :value="otpVal"
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              :maxlength="otpDigits"
+              autocomplete="one-time-code"
+              class="rx-otp-hidden-native-input"
+              aria-label="Verification code input"
+              @input="handleOtpInput"
+              @focus="otpFocused = true"
+              @blur="otpFocused = false"
+            />
+
+            <!-- Visual cells displaying the characters with active caret -->
+            <div v-if="otpStatus === 'idle' || otpStatus === 'error'" class="rx-verification-code-cells" aria-hidden="true">
               <span
                 v-for="(c, idx) in otpCells"
                 :key="idx"
                 class="rx-verification-code-cell"
-                :class="{ 'is-filled': !!c, 'is-active': idx === otpVal.length }"
+                :class="{
+                  'is-filled': !!c,
+                  'is-active': otpFocused && idx === Math.min(otpVal.length, otpDigits - 1)
+                }"
               >
                 {{ c ? (otpMask ? '•' : c) : '' }}
+                <span v-if="otpFocused && idx === otpVal.length && !c" class="rx-otp-caret" aria-hidden="true"></span>
               </span>
             </div>
+
+            <!-- Status view when verifying or verified -->
             <div v-else class="rx-verification-code-status" :class="`is-${otpStatus}`" role="status">
-              <span>{{ otpStatus === 'verifying' ? 'Verifying code with server HMAC...' : '✓ Code verified securely' }}</span>
+              <span class="rx-verification-code-orb" :class="`is-${otpStatus}`">
+                <span v-if="otpStatus === 'success'" class="rx-verification-code-check">✓</span>
+                <span v-else class="rx-verification-code-spinner"></span>
+              </span>
+              <span class="rx-verification-code-message">
+                {{ otpStatus === 'verifying' ? 'Verifying code with server HMAC...' : '✓ Code verified securely' }}
+              </span>
             </div>
+
             <span v-if="otpStatus === 'error'" class="rx-verification-code-error" role="alert">
               Invalid verification code. Try "2026".
+            </span>
+          </div>
+
+          <!-- Typing helper instructions -->
+          <div class="rx-stage-feedback" style="margin-top: 14px;">
+            <span class="rx-feedback-indicator" :class="{ pulse: otpFocused }"></span>
+            <span class="rx-feedback-text">
+              {{ otpFocused ? `Active typing: "${otpVal || '(empty)'}" (${otpVal.length}/${otpDigits}) — Type numbers on keyboard` : 'Click the code boxes above to focus and type directly with your keyboard' }}
             </span>
           </div>
 
@@ -586,13 +652,13 @@ function copyCode(text: string) {
               Paste "2026"
             </button>
             <button type="button" class="rx-pill-action" @click="simulateOtpFill('9999')">
-              Paste "9999"
+              Paste "9999" (Error)
             </button>
             <button type="button" class="rx-pill-action primary" @click="simulateOtpVerify">
               Submit Verification
             </button>
             <button type="button" class="rx-pill-action" @click="simulateOtpFill('')">
-              Clear
+              Clear &amp; Type
             </button>
           </div>
         </div>
@@ -2043,6 +2109,47 @@ function copyCode(text: string) {
 .rx-form-counter {
   font-size: 11px;
   color: var(--vp-c-text-3);
+}
+
+/* Real OTP Native Input Overlay */
+.rx-otp-hidden-native-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.001;
+  border: none;
+  background: transparent;
+  color: transparent;
+  cursor: text;
+  z-index: 10;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+.rx-verification-code {
+  position: relative;
+  cursor: text;
+}
+
+.rx-verification-code-cells {
+  pointer-events: none;
+  position: relative;
+}
+
+.rx-otp-caret {
+  display: inline-block;
+  width: 2px;
+  height: 1.25rem;
+  background: var(--vp-c-brand-1);
+  animation: rx-caret-blink 1s ease infinite;
+  margin-left: 1px;
+}
+
+@keyframes rx-caret-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
 
 /* OTP Quick Actions */
