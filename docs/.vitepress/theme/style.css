@@ -1028,6 +1028,10 @@ body {
 /* ==========================================================================
    Hire Me Section Styling (Obvious & Modern)
    ========================================================================== */
+#hire-me {
+  scroll-margin-top: calc(var(--vp-nav-height, 64px) + 24px);
+}
+
 .resux-hire-card {
   position: relative;
   overflow: hidden;
@@ -1148,12 +1152,14 @@ body {
   gap: 8px;
   padding: 10px 20px;
   border-radius: 10px;
+  font-family: inherit;
   font-size: 0.95rem;
   font-weight: 600;
   background: var(--resux-surface-muted);
   color: var(--vp-c-text-1) !important;
   border: 1px solid var(--resux-border);
   text-decoration: none !important;
+  cursor: pointer;
   transition: all 0.18s ease;
 }
 
