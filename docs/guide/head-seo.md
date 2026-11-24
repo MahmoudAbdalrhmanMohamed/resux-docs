@@ -58,6 +58,10 @@ useHead({
 
 Resux automatically places critical document-level `<meta>` tags (`charset`, `http-equiv` such as Content Security Policy, and `viewport`) at the very top of `<head>`—before preload links, stylesheets, and scripts—so browser parsers apply character encoding, viewport sizing, and security policies before fetching subresources.
 
+### Meta tag deduplication
+
+When head entries from several sources (global config, modules, layouts, `useHead`, `useSeoMeta`, page metadata) are merged, `<meta>` tags are deduplicated by key: `charset`, `name`, `property`, or `http-equiv`. The last entry wins, so a page-level call overrides layout and global defaults, and key order follows the first occurrence. Repeated tags inside a single entry are preserved, so intentional lists such as multiple `og:image` tags from one `useSeoMeta` call still emit every entry.
+
 ## `useSeoMeta`
 
 ```ts
