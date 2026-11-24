@@ -1,0 +1,138 @@
+# Resux Documentation Index
+
+Resux is an HTML-first public-beta web framework with a custom Vue-like SFC compiler, SSR renderer, serialized resumable state, delegated event runtime, route payload navigation, server APIs, modules, hooks, package modes, first-party media, deployment adapters, optional Vue islands, and a local safety/integrity subsystem.
+
+Framework source: https://github.com/MahmoudAbdalrhmanMohamed/resux
+Documentation source: https://github.com/MahmoudAbdalrhmanMohamed/resux-docs
+Package: resuxjs
+Node requirement in current source: >=20.19.0
+Release channels: stable 0.3 via npm latest; public beta 0.4 via npm next
+First public-beta milestone: 0.4.0-beta.1
+Current public beta: 0.4.0-beta.7
+
+Source code and tests are the documentation source of truth. Do not assume npm latest permanently matches source documentation.
+
+Start:
+- /guide/framework-tour
+- /guide/what-is-resux
+- /guide/getting-started
+- /guide/project-structure
+- /guide/mental-model
+
+Core:
+- /guide/rendering-lifecycle
+- /guide/resumability-handlers
+- /guide/components
+- /guide/template-syntax
+- /guide/state
+- /guide/async-data
+- /guide/routing
+- /guide/view-transitions
+- /guide/layouts
+- /guide/head-seo
+- /guide/runtime-config
+
+UI components (`resuxjs/ui`, Vue runtime boundary):
+- /components/
+- /components/teleport
+- /components/transition
+- /components/button
+- /components/input
+- /components/textarea
+- /components/select
+- /components/date-picker
+- /components/switch
+- /components/verification-code
+- /components/card
+- /components/badge
+- /components/avatar
+- /components/alert
+- /components/skeleton
+- /components/divider
+- /components/kbd
+- /components/accordion
+- /components/tabs
+- /components/popover
+- /components/dropdown
+- /components/tooltip
+- /components/modal
+- /components/motion
+- /components/reveal
+- /components/auto-animate
+- /components/icon
+- /reference/ui
+
+First-party media (Resux renderer primitives):
+- /media/
+- /media/images
+- /media/responsive-images
+- /media/optimization
+- /media/video
+
+Fonts:
+- /fonts/
+- /fonts/configuration
+- /fonts/performance
+
+Icons (`resuxjs/icons`, Vue runtime boundary):
+- /icons/
+- /icons/usage
+- /icons/configuration
+- /icons/runtime
+
+Platform:
+- /guide/plugins
+- /guide/middleware
+- /guide/server-api
+- /guide/modules-route-rules
+- /guide/package-integration
+- /guide/integration-cookbook
+- /guide/css-tailwind
+- /guide/typescript-generated-types
+- /guide/testing-quality
+
+Optional/advanced:
+- /guide/i18n
+- /guide/ui-animations
+- /guide/vue-islands
+
+Operations and safety:
+- /guide/security-caching
+- /guide/halal-core
+- /guide/dev-build-output
+- /guide/deployment
+- /guide/troubleshooting
+
+Reference:
+- /reference/packages
+- /reference/api-index
+- /reference/coverage
+- /reference/ui
+- /reference/cli
+- /reference/composables
+- /reference/configuration
+- /reference/file-conventions
+- /reference/hooks
+- /reference/runtime
+- /reference/compiler
+- /reference/status
+- /reference/release
+- /reference/limits
+
+Important facts:
+- Resux 0.4 is public beta; APIs may still change before 1.0.
+- Use npm `next` for public-beta packages and `latest` for the stable 0.3 line.
+- Normal Resux components do not hydrate through Vue.
+- `resuxjs/ui` components and `resuxjs/icons` Icon/ResuxIcon are Vue runtime components; use explicit Vue/client contexts.
+- `ResuxImg`, `ResuxPicture`, and `ResuxVideo` are handled by the Resux renderer and are not `resuxjs/ui` Vue components.
+- `resuxjs/fonts` supports Google Fonts, local self-hosted fonts (`localFont()`), `fontless` automatic CSS/template scanning (`autoScan: true`), `fontaine` zero-CLS fallback metric overrides, semantic named weights, and variable font axes.
+- `resuxjs/icons` provides `<Icon>` / `<ResuxIcon>` and `useIcon` with Nuxt Icon syntax (`lucide:check`, `custom:logo`), compile-time SVG inlining, `svg` and `css` rendering modes, offline `@iconify-json/*` collections, and bounded LRU caching.
+- `useViewTransition()` and native View Transitions API integration (`router.viewTransition`, `:view-transition` on `<ResuxLink>`, `definePageMeta({ viewTransition })`) automatically respect `prefers-reduced-motion: reduce`.
+- Route navigation preloads route-specific stylesheets (`preloadRouteHeadStyles`) before swapping the DOM to prevent FOUC.
+- Critical `<meta>` tags (`charset`, `http-equiv`, `viewport`) are emitted at the top of `<head>` before preloads and stylesheets, and `useHead({ style })` supports `textContent`, `children`, or `innerHTML` plus reactive refs/getters. Merged `<meta>` tags dedupe by `charset`/`name`/`property`/`http-equiv` with the last entry winning; duplicates within a single entry are preserved.
+- CLI and Halal Core policy loaders automatically load project `.env.local` and `.env` files without overwriting existing process environment variables or interfering with Vite mode-aware `VITE_*` variables.
+- `RxReveal` is mount-triggered, not viewport-triggered; the `vAnime`/`vAnimate` directive is the viewport-observed UI API.
+- `RxAutoAnimate` currently runs one mount animation and does not observe child/layout mutations.
+- `useFetch` returns an AsyncDataResource with data/value/pending/error refs.
+- image transforms require sharp; video transforms require ffmpeg.
+- production server/deployment report verification requires RESUX_HALAL_REPORT_SIGNING_SECRET.
