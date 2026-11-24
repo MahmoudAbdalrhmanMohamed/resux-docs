@@ -101,10 +101,16 @@ state.tags.push('runtime')
 
 Current proxy tracking includes property reads, `in` checks, key iteration, set/add/delete operations, and array length/index relationships.
 
-Refs stored as property values are unwrapped on read: `state.count` returns the ref's value rather than the ref itself, and refs read this way are not proxied. Assigning a plain value over a stored ref updates that ref in place, preserving its identity and firing its own watchers. Refs stored at array indices stay wrapped, matching Vue semantics. In other positions a ref is treated like any other object: `reactive(someRef)` proxies the ref itself, and a ref read back from a `Map` or `Set` is proxied on read.
+Refs stored as object property values are unwrapped on read: `state.count` returns the ref's value rather than the ref itself, and refs read this way are not proxied. Assigning a plain value over a ref stored as an object property updates that ref in place, preserving its identity and firing its own watchers. Refs stored at array indices stay wrapped, matching Vue semantics, so `items[0] = value` replaces the stored ref with the plain value instead of updating it in place.
+
+::: warning TypeScript types do not model unwrapping
+`reactive<T>` returns `T`, so the static type of `state.count` stays `Ref<number>` even though reads return the unwrapped value at runtime. Do not write `state.count.value`: it type-checks but fails at runtime, because the read already unwrapped the ref. Plain-value assignment (`state.count = 2`) works at runtime but fails type-checking; cast the property (`(state as { count: number }).count = 2`) or keep a direct reference to the original ref for typed updates.
+:::
+
+In other positions a ref is treated like any other object: `reactive(someRef)` proxies the ref itself, and a ref read back from a `Map` or `Set` is proxied on read.
 
 ::: info Supported target kinds
-`reactive()` instruments plain objects, arrays, and the collection types `Map`, `Set`, `WeakMap`, and `WeakSet`. Collection keys and values written through the proxy are stored raw, so lookups accept raw or proxied keys, and `get`/`has`/`set`/`add`/`delete`/`clear`/`size` plus all iteration forms are tracked and trigger effects. Entries that already exist before `reactive()` wraps a collection are not normalized: if a `Map` already holds a proxied key, `get` with the raw key misses that entry, so keep using the same key form (raw or proxied) that was inserted. Other object kinds such as `Date`, DOM nodes, and class instances are returned without Resux proxy instrumentation.
+`reactive()` instruments plain objects, arrays, and the collection types `Map`, `Set`, `WeakMap`, and `WeakSet`. Collection keys and values written through the proxy are stored raw, so lookups accept raw or proxied keys, and `get`/`has`/`set`/`add`/`delete`/`clear`/`size` plus all iteration forms are tracked and trigger effects. Entries that already exist before `reactive()` wraps a collection are not normalized: if a `Map` already holds a proxied key, `get` with the raw key misses that entry, `delete` with the proxied key cannot remove it, and `set` with the proxied key adds a second entry under the normalized raw key instead of overwriting, so keep using the same key form (raw or proxied) that was inserted. Other object kinds such as `Date`, DOM nodes, and class instances are returned without Resux proxy instrumentation.
 :::
 
 ### `isReactive()`
