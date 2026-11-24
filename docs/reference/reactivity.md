@@ -101,8 +101,10 @@ state.tags.push('runtime')
 
 Current proxy tracking includes property reads, `in` checks, key iteration, set/add/delete operations, and array length/index relationships.
 
+Refs stored as property values are unwrapped on read: `state.count` returns the ref's value rather than the ref itself, and refs are never proxied. Assigning a plain value over a stored ref updates that ref in place, preserving its identity and firing its own watchers. Refs stored at array indices stay wrapped, matching Vue semantics.
+
 ::: info Supported target kinds
-The base proxy implementation currently handles plain objects and arrays. Other object kinds such as `Map`, `Set`, `Date`, DOM nodes, and class instances are returned without Resux proxy instrumentation rather than receiving collection-specific handlers.
+`reactive()` instruments plain objects, arrays, and the collection types `Map`, `Set`, `WeakMap`, and `WeakSet`. Collection keys and values are stored raw; lookups accept raw or proxied keys, and `get`/`has`/`set`/`add`/`delete`/`clear`/`size` plus all iteration forms are tracked and trigger effects. Other object kinds such as `Date`, DOM nodes, and class instances are returned without Resux proxy instrumentation.
 :::
 
 ### `isReactive()`
