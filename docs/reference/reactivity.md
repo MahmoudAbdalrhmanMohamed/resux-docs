@@ -101,10 +101,10 @@ state.tags.push('runtime')
 
 Current proxy tracking includes property reads, `in` checks, key iteration, set/add/delete operations, and array length/index relationships.
 
-Refs stored as property values are unwrapped on read: `state.count` returns the ref's value rather than the ref itself, and refs are never proxied. Assigning a plain value over a stored ref updates that ref in place, preserving its identity and firing its own watchers. Refs stored at array indices stay wrapped, matching Vue semantics.
+Refs stored as property values are unwrapped on read: `state.count` returns the ref's value rather than the ref itself, and refs read this way are not proxied. Assigning a plain value over a stored ref updates that ref in place, preserving its identity and firing its own watchers. Refs stored at array indices stay wrapped, matching Vue semantics. In other positions a ref is treated like any other object: `reactive(someRef)` proxies the ref itself, and a ref read back from a `Map` or `Set` is proxied on read.
 
 ::: info Supported target kinds
-`reactive()` instruments plain objects, arrays, and the collection types `Map`, `Set`, `WeakMap`, and `WeakSet`. Collection keys and values are stored raw; lookups accept raw or proxied keys, and `get`/`has`/`set`/`add`/`delete`/`clear`/`size` plus all iteration forms are tracked and trigger effects. Other object kinds such as `Date`, DOM nodes, and class instances are returned without Resux proxy instrumentation.
+`reactive()` instruments plain objects, arrays, and the collection types `Map`, `Set`, `WeakMap`, and `WeakSet`. Collection keys and values written through the proxy are stored raw, so lookups accept raw or proxied keys, and `get`/`has`/`set`/`add`/`delete`/`clear`/`size` plus all iteration forms are tracked and trigger effects. Entries that already exist before `reactive()` wraps a collection are not normalized: if a `Map` already holds a proxied key, `get` with the raw key misses that entry, so keep using the same key form (raw or proxied) that was inserted. Other object kinds such as `Date`, DOM nodes, and class instances are returned without Resux proxy instrumentation.
 :::
 
 ### `isReactive()`
