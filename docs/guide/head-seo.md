@@ -60,7 +60,9 @@ Resux automatically places critical document-level `<meta>` tags (`charset`, `ht
 
 ### Meta tag deduplication
 
-When head entries from several sources (global config, modules, layouts, `useHead`, `useSeoMeta`, page metadata) are merged, `<meta>` tags are deduplicated by key: `charset`, `name`, `property`, or `http-equiv`. The last entry wins, so a page-level call overrides layout and global defaults, and key order follows the first occurrence. Repeated tags inside a single entry are preserved, so intentional lists such as multiple `og:image` tags from one `useSeoMeta` call still emit every entry.
+When head entries from several sources (global config, modules, layouts, `useHead`, `useSeoMeta`, page metadata) are merged, `<meta>` tags are deduplicated by key: `charset`, `name`, `property`, or `http-equiv`. The last entry wins, so a page-level call overrides layout and global defaults. Each winning tag keeps the position it had in the source entry it came from, so a page override of `description` appears where the page emitted it, not where the layout's dropped tag sat. Repeated tags inside a single entry are preserved, so intentional lists such as multiple `og:image` tags from one `useSeoMeta` call still emit every entry.
+
+Page metadata from `definePageMeta` merges before layout head entries, so a layout `useHead` value for the same key, such as `description`, overrides the page's `definePageMeta` value. Only `useHead` or `useSeoMeta` calls made in the page component itself override layout values.
 
 ## `useSeoMeta`
 
