@@ -58,6 +58,12 @@ useHead({
 
 Resux automatically places critical document-level `<meta>` tags (`charset`, `http-equiv` such as Content Security Policy, and `viewport`) at the very top of `<head>`—before preload links, stylesheets, and scripts—so browser parsers apply character encoding, viewport sizing, and security policies before fetching subresources.
 
+### Meta tag deduplication
+
+When head entries from several sources (modules, layouts, `useHead`, `useSeoMeta`, page metadata) are merged, `<meta>` tags are deduplicated by key: `charset`, `name`, `property`, or `http-equiv`. The last entry wins, so a page-level call overrides layout and global defaults. Deduplication resolves conflicts across entries only: repeated tags inside a single entry are preserved, so intentional lists such as multiple `og:image` tags from one `useSeoMeta` call still emit every entry. The global `app.head` config, `definePageMeta` metadata, and the runtime i18n head (which supplies locale `htmlAttrs` and alternate links, not meta tags) merge into one shared entry before everything else: page metadata overrides same-key tags from `app.head` during that merge, but same-key repeats written within `app.head` itself are kept. Critical tags (`charset`, `viewport`, and `http-equiv` meta) always render at the top of `<head>` regardless of source position; every other winning tag keeps the position it had in the source entry it came from, so a page override of `description` appears where the page emitted it, not where the layout's dropped tag sat. This ordering guarantee covers server rendering: on client-side navigation, head reconciliation reuses existing matching tags in place and only appends new ones, so reordering an already-mounted list (for example swapping two `og:image` entries) does not move the mounted elements.
+
+Page metadata from `definePageMeta` merges before layout head entries, so a layout `useHead` value for the same key, such as `description`, overrides the page's `definePageMeta` value. Only `useHead` or `useSeoMeta` calls made in the page component itself override layout values.
+
 ## `useSeoMeta`
 
 ```ts

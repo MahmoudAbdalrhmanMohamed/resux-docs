@@ -129,7 +129,7 @@ Important facts:
 - `resuxjs/icons` provides `<Icon>` / `<ResuxIcon>` and `useIcon` with Nuxt Icon syntax (`lucide:check`, `custom:logo`), compile-time SVG inlining, `svg` and `css` rendering modes, offline `@iconify-json/*` collections, and bounded LRU caching.
 - `useViewTransition()` and native View Transitions API integration (`router.viewTransition`, `:view-transition` on `<ResuxLink>`, `definePageMeta({ viewTransition })`) automatically respect `prefers-reduced-motion: reduce`.
 - Route navigation preloads route-specific stylesheets (`preloadRouteHeadStyles`) before swapping the DOM to prevent FOUC.
-- Critical `<meta>` tags (`charset`, `http-equiv`, `viewport`) are emitted at the top of `<head>` before preloads and stylesheets, and `useHead({ style })` supports `textContent`, `children`, or `innerHTML` plus reactive refs/getters.
+- Critical `<meta>` tags (`charset`, `http-equiv`, `viewport`) are emitted at the top of `<head>` before preloads and stylesheets, and `useHead({ style })` supports `textContent`, `children`, or `innerHTML` plus reactive refs/getters. Merged `<meta>` tags dedupe by `charset`/`name`/`property`/`http-equiv` with the last entry winning; duplicates within a single entry are preserved.
 - CLI and Halal Core policy loaders automatically load project `.env.local` and `.env` files without overwriting existing process environment variables or interfering with Vite mode-aware `VITE_*` variables.
 - `RxReveal` is mount-triggered, not viewport-triggered; the `vAnime`/`vAnimate` directive is the viewport-observed UI API.
 - `RxAutoAnimate` currently runs one mount animation and does not observe child/layout mutations.
