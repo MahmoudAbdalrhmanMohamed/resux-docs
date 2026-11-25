@@ -16,8 +16,8 @@ This page maps each public `resuxjs` package entry point to the documentation th
 | `resuxjs/build` | [Package Exports](./packages.md), [Compiler API](./compiler.md) | Public build-contract version, logical module identifiers and artifact paths |
 | `resuxjs/create` | [Project Creation API](./create.md), [CLI](./cli.md) | Programmatic scaffolding, arguments and destructive-target safety |
 | `resuxjs/i18n` | [i18n API](./i18n.md), [i18n and Localization](/guide/i18n) | Module config/types and public translation/path/head helpers |
-| `resuxjs/ui` | [Component catalog](/components/), [UI Package API](./ui.md) | 23 components + aliases + module/motion APIs |
-| `resuxjs/icons` | [Icons](/icons/), [Usage](/icons/usage), [Configuration](/icons/configuration), [Runtime Loading](/icons/runtime) | Modular icon engine (`<Icon>`, `useIcon`), compile-time SVG inlining, CSS/SVG modes, offline collections, custom SVGs, and LRU cache |
+| `resuxjs/ui` | [Component catalog](/components/), [UI Package API](./ui.md) | 24 components + aliases + module/motion APIs |
+| `resuxjs/icons` | [Icons](/icons/), [Usage](/icons/usage), [Configuration](/icons/configuration), [Runtime Loading](/icons/runtime) | Modular icon engine (`<Icon>` / `<ResuxIcon>`), compile-time SVG inlining, CSS/SVG modes, offline collections, custom SVGs, and LRU cache |
 | `resuxjs/fonts` | [Fonts](/fonts/), [Configuration](/fonts/configuration), [Performance](/fonts/performance) | Font engine (`fontless` auto-scanning, `fontaine` zero-CLS metrics, Google/local/multi-provider fonts, named weights, variable axes) |
 | `resuxjs/kit` | [Resux Kit API](./kit.md), [Modules and Route Rules](/guide/modules-route-rules) | Module registration/extension helpers and public input types |
 | `resuxjs/core` | [Core API](./core.md), [Lifecycle Hooks](./hooks.md) | Config resolver, hooks, module container and core app factory |
@@ -42,7 +42,7 @@ The docs cover `resuxjs/fonts` including `fontless` automatic CSS/template scann
 
 ### Icons
 
-The docs cover `resuxjs/icons` including `<Icon>` / `<ResuxIcon>` and `useIcon`, compile-time static SVG inlining, `svg` vs `css` rendering modes, offline `@iconify-json/*` collections, local `./assets/icons` custom SVGs, bounded LRU caching, and how `resuxjs/icons` differs from the UI package's `RxIcon`.
+The docs cover `resuxjs/icons` including `<Icon>` / `<ResuxIcon>`, compile-time static SVG inlining, `svg` vs `css` rendering modes, offline `@iconify-json/*` collections, local `./assets/icons` custom SVGs, bounded LRU caching, and how `resuxjs/icons` differs from the UI package's `RxIcon`.
 
 ### Low-level and optional public packages
 
