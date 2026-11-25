@@ -54,11 +54,15 @@ async function handleComplete(completedCode: string) {
 | `length` | `number` | `6` | Total number of code input cells (typically 4, 6, or 8). |
 | `mode` | `'numeric' \| 'alphanumeric'` | `'numeric'` | Input validation mode. `'numeric'` accepts digits `0-9`; `'alphanumeric'` accepts `A-Z, a-z, 0-9`. |
 | `status` | `'idle' \| 'verifying' \| 'success' \| 'error'` | `'idle'` | Interactive status controlling animation states and status indicators. |
-| `autofocus` | `boolean` | `false` | Automatically focus the first input cell on mount. |
+| `autoFocus` | `boolean` | `false` | Automatically focus the first input cell on mount (ignored while `disabled`). |
 | `disabled` | `boolean` | `false` | Disables input interaction and darkens cell borders. |
 | `unstyled` | `boolean` | `false` | Omits default theme styling for custom CSS implementations. |
 | `ariaLabel` | `string` | `'Verification code'` | Accessible label for screen readers. |
 | `errorText` | `string` | `'The verification code is invalid'` | Accessible error message displayed and announced when `status="error"`. |
+| `mask` | `boolean` | `false` | Masks entered digits (password-style cells). |
+| `name` | `string` | `''` | Form field name applied to the cell inputs. |
+| `verifyingText` | `string` | `'Verifying…'` | Status message shown while `status="verifying"`. |
+| `successText` | `string` | `'Verified and secure'` | Status message shown when `status="success"`. |
 
 ## Events
 
