@@ -13,7 +13,7 @@ Resux currently uses two npm channels:
 
 The stable line is currently `resuxjs@0.3.11`.
 
-The public beta started with `0.4.0-beta.1`. The current beta is **`0.4.0-beta.7`**, which includes the v1 font engine (`fontless` + `fontaine`), modular v1 icon system, native View Transitions API support, route CSS preloading before DOM swap, critical `<meta>` tag ordering and reactive head descriptors, hero video page-ready poster persistence, and `.env.local` / `.env` loading across the CLI and Halal Core.
+The public beta started with `0.4.0-beta.1`. The current beta is **`0.4.0-beta.8`**, which includes the v1 font engine (`fontless` + `fontaine`), modular v1 icon system, native View Transitions API support, route CSS preloading before DOM swap, critical `<meta>` tag ordering and reactive head descriptors, hero video page-ready poster persistence, and `.env.local` / `.env` loading across the CLI and Halal Core. The `0.4.0-beta.8` update adds reactivity collection instrumentation with ref unwrapping, head `<meta>` deduplication, template refs in resumable client handlers, camelCase `<Transition>` / `<TransitionGroup>` SSR support, `<ClientEnhance>` injection hardening, and Vercel Node runtime clamping.
 
 Install the stable channel:
 
@@ -30,7 +30,7 @@ npm install resuxjs@next
 Pin the exact beta when you need a repeatable environment:
 
 ```sh
-npm install resuxjs@0.4.0-beta.7
+npm install resuxjs@0.4.0-beta.8
 ```
 
 Prereleases do not replace `latest`; versions with a prerelease suffix are published under `next`.
@@ -44,8 +44,8 @@ The framework's `.github/workflows/npm-publish.yml` workflow starts when a **Git
 The release tag must match the package version exactly. For example:
 
 ```txt
-package version: 0.4.0-beta.7
-release tag:     v0.4.0-beta.7
+package version: 0.4.0-beta.8
+release tag:     v0.4.0-beta.8
 npm dist-tag:    next
 ```
 

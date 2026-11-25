@@ -8,7 +8,7 @@ Package: resuxjs
 Node requirement in current source: >=20.19.0
 Release channels: stable 0.3 via npm latest; public beta 0.4 via npm next
 First public-beta milestone: 0.4.0-beta.1
-Current public beta: 0.4.0-beta.7
+Current public beta: 0.4.0-beta.8
 
 Source code and tests are the documentation source of truth. Do not assume npm latest permanently matches source documentation.
 
