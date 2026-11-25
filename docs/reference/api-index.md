@@ -7,11 +7,12 @@ This index maps the public `resuxjs` package entry points to their focused docum
 The root entry re-exports the application-facing runtime surface, including:
 
 - reactivity: `ref`, `reactive`, `computed`, `watch`, `watchEffect`, `readonly`, conversion/check helpers, and `nextTick`;
-- state/data: `useState`, `useGlobalState`, `useAsyncData`, `useFetch`, `$fetch`, and `apiURL`;
 - routing: `useRoute`, `useRouter`, `navigateTo`, `abortNavigation`, and `useViewTransition`;
 - app/config: `useRuntimeConfig`, `useResuxApp`, and application/plugin/module factories;
-- head/errors: `useHead`, `useSeoMeta`, `useError`, `createError`, `showError`, and `clearError`;
+- errors: `useError`, `createError`, `showError`, and `clearError`;
 - server helpers, package/client-enhancement helpers, device/i18n helpers, and `useResuxImage()`.
+
+State/data and head composables (`useState`, `useGlobalState`, `useAsyncData`, `useFetch`, `$fetch`, `apiURL`, `useHead`, `useSeoMeta`) are not root exports: import them from `resuxjs/runtime`, or rely on the `resuxjs/globals` types that make them available without imports inside Resux application files.
 
 Read [Composables and Globals](./composables.md), [Runtime Internals](./runtime.md), and the conceptual guides for the feature you are using.
 
@@ -73,7 +74,7 @@ Primary docs: [UI component catalog](/components/) and [UI Package API](./ui.md)
 
 ## `resuxjs/icons`
 
-Optional modular icon system (`<Icon>` / `<ResuxIcon>`, `useIcon`) with Nuxt Icon syntax parity, compile-time static SVG inlining, `svg` and `css` rendering modes, offline `@iconify-json/*` collection loading, custom local SVGs, and bounded LRU caching.
+Optional modular icon system (`<Icon>` / `<ResuxIcon>`) with Nuxt Icon syntax parity, compile-time static SVG inlining, `svg` and `css` rendering modes, offline `@iconify-json/*` collection loading, custom local SVGs, and bounded LRU caching.
 
 Primary docs: [Icons](/icons/), [Usage and Registry](/icons/usage), [Configuration](/icons/configuration), and [Runtime Loading](/icons/runtime).
 
