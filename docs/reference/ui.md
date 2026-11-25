@@ -220,6 +220,7 @@ Every `Rx*` component has an equivalent `Resux*` alias.
 | `RxReveal` / `ResuxReveal` | [Reveal](/components/reveal) |
 | `RxAutoAnimate` / `ResuxAutoAnimate` | [AutoAnimate](/components/auto-animate) |
 | `RxIcon` / `ResuxIcon` | [UI Icon primitive](/components/icon) |
+| `RxVerificationCode` / `ResuxVerificationCode` | [VerificationCode](/components/verification-code) |
 
 ## Important implementation boundaries
 
