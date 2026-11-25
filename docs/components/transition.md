@@ -43,13 +43,8 @@ const isVisible = ref(true)
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `name` | `string` | `'v'` | Used to automatically generate transition CSS class names. For example, `name="fade"` generates `.fade-enter-active`, etc. |
-| `appear` | `boolean` | `false` | Whether to apply transition classes on the initial server-to-client mount. |
-| `enterActiveClass` | `string` | `undefined` | Custom CSS class applied during the entire enter phase. |
-| `enterFromClass` | `string` | `undefined` | Custom CSS class applied at the start of the enter phase. |
-| `enterToClass` | `string` | `undefined` | Custom CSS class applied at the end of the enter phase. |
-| `leaveActiveClass` | `string` | `undefined` | Custom CSS class applied during the entire leave phase. |
-| `leaveFromClass` | `string` | `undefined` | Custom CSS class applied at the start of the leave phase. |
-| `leaveToClass` | `string` | `undefined` | Custom CSS class applied at the end of the leave phase. |
+
+Custom per-phase class overrides (Vue's `enterActiveClass` / `enterFromClass` / `enterToClass` / `leaveActiveClass` / `leaveFromClass` / `leaveToClass`) and the `appear` prop are not implemented; class names always derive from `name`.
 
 ## Transition lifecycle CSS classes
 
