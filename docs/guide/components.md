@@ -29,9 +29,25 @@ button { font: inherit; }
 
 A Resux component requires a `<template>` block. Plain CSS and scoped CSS are supported. Style modules, style `src`, and non-CSS style languages are rejected for resumable components.
 
-::: warning Events are not delivered yet
-`defineEmits()` and `emit(...)` are accepted, but they do nothing today: an emitted event is not delivered to a parent's `@changed` handler. The example above shows the intended syntax. Delivery of emitted events to parent handlers is planned for 0.5.0.
-:::
+## Component events
+
+An emitted event calls the handler written on the component tag:
+
+```vue
+<Counter label="Clicks" @changed="onChanged" />
+```
+
+```ts
+function onChanged(value: number) {
+  total.value = value
+}
+```
+
+- The handler receives all emitted arguments. An inline handler such as `@changed="total = $event"` gets the first argument as `$event`.
+- Event names match in camelCase, so `@save-item` and `emit('saveItem')` are the same event.
+- Events nobody listens to are ignored.
+- During the server render `emit` does nothing. The page payload carries the link from each child to its parent handler, so a resumed child, or a child created in the browser inside `v-if` / `v-for`, reaches its parent without the server running again.
+- Native DOM events on a component tag, such as `@click` on `<Counter>`, and event modifiers on component events are not supported.
 
 ## Setup macros
 
