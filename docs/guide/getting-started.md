@@ -6,7 +6,7 @@ This guide gets a Resux app running, shows you the important generated files, an
 
 You need:
 
-- Node.js `>=20.19.0`
+- Node.js `>=20.19.0` (known issue in 0.4.0: with npm `engine-strict` on Node 20, installs fail with EBADENGINE because `unifont@^1.0.3` pulls in `undici@^8`, which needs Node >=22.19; default npm settings only warn and everything works; a fix is planned for 0.4.1)
 - npm, pnpm, yarn, or Bun
 - a modern browser
 
