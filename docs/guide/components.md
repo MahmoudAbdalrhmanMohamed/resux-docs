@@ -29,6 +29,10 @@ button { font: inherit; }
 
 A Resux component requires a `<template>` block. Plain CSS and scoped CSS are supported. Style modules, style `src`, and non-CSS style languages are rejected for resumable components.
 
+::: warning Events are not delivered yet
+`defineEmits()` and `emit(...)` are accepted, but they do nothing today: an emitted event is not delivered to a parent's `@changed` handler. The example above shows the intended syntax. Delivery of emitted events to parent handlers is planned for 0.5.0.
+:::
+
 ## Setup macros
 
 The setup context provides compiler-compatible helpers including:
