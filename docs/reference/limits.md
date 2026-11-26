@@ -27,6 +27,15 @@ Normal Resux components use `.vue` files, but they are compiled into Resux compo
 
 Unsupported Vue syntax should fail at compile time instead of silently hydrating the application. Check [Template Syntax](/guide/template-syntax) before copying a Vue component from another project.
 
+## Components inside `v-if` and `v-for`
+
+Components inside `v-if` and `v-for` blocks are created in the browser when a block re-renders. Their module loads on demand, so a page without components inside blocks pays nothing extra. Current limits:
+
+- Slot content passed to a component inside a block is not rendered yet. A development warning is logged.
+- When any state in the owning component changes, the blocks re-render and client-created components start from fresh state. Keyed state preservation is planned.
+
+Known issue in 0.4.0: on a client update, every component inside a `v-if` or `v-for` block is replaced by an empty literal tag, with no error. The server-rendered first paint is correct. This is fixed on `main` and ships in the next release.
+
 ## No automatic hydration fallback
 
 Resux does not automatically switch an unsupported component to full Vue hydration.
