@@ -150,15 +150,32 @@ The model expression must be assignable, such as a ref, member expression, or in
 
 ## Slots
 
-Named and scoped slots use the branded directive convention:
+A component tag can pass content to named slots, and the component can pass props back to that content (scoped slots). `#name`, `v-slot:name` and `rx-slot:name` are the same thing:
 
 ```vue
-<template rx-slot:header="{ title }">
-  <h2>{{ title }}</h2>
+<!-- Card.vue -->
+<template>
+  <section>
+    <header><slot name="header" :count="count">Default header</slot></header>
+    <slot>Default body</slot>
+    <ul><li v-for="item in items" :key="item.id"><slot name="row" :item="item" /></li></ul>
+  </section>
 </template>
+
+<!-- parent -->
+<Card>
+  <template #header="{ count }"><h2>Items: {{ count }}</h2></template>
+  <p>The body goes to the default slot.</p>
+  <template #row="{ item }">{{ item.name }}</template>
+</Card>
 ```
 
-Only the documented slot subset should be considered stable.
+- Content written directly inside the tag (outside any `<template #name>`) is the default slot.
+- Content inside `<slot>` is the fallback. It renders when the parent does not provide that slot. A default slot counts as provided only when it has something other than whitespace.
+- Slot params are a name (`#row="props"`) or simple destructuring (`#row="{ item, index: i }"`). Defaults, nested patterns, rest and dynamic names (`#[name]`) are compile errors, as is providing the same slot twice.
+- Slot content is evaluated in the parent's scope, on the server, in the browser and after resume. The child's page payload lists the slots it was given and where the parent renders them, so a resumed child shows current content without running the server again.
+- `<slot>` works inside `v-if` and `v-for` of the child.
+- Text in a scoped slot that reads the parent's own state updates on the child's next re-render, not on the parent's change. Plain slots are patched live. See [Current Limits](/reference/limits).
 
 ## Dynamic components
 
@@ -189,7 +206,7 @@ The name must be a string. An unknown name or a component object fails with an e
 | `rx-model` | — | `v-model` |
 | `rx-bind:name` | `:name` | `v-bind:name` |
 | `rx-on:event` | `@event` | `v-on:event` |
-| `rx-slot:name` | — | `v-slot:name` |
+| `rx-slot:name` | `#name` | `v-slot:name` |
 
 The full and shortcut forms emit the same Resux template model. The emitted model does not keep Vue directive objects.
 
