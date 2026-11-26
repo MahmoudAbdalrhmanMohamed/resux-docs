@@ -104,7 +104,7 @@ features:
 <div class="resux-home-section">
   <p class="resux-home-eyebrow">Install</p>
   <h2 class="resux-home-title">Create a Resux project.</h2>
-  <p class="resux-home-lead">Resux currently requires Node.js <code>&gt;=20.19.0</code>. Known issue in 0.4.0: with npm <code>engine-strict</code> on Node 20, installs fail with EBADENGINE because <code>unifont@^1.0.3</code> pulls in <code>undici@^8</code>, which needs Node &gt;=22.19. Default npm settings only warn and everything works. A fix is planned for 0.4.1.</p>
+  <p class="resux-home-lead">Resux currently requires Node.js <code>&gt;=20.19.0</code>. Known issue in 0.4.0: with npm <code>engine-strict</code> on Node 20, installs fail with EBADENGINE because <code>undici@^8</code> (via <code>unifont@^1.0.3</code> and <code>fontless@^1.3.2</code>) needs Node &gt;=22.19 and <code>rollup-plugin-visualizer@7</code> (via <code>nitropack</code>) needs Node &gt;=22. Default npm settings only warn and everything works. Requiring Node &gt;=22.19 is planned for a later minor release.</p>
 </div>
 
 Stable channel:
