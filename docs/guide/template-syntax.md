@@ -160,6 +160,21 @@ Named and scoped slots use the branded directive convention:
 
 Only the documented slot subset should be considered stable.
 
+## Dynamic components
+
+`<component :is="name">` renders the component whose registered or auto-discovered name the expression returns:
+
+```vue
+<script setup lang="ts">
+const which = ref('Badge')
+</script>
+<template>
+  <component :is="which" />
+</template>
+```
+
+The name must be a string. An unknown name or a component object fails with an error on the server and logs a development error in the browser. Changing the name in the browser creates the new component and releases the old one. The page payload lists the component names a page can switch between only for pages that use a dynamic `:is`. See [Current Limits](/reference/limits) for details.
+
 ## Directive mapping
 
 | Public Resux syntax | Shortcut | Internal parser spelling |
