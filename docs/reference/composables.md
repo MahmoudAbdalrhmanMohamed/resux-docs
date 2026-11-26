@@ -388,7 +388,7 @@ defineExpose({ focus })
 defineOptions({ name: 'AccountForm' })
 ```
 
-`defineEmits()` and `emit(...)` are accepted, but they do nothing today. An emitted event is not delivered to a parent handler. Delivery is planned for 0.5.0. Only the syntax documented by the compiler subset is supported.
+`defineEmits()` returns the function that emits an event to the handler written on the component tag, for example `@save="onSave"`. The server render keeps `emit` a no-op; the browser delivers it. See [Component events](/guide/components#component-events). Only the syntax documented by the compiler subset is supported.
 
 ## Server handlers
 
