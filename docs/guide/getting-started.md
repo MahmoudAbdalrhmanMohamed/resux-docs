@@ -6,7 +6,7 @@ This guide gets a Resux app running, shows you the important generated files, an
 
 You need:
 
-- Node.js `>=20.19.0` (known issue in 0.4.0: with npm `engine-strict` on Node 20, installs fail with EBADENGINE because `unifont@^1.0.3` pulls in `undici@^8`, which needs Node >=22.19; default npm settings only warn and everything works; a fix is planned for 0.4.1)
+- Node.js `>=20.19.0` (known issue in 0.4.0: with npm `engine-strict` on Node 20, installs fail with EBADENGINE because `undici@^8` (via `unifont@^1.0.3` and `fontless@^1.3.2`) needs Node >=22.19 and `rollup-plugin-visualizer@7` (via `nitropack`) needs Node >=22; default npm settings only warn and everything works; requiring Node >=22.19 is planned for a later minor release)
 - npm, pnpm, yarn, or Bun
 - a modern browser
 
