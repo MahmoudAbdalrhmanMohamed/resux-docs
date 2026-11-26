@@ -33,6 +33,7 @@ Components inside `v-if` and `v-for` blocks are created in the browser when a bl
 
 - Components render their default slot. All children of the component tag form one slot, evaluated in the parent scope, the same as on the server. Named and scoped slots are not part of the server renderer and are not rendered on the client either.
 - Children are kept across block re-renders by `:key`. Without a key they are matched by position among siblings of the same component, and development mode logs a warning. A child whose props or slot content changed is created fresh and restarts its state. In-place prop updates are not supported yet.
+- `<component :is="name">` takes the name of a registered or auto-discovered component as a string. Component objects, such as an imported component passed as a value, are not supported and fail with a clear error, as does an unknown name. When the name changes in the browser, the old component is dropped and the new one starts fresh. The same name keeps its state.
 
 Known issue in 0.4.0: on a client update, every component inside a `v-if` or `v-for` block is replaced by an empty literal tag, with no error. The server-rendered first paint is correct. This is fixed on `main` and ships in the next release.
 
