@@ -8,12 +8,12 @@ Resux currently uses two npm channels:
 
 | Channel | npm tag | Intended use |
 | --- | --- | --- |
-| Stable 0.3 line | `latest` | Existing stable pre-beta installs |
-| Public beta 0.4 line | `next` | Evaluation, real-world testing, and compatibility feedback |
+| Stable 0.4 line | `latest` | New and existing projects |
+| Prereleases | `next` | Testing upcoming releases before they become stable |
 
-The stable line is currently `resuxjs@0.3.11`.
+The stable line is currently `resuxjs@0.4.0`. The previous 0.3 line stays installable by exact version, for example `resuxjs@0.3.11`.
 
-The public beta started with `0.4.0-beta.1`. The current beta is **`0.4.0-beta.8`**, which includes the v1 font engine (`fontless` + `fontaine`), modular v1 icon system, native View Transitions API support, route CSS preloading before DOM swap, critical `<meta>` tag ordering and reactive head descriptors, hero video page-ready poster persistence, and `.env.local` / `.env` loading across the CLI and Halal Core. The `0.4.0-beta.8` update adds reactivity collection instrumentation with ref unwrapping, head `<meta>` deduplication, template refs in resumable client handlers, camelCase `<Transition>` / `<TransitionGroup>` SSR support, `<ClientEnhance>` injection hardening, and Vercel Node runtime clamping.
+The 0.4 line started as a public beta with `0.4.0-beta.1` and reached stable with **`0.4.0`**. The 0.4 betas added the v1 font engine (`fontless` + `fontaine`), the modular v1 icon system, native View Transitions API support, route CSS preloading before DOM swap, critical `<meta>` tag ordering and reactive head descriptors, hero video page-ready poster persistence, `.env.local` / `.env` loading across the CLI and Halal Core, reactivity collection instrumentation with ref unwrapping, head `<meta>` deduplication, template refs in resumable client handlers, camelCase `<Transition>` / `<TransitionGroup>` SSR support, `<ClientEnhance>` injection hardening, and Vercel Node runtime clamping. `0.4.0` is the first stable release of the line. On top of the betas it adds a client runtime parity and hardening pass (collections, refs, watchers and the scheduler, readonly views, i18n, package cache keys, and development-time serializability checks), compiler fixes for `rx` directive attribute values and arrow function parameters, deploy option scoping, and a build-time secret scan of public `runtimeConfig` that now covers nested objects at any depth.
 
 Install the stable channel:
 
@@ -21,16 +21,16 @@ Install the stable channel:
 npm install resuxjs@latest
 ```
 
-Install the public beta:
+Install the newest prerelease, when one is published (see `npm view resuxjs dist-tags` for what `next` points to):
 
 ```sh
 npm install resuxjs@next
 ```
 
-Pin the exact beta when you need a repeatable environment:
+Pin the exact version when you need a repeatable environment:
 
 ```sh
-npm install resuxjs@0.4.0-beta.8
+npm install resuxjs@0.4.0
 ```
 
 Prereleases do not replace `latest`; versions with a prerelease suffix are published under `next`.
@@ -44,9 +44,9 @@ The framework's `.github/workflows/npm-publish.yml` workflow starts when a **Git
 The release tag must match the package version exactly. For example:
 
 ```txt
-package version: 0.4.0-beta.8
-release tag:     v0.4.0-beta.8
-npm dist-tag:    next
+package version: 0.4.0
+release tag:     v0.4.0
+npm dist-tag:    latest
 ```
 
 The tagged commit must also be reachable from `main`.
