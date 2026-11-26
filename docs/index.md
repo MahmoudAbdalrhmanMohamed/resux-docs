@@ -44,19 +44,19 @@ features:
 ---
 
 <div class="resux-home-section">
-  <p class="resux-home-eyebrow">Public beta</p>
-  <h2 class="resux-home-title">Current beta: 0.4.0-beta.8</h2>
-  <p class="resux-home-lead">Resux 0.4 is available for public testing. It is a good fit for learning, demos, compatibility testing, and non-critical applications. Because Resux is still pre-1.0, pin your version and test upgrades before using it in an important production system.</p>
+  <p class="resux-home-eyebrow">Stable release</p>
+  <h2 class="resux-home-title">Current release: 0.4.0</h2>
+  <p class="resux-home-lead">Resux 0.4 is the current stable release. Because Resux is still pre-1.0, APIs can change between minor releases: pin your version and test upgrades before using it in an important production system.</p>
 
   <div class="resux-home-grid">
     <a class="resux-home-card" href="./reference/status">
       <span class="resux-card-kicker">Status</span>
-      <strong>What “public beta” means</strong>
+      <strong>Project status</strong>
       <span>See what is validated today, what can still change, and how to evaluate Resux safely.</span>
     </a>
     <a class="resux-home-card" href="./reference/release">
       <span class="resux-card-kicker">Releases</span>
-      <strong>Stable and beta channels</strong>
+      <strong>Stable and prerelease channels</strong>
       <span>Learn how the npm latest and next channels are used and how prerelease publishing works.</span>
     </a>
   </div>
@@ -104,7 +104,7 @@ features:
 <div class="resux-home-section">
   <p class="resux-home-eyebrow">Install</p>
   <h2 class="resux-home-title">Create a Resux project.</h2>
-  <p class="resux-home-lead">Resux currently requires Node.js <code>&gt;=20.19.0</code>.</p>
+  <p class="resux-home-lead">Resux currently requires Node.js <code>&gt;=20.19.0</code>. Known issue in 0.4.0: with npm <code>engine-strict</code> on Node 20, installs fail with EBADENGINE because <code>unifont@^1.0.3</code> pulls in <code>undici@^8</code>, which needs Node &gt;=22.19. Default npm settings only warn and everything works. A fix is planned for 0.4.1.</p>
 </div>
 
 Stable channel:
@@ -113,7 +113,7 @@ Stable channel:
 npx create-resuxjs@latest my-app
 ```
 
-Public beta:
+Prerelease, when one is published:
 
 ```sh
 npx create-resuxjs@next my-app
@@ -122,10 +122,10 @@ npm install
 npm run dev
 ```
 
-For repeatable beta testing, pin the exact version:
+For a repeatable setup, pin the exact version:
 
 ```sh
-npx create-resuxjs@0.4.0-beta.8 my-app
+npx create-resuxjs@0.4.0 my-app
 ```
 
 <div class="resux-home-section">

@@ -6,7 +6,7 @@ This guide gets a Resux app running, shows you the important generated files, an
 
 You need:
 
-- Node.js `>=20.19.0`
+- Node.js `>=20.19.0` (known issue in 0.4.0: with npm `engine-strict` on Node 20, installs fail with EBADENGINE because `unifont@^1.0.3` pulls in `undici@^8`, which needs Node >=22.19; default npm settings only warn and everything works; a fix is planned for 0.4.1)
 - npm, pnpm, yarn, or Bun
 - a modern browser
 
@@ -18,29 +18,29 @@ node --version
 
 Resux currently has two npm channels:
 
-- `latest` → stable 0.3.x releases
-- `next` → public-beta 0.4.x prereleases
+- `latest`: stable releases (currently 0.4.x)
+- `next`: prereleases of upcoming versions
 
-The current public beta is **0.4.0-beta.8**.
+The current stable release is **0.4.0**.
 
 ## Create an application
 
-For the stable channel:
+For the stable channel (the default):
 
 ```sh
 npx create-resuxjs@latest my-app
 ```
 
-For the public beta:
+For a prerelease, when one is published:
 
 ```sh
 npx create-resuxjs@next my-app
 ```
 
-If you want a repeatable beta setup, pin the exact release:
+If you want a repeatable setup, pin the exact release:
 
 ```sh
-npx create-resuxjs@0.4.0-beta.8 my-app
+npx create-resuxjs@0.4.0 my-app
 ```
 
 Then start the project:
@@ -54,17 +54,17 @@ npm run dev
 You can also create a project through the main package CLI:
 
 ```sh
-npx resuxjs@next init my-app
+npx resuxjs@latest init my-app
 ```
 
-Before using the beta for an important workload, read [Project Status](/reference/status) and [Current Limits](/reference/limits).
+Before using Resux for an important workload, read [Project Status](/reference/status) and [Current Limits](/reference/limits).
 
 ## Choose a starter template
 
 The default template is a good place to begin:
 
 ```sh
-npx create-resuxjs@next my-app --template default
+npx create-resuxjs@latest my-app --template default
 ```
 
 Available templates:
@@ -85,7 +85,7 @@ Available templates:
 You can generate several optional features together:
 
 ```sh
-npx create-resuxjs@next my-app \
+npx create-resuxjs@latest my-app \
   --features seo,i18n,media,tailwind,server-api,tests
 ```
 
@@ -103,15 +103,15 @@ Supported feature names include:
 For an i18n starter with hreflang output:
 
 ```sh
-npx create-resuxjs@next my-app --features i18n --hreflang
+npx create-resuxjs@latest my-app --features i18n --hreflang
 ```
 
 Other useful create options:
 
 ```sh
-npx create-resuxjs@next my-app --no-install
-npx create-resuxjs@next my-app --package-manager pnpm
-npx create-resuxjs@next my-app --yes
+npx create-resuxjs@latest my-app --no-install
+npx create-resuxjs@latest my-app --package-manager pnpm
+npx create-resuxjs@latest my-app --yes
 ```
 
 `--force` can clear a non-empty target directory, but Resux blocks dangerous locations such as the filesystem root, your home directory, the current working directory, and ancestors of the current working directory.

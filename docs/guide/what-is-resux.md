@@ -1,6 +1,6 @@
 # What is Resux?
 
-Resux is a public-beta, HTML-first web framework with a custom compiler, server renderer, resumable browser runtime, file-based routing, server APIs, build-time modules, deployment adapters, and optional Vue runtime islands.
+Resux is an HTML-first web framework with a custom compiler, server renderer, resumable browser runtime, file-based routing, server APIs, build-time modules, deployment adapters, and optional Vue runtime islands.
 
 Normal Resux components are written as `.vue` files, but they are **not hydrated by Vue**. Resux compiles a focused Vue-like SFC subset into:
 
@@ -13,7 +13,7 @@ Normal Resux components are written as `.vue` files, but they are **not hydrated
 The browser starts from server HTML and resumes only the scope required by an interaction or client enhancement.
 
 ::: info Documentation target
-These docs track the current framework source and its public `resuxjs/*` package surface. Resux 0.4 is the public-beta line and is distributed through npm's `next` tag; the stable 0.3 line remains on `latest` unless explicitly promoted later. Check [Project Status](/reference/status) and [Release and Publishing](/reference/release) before choosing a channel.
+These docs track the current framework source and its public `resuxjs/*` package surface. Resux 0.4 is the current stable line and is distributed through npm's `latest` tag; prereleases of upcoming versions use the `next` tag. Check [Project Status](/reference/status) and [Release and Publishing](/reference/release) before choosing a channel.
 :::
 
 ## The request-to-interaction flow
@@ -79,7 +79,7 @@ Stable channel:
 npx create-resuxjs@latest my-app
 ```
 
-Public beta:
+Prerelease, when one is published:
 
 ```sh
 npx create-resuxjs@next my-app

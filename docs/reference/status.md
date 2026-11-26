@@ -1,34 +1,34 @@
-# Project Status: Public Beta
+# Project Status: Stable 0.4
 
-Resux is currently in **public beta**. The current beta release is **0.4.0-beta.8**.
+Resux 0.4 is the current **stable** line. The current release is **0.4.0**.
 
-The 0.4 line is meant for public evaluation, real-world testing, deployment checks, package compatibility work, and feedback before Resux reaches 1.0. The framework has passed a substantial CI and packaging hardening pass, but pre-1.0 APIs can still change as more applications uncover edge cases.
+The 0.4 line is published under the `latest` npm tag. The framework has passed a substantial CI and packaging hardening pass, but Resux is still pre-1.0: APIs can change between minor releases, and breaking changes are documented in the changelog.
 
 ## Release channels
 
 | Channel | Version line | npm tag | Best fit |
 | --- | --- | --- | --- |
-| Stable | 0.3.x | `latest` | Existing projects that want the current stable pre-beta line |
-| Public beta | 0.4.x prereleases | `next` | New testing, feedback, and access to the latest hardening work |
+| Stable | 0.4.x | `latest` | New and existing projects. The older 0.3.x line stays installable by exact version |
+| Prerelease | Upcoming versions with a prerelease suffix | `next` | Testing upcoming releases before they become stable |
 
-The public beta started with `0.4.0-beta.1`. Through `0.4.0-beta.8`, the 0.4 beta series has added the modernized font engine (`fontless` + `fontaine` zero-CLS metrics, local/multi-provider fonts, semantic named weights), the modular icon system (`<Icon>`, CSS/SVG modes, compile-time SVG inlining, offline collections), native View Transitions API integration (`useViewTransition`), FOUC-free route CSS preloading, critical `<meta>` tag ordering and reactive `useHead` descriptors, hero video page-ready poster persistence, and `.env.local` / `.env` loading in the CLI and Halal Core. The `0.4.0-beta.8` update adds reactivity collection instrumentation with ref unwrapping, head `<meta>` deduplication, template refs in resumable client handlers, camelCase `<Transition>` / `<TransitionGroup>` SSR support, `<ClientEnhance>` injection hardening, and Vercel Node runtime clamping.
+0.4 started as a public beta (`0.4.0-beta.1` through `0.4.0-beta.8`). The betas added the v1 font engine (`fontless` + `fontaine`), the modular v1 icon system, native View Transitions API support, route CSS preloading before DOM swap, critical `<meta>` tag ordering and reactive head descriptors, hero video page-ready poster persistence, `.env.local` / `.env` loading across the CLI and Halal Core, reactivity collection instrumentation with ref unwrapping, head `<meta>` deduplication, template refs in resumable client handlers, camelCase `<Transition>` / `<TransitionGroup>` SSR support, `<ClientEnhance>` injection hardening, and Vercel Node runtime clamping. `0.4.0` is the first stable release of the line. On top of the betas it adds a client runtime parity and hardening pass (collections, refs, watchers and the scheduler, readonly views, i18n, package cache keys, and development-time serializability checks), compiler fixes for `rx` directive attribute values and arrow function parameters, deploy option scoping, and a build-time secret scan of public `runtimeConfig` that now covers nested objects at any depth.
 
-Try the beta:
+Create a new app:
 
 ```sh
-npx create-resuxjs@next my-app
+npx create-resuxjs@latest my-app
 cd my-app
 npm install
 npm run dev
 ```
 
-For repeatable testing, pin the exact release:
+For a repeatable setup, pin the exact release:
 
 ```sh
-npx create-resuxjs@0.4.0-beta.8 my-app
+npx create-resuxjs@0.4.0 my-app
 ```
 
-## What the beta is good for
+## Where to use Resux 0.4
 
 Resux 0.4 is appropriate for:
 
@@ -59,9 +59,9 @@ The framework also includes bounded route/icon caches and request concurrency co
 
 That is useful evidence, but CI cannot replace testing across independent applications and workloads.
 
-## Using the beta in a production-like environment
+## Using Resux 0.4 in production-like environments
 
-If you want to evaluate Resux in staging or a real low-risk application:
+Before running Resux in staging or a real application:
 
 1. pin the exact Resux version;
 2. run your own integration and end-to-end tests;
@@ -71,7 +71,7 @@ If you want to evaluate Resux in staging or a real low-risk application:
 6. monitor runtime errors and resource usage;
 7. test framework upgrades before shipping them.
 
-For business-critical systems with strict support or compatibility requirements, evaluate the beta in a limited-risk environment before making it a core dependency.
+For business-critical systems with strict support or compatibility requirements, evaluate Resux 0.4 in a limited-risk environment before making it a core dependency.
 
 ## What still needs broader evidence
 
