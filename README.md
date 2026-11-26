@@ -2,7 +2,7 @@
 
 This repository contains the official documentation site for **Resux**, a resumable web framework with Vue-like single-file components, server rendering, file-based routing, and an HTML-first runtime model.
 
-Resux is currently in **public beta**. The current beta release is **0.4.0-beta.8**. It is ready for evaluation, real-world testing, demos, and non-critical applications, while APIs may still change before 1.0.
+Resux 0.4 is the current **stable** line. The current release is **0.4.0**. Resux is still pre-1.0, so APIs may change between minor releases.
 
 ## Start here
 
