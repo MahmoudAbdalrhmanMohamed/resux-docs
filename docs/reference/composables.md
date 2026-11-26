@@ -388,7 +388,7 @@ defineExpose({ focus })
 defineOptions({ name: 'AccountForm' })
 ```
 
-`emit(...)` is also available in setup context. Only the syntax documented by the compiler subset is supported.
+`defineEmits()` and `emit(...)` are accepted, but they do nothing today. An emitted event is not delivered to a parent handler. Delivery is planned for 0.5.0. Only the syntax documented by the compiler subset is supported.
 
 ## Server handlers
 
