@@ -18,8 +18,8 @@ node --version
 
 Resux currently has two npm channels:
 
-- `latest` â stable releases (currently 0.4.x)
-- `next` â prereleases of upcoming versions
+- `latest`: stable releases (currently 0.4.x)
+- `next`: prereleases of upcoming versions
 
 The current stable release is **0.4.0**.
 
