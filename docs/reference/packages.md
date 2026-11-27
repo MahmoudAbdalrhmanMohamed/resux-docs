@@ -39,6 +39,7 @@ Resux requires a modern Node.js runtime. Check the `engines` field of the instal
 | `resuxjs/ui` | UI tokens, primitives, motion helpers, and animation support |
 | `resuxjs/icons` | Icon module and icon runtime helpers |
 | `resuxjs/fonts` | Font optimization module |
+| `resuxjs/theme` | Opt-in dark and light mode module and `useTheme()` |
 | `resuxjs/kit` | Module-author utilities and extension types |
 | `resuxjs/core` | Lower-level framework container APIs for advanced tooling |
 | `resuxjs/halal` | Halal Core policy, scanner/evaluator, enforcement, runtime guard, review, AI, integrity, and reporting APIs |
