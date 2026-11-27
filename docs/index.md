@@ -45,8 +45,8 @@ features:
 
 <div class="resux-home-section">
   <p class="resux-home-eyebrow">Stable release</p>
-  <h2 class="resux-home-title">Current release: 0.4.0</h2>
-  <p class="resux-home-lead">Resux 0.4 is the current stable release. Because Resux is still pre-1.0, APIs can change between minor releases: pin your version and test upgrades before using it in an important production system.</p>
+  <h2 class="resux-home-title">Current release: 0.5.0</h2>
+  <p class="resux-home-lead">Resux 0.5 is the current stable release. Because Resux is still pre-1.0, APIs can change between minor releases: pin your version and test upgrades before using it in an important production system.</p>
 
   <div class="resux-home-grid">
     <a class="resux-home-card" href="./reference/status">
@@ -104,7 +104,7 @@ features:
 <div class="resux-home-section">
   <p class="resux-home-eyebrow">Install</p>
   <h2 class="resux-home-title">Create a Resux project.</h2>
-  <p class="resux-home-lead">Resux currently requires Node.js <code>&gt;=20.19.0</code>. Known issue in 0.4.0: with npm <code>engine-strict</code> on Node 20, installs fail with EBADENGINE because <code>undici@^8</code> (via <code>unifont@^1.0.3</code> and <code>fontless@^1.3.2</code>) needs Node &gt;=22.19 and <code>rollup-plugin-visualizer@7</code> (via <code>nitropack</code>) needs Node &gt;=22. Default npm settings only warn and everything works. Requiring Node &gt;=22.19 is planned for a later minor release.</p>
+  <p class="resux-home-lead">Resux requires Node.js <code>&gt;=22.19.0</code>.</p>
 </div>
 
 Stable channel:
@@ -125,7 +125,7 @@ npm run dev
 For a repeatable setup, pin the exact version:
 
 ```sh
-npx create-resuxjs@0.4.0 my-app
+npx create-resuxjs@0.5.0 my-app
 ```
 
 <div class="resux-home-section">
