@@ -50,6 +50,7 @@ const expectedDestinations = new Map([
   [`${packageName}/ui`, 'docs/reference/ui.md'],
   [`${packageName}/icons`, 'docs/icons/index.md'],
   [`${packageName}/fonts`, 'docs/fonts/index.md'],
+  [`${packageName}/theme`, 'docs/guide/theme.md'],
   [`${packageName}/kit`, 'docs/reference/kit.md'],
   [`${packageName}/core`, 'docs/reference/core.md'],
   [`${packageName}/halal`, 'docs/reference/halal.md'],
