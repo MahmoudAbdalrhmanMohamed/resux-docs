@@ -6,7 +6,7 @@ This guide gets a Resux app running, shows you the important generated files, an
 
 You need:
 
-- Node.js `>=20.19.0` (known issue in 0.4.0: with npm `engine-strict` on Node 20, installs fail with EBADENGINE because `undici@^8` (via `unifont@^1.0.3` and `fontless@^1.3.2`) needs Node >=22.19 and `rollup-plugin-visualizer@7` (via `nitropack`) needs Node >=22; default npm settings only warn and everything works; requiring Node >=22.19 is planned for a later minor release)
+- Node.js `>=22.19.0`
 - npm, pnpm, yarn, or Bun
 - a modern browser
 
@@ -18,10 +18,10 @@ node --version
 
 Resux currently has two npm channels:
 
-- `latest`: stable releases (currently 0.4.x)
+- `latest`: stable releases (currently 0.5.x)
 - `next`: prereleases of upcoming versions
 
-The current stable release is **0.4.0**.
+The current stable release is **0.5.0**.
 
 ## Create an application
 
@@ -40,7 +40,7 @@ npx create-resuxjs@next my-app
 If you want a repeatable setup, pin the exact release:
 
 ```sh
-npx create-resuxjs@0.4.0 my-app
+npx create-resuxjs@0.5.0 my-app
 ```
 
 Then start the project:

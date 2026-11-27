@@ -36,8 +36,6 @@ Components inside `v-if` and `v-for` blocks are created in the browser when a bl
 - `<component :is="name">` takes the name of a registered or auto-discovered component as a string. Component objects, such as an imported component passed as a value, are not supported and fail with a clear error, as does an unknown name. When the name changes in the browser, the old component is dropped and the new one starts fresh. The same name keeps its state.
 - Components that the server rendered inside a `v-for` or `v-if` block are not matched to the browser's copies. When the parent's state changes, the block re-renders and these children are created again from their props, so a local ref inside such a child can reset. This shows up when the component tag has slot content and the parent state changes in response to the child's emit. Keep state that must survive in the parent, or avoid slot content on components inside a `v-for`.
 
-Known issue in 0.4.0: on a client update, every component inside a `v-if` or `v-for` block is replaced by an empty literal tag, with no error. The server-rendered first paint is correct. This is fixed on `main` and ships in the next release.
-
 ## Component tag attributes
 
 Attributes on a component tag that are not declared props, such as `class`, `id` or `aria-*`, are not passed through to the component's root element. Declare the values as props and bind them inside the component, or put the attribute on an element inside the component. Falling through root attributes is not part of the current model.
