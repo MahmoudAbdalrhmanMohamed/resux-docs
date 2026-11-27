@@ -39,12 +39,15 @@ if (status.error.value) {
 
 ```ts
 const result = await $fetch<{ saved: boolean }>('/api/items', {
+  headers: { 'content-type': 'application/json' },
   method: 'POST',
-  body: { title: 'Example' }
+  body: JSON.stringify({ title: 'Example' })
 })
 ```
 
 `$fetch` resolves internal URLs correctly during SSR and returns parsed data directly.
+
+`$fetch` is the platform `fetch` with SSR-safe URL resolution, so the options are the standard `RequestInit` options. It does not serialize an object `body`: pass a string (for example `JSON.stringify(...)`) and set the `content-type` header yourself. A non-2xx response throws an `Error` whose message is `Fetch failed for <url>: <status>`; it does not carry the response body or a `statusMessage`. A successful response is parsed with `response.json()`, so the endpoint must return JSON.
 
 ## Native `fetch` and `apiURL`
 
