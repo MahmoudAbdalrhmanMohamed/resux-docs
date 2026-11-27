@@ -39,7 +39,6 @@ if (status.error.value) {
 
 ```ts
 const result = await $fetch<{ saved: boolean }>('/api/items', {
-
   method: 'POST',
   // A plain object or array is sent as JSON with a content-type header.
   body: { title: 'Example' }
