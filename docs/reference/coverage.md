@@ -19,6 +19,7 @@ This page maps each public `resuxjs` package entry point to the documentation th
 | `resuxjs/ui` | [Component catalog](/components/), [UI Package API](./ui.md) | 24 components + aliases + module/motion APIs |
 | `resuxjs/icons` | [Icons](/icons/), [Usage](/icons/usage), [Configuration](/icons/configuration), [Runtime Loading](/icons/runtime) | Modular icon engine (`<Icon>` / `<ResuxIcon>`), compile-time SVG inlining, CSS/SVG modes, offline collections, custom SVGs, and LRU cache |
 | `resuxjs/fonts` | [Fonts](/fonts/), [Configuration](/fonts/configuration), [Performance](/fonts/performance) | Font engine (`fontless` auto-scanning, `fontaine` zero-CLS metrics, Google/local/multi-provider fonts, named weights, variable axes) |
+| `resuxjs/theme` | [Theme](/guide/theme) | Opt-in dark and light mode module: pre-paint mode script, saved choice, CSS variables, `forceTheme`, `useTheme()` |
 | `resuxjs/kit` | [Resux Kit API](./kit.md), [Modules and Route Rules](/guide/modules-route-rules) | Module registration/extension helpers and public input types |
 | `resuxjs/core` | [Core API](./core.md), [Lifecycle Hooks](./hooks.md) | Config resolver, hooks, module container and core app factory |
 | `resuxjs/halal` | [Halal Core API](./halal.md), [Halal Core](/guide/halal-core) | Policy, scanner/evaluator, enforcement, runtime guard/review utilities |
