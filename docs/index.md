@@ -45,8 +45,8 @@ features:
 
 <div class="resux-home-section">
   <p class="resux-home-eyebrow">Stable release</p>
-  <h2 class="resux-home-title">Current release: 0.5.0</h2>
-  <p class="resux-home-lead">Resux 0.5 is the current stable release. Because Resux is still pre-1.0, APIs can change between minor releases: pin your version and test upgrades before using it in an important production system.</p>
+  <h2 class="resux-home-title">Current release: 1.0.0</h2>
+  <p class="resux-home-lead">Resux 1.0 is the current stable release and follows Semantic Versioning. Changes are documented in the changelog. Pin your version and test upgrades before using it in an important production system.</p>
 
   <div class="resux-home-grid">
     <a class="resux-home-card" href="./reference/status">
@@ -125,7 +125,7 @@ npm run dev
 For a repeatable setup, pin the exact version:
 
 ```sh
-npx create-resuxjs@0.5.0 my-app
+npx create-resuxjs@1.0.0 my-app
 ```
 
 <div class="resux-home-section">
