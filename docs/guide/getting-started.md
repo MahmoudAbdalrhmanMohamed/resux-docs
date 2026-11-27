@@ -18,10 +18,10 @@ node --version
 
 Resux currently has two npm channels:
 
-- `latest`: stable releases (currently 0.5.x)
+- `latest`: stable releases (currently 1.0.x)
 - `next`: prereleases of upcoming versions
 
-The current stable release is **0.5.0**.
+The current stable release is **1.0.0**.
 
 ## Create an application
 
@@ -40,7 +40,7 @@ npx create-resuxjs@next my-app
 If you want a repeatable setup, pin the exact release:
 
 ```sh
-npx create-resuxjs@0.5.0 my-app
+npx create-resuxjs@1.0.0 my-app
 ```
 
 Then start the project:
@@ -209,7 +209,7 @@ Inspect targets include routes, plugins, enhancements, middleware, imports, comp
 
 ## Build for production
 
-If you use production report authentication, configure a private signing secret of at least 32 characters:
+Configure a private signing secret of at least 32 characters. `resux build` signs the Halal report with it, and `resux start` and `resux preview` check that signature, so both steps need the same value:
 
 ```sh
 export RESUX_HALAL_REPORT_SIGNING_SECRET='replace-with-a-private-random-secret'
@@ -221,6 +221,8 @@ Then build and start the app:
 npm run build
 npm run start
 ```
+
+If the secret is not set, the build warns that it generated a temporary one. That temporary secret is gone when the build ends, so `npm run start` then stops with `Preview rejected: Report integrity check is invalid`. Set the secret for both steps, or run the built server directly with `node .output/server/index.mjs`.
 
 Typical build output includes:
 
