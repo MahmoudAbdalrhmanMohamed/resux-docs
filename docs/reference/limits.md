@@ -37,6 +37,14 @@ Components inside `v-if` and `v-for` blocks are created in the browser when a bl
 
 Known issue in 0.4.0: on a client update, every component inside a `v-if` or `v-for` block is replaced by an empty literal tag, with no error. The server-rendered first paint is correct. This is fixed on `main` and ships in the next release.
 
+## Component tag attributes
+
+Attributes on a component tag that are not declared props, such as `class`, `id` or `aria-*`, are not passed through to the component's root element. Declare the values as props and bind them inside the component, or put the attribute on an element inside the component. Falling through root attributes is not part of the current model.
+
+## Server handler imports
+
+Server handlers are copied into the build output before bundling, so a relative import from a handler to another project file (for example `import { x } from '../lib/x'`) fails the build with `UNRESOLVED_IMPORT`. Import npm packages, or keep the helper code inside the handler file.
+
 ## No automatic hydration fallback
 
 Resux does not automatically switch an unsupported component to full Vue hydration.
