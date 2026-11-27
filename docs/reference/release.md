@@ -8,12 +8,14 @@ Resux currently uses two npm channels:
 
 | Channel | npm tag | Intended use |
 | --- | --- | --- |
-| Stable 0.4 line | `latest` | New and existing projects |
+| Stable 0.5 line | `latest` | New and existing projects |
 | Prereleases | `next` | Testing upcoming releases before they become stable |
 
-The stable line is currently `resuxjs@0.4.0`. The previous 0.3 line stays installable by exact version, for example `resuxjs@0.3.11`.
+The stable line is currently `resuxjs@0.5.0`. Older lines stay installable by exact version, for example `resuxjs@0.4.0` (Node.js `>=20.19.0`) or `resuxjs@0.3.11`.
 
 The 0.4 line started as a public beta with `0.4.0-beta.1` and reached stable with **`0.4.0`**. The 0.4 betas added the v1 font engine (`fontless` + `fontaine`), the modular v1 icon system, native View Transitions API support, route CSS preloading before DOM swap, critical `<meta>` tag ordering and reactive head descriptors, hero video page-ready poster persistence, `.env.local` / `.env` loading across the CLI and Halal Core, reactivity collection instrumentation with ref unwrapping, head `<meta>` deduplication, template refs in resumable client handlers, camelCase `<Transition>` / `<TransitionGroup>` SSR support, `<ClientEnhance>` injection hardening, and Vercel Node runtime clamping. `0.4.0` is the first stable release of the line. On top of the betas it adds a client runtime parity and hardening pass (collections, refs, watchers and the scheduler, readonly views, i18n, package cache keys, and development-time serializability checks), compiler fixes for `rx` directive attribute values and arrow function parameters, deploy option scoping, and a build-time secret scan of public `runtimeConfig` that now covers nested objects at any depth.
+
+The 0.5 line started as a public beta with `0.5.0-beta.1` and reached stable with **`0.5.0`**. It adds named and scoped slots, native DOM events on a component tag, client-created components inside `v-if` and `v-for`, a much smaller resume bootstrap, and requires Node.js `>=22.19.0`. See the changelog for details.
 
 Install the stable channel:
 
@@ -30,7 +32,7 @@ npm install resuxjs@next
 Pin the exact version when you need a repeatable environment:
 
 ```sh
-npm install resuxjs@0.4.0
+npm install resuxjs@0.5.0
 ```
 
 Prereleases do not replace `latest`; versions with a prerelease suffix are published under `next`.
@@ -44,8 +46,8 @@ The framework's `.github/workflows/npm-publish.yml` workflow starts when a **Git
 The release tag must match the package version exactly. For example:
 
 ```txt
-package version: 0.4.0
-release tag:     v0.4.0
+package version: 0.5.0
+release tag:     v0.5.0
 npm dist-tag:    latest
 ```
 
