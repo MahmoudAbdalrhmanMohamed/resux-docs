@@ -34,6 +34,15 @@ Components inside `v-if` and `v-for` blocks are created in the browser when a bl
 - Named and scoped slots work the same as on the server, with slot content evaluated in the parent scope. A scoped slot depends on the child's props, so a child that uses one is created fresh when its block re-renders. Text in a scoped slot that reads the parent's own state updates on the child's next re-render, not when the parent changes; plain slots are patched live.
 - Children are kept across block re-renders by `:key`. Without a key they are matched by position among siblings of the same component, and development mode logs a warning. A child whose props changed keeps its state and DOM and re-renders in place with the new props. Setup code that copied a prop into its own ref or computed keeps the old value, because props are plain values there. A child whose (unscoped) slot content changed is created fresh and restarts its state.
 - `<component :is="name">` takes the name of a registered or auto-discovered component as a string. Component objects, such as an imported component passed as a value, are not supported and fail with a clear error, as does an unknown name. When the name changes in the browser, the old component is dropped and the new one starts fresh. The same name keeps its state.
+- Components that the server rendered inside a `v-for` or `v-if` block are not matched to the browser's copies. When the parent's state changes, the block re-renders and these children are created again from their props, so a local ref inside such a child can reset. This shows up when the component tag has slot content and the parent state changes in response to the child's emit. Keep state that must survive in the parent, or avoid slot content on components inside a `v-for`.
+
+## Component tag attributes
+
+Attributes on a component tag that are not declared props, such as `class`, `id` or `aria-*`, are not passed through to the component's root element. Declare the values as props and bind them inside the component, or put the attribute on an element inside the component. Falling through root attributes is not part of the current model.
+
+## Server handler imports
+
+Server handlers are copied into the build output before bundling, so a relative import from a handler to another project file (for example `import { x } from '../lib/x'`) fails the build with `UNRESOLVED_IMPORT`. Import npm packages, or keep the helper code inside the handler file.
 
 ## No automatic hydration fallback
 
