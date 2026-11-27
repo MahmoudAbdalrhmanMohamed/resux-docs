@@ -47,6 +47,7 @@ const platformGuide = [
   { text: 'Testing and Quality', link: '/guide/testing-quality' },
   { text: 'Media Guide', link: '/guide/media' },
   { text: 'Fonts Guide', link: '/guide/fonts' },
+  { text: 'Dark and Light Theme', link: '/guide/theme' },
   { text: 'Icons Guide', link: '/guide/icons' }
 ]
 
