@@ -85,6 +85,8 @@ export RESUX_FFMPEG_PATH=/absolute/path/to/ffmpeg
 
 Set `RESUX_HALAL_REPORT_SIGNING_SECRET` before the production build and use the same secret during production verification. Rebuild after changing the key.
 
+This also covers `resux start` or `resux preview` printing `Preview rejected: Report integrity check is invalid or the report has been modified` right after a local `resux build`. When the secret is not set, the build signs the report with a temporary secret that does not survive the build, so the next command cannot verify it. Export the same secret (at least 32 characters) for the build and for `start` or `preview`, then rebuild. As an alternative for a local check, run `node .output/server/index.mjs`.
+
 ## Review-required project cannot build
 
 Generate the request:

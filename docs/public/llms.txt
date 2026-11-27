@@ -5,10 +5,10 @@ Resux is an HTML-first web framework with a custom Vue-like SFC compiler, SSR re
 Framework source: https://github.com/MahmoudAbdalrhmanMohamed/resux
 Documentation source: https://github.com/MahmoudAbdalrhmanMohamed/resux-docs
 Package: resuxjs
-Node requirement in current source: >=20.19.0
-Release channels: stable 0.4 via npm latest; prereleases via npm next
-First 0.4 prerelease: 0.4.0-beta.1
-Current stable release: 0.4.0
+Node requirement in current source: >=22.19.0
+Release channels: stable 1.0 via npm latest; prereleases via npm next
+First 1.0 release candidate: 1.0.0-rc.1
+Current stable release: 1.0.0
 
 Source code and tests are the documentation source of truth. Do not assume npm latest permanently matches source documentation.
 
@@ -120,8 +120,8 @@ Reference:
 - /reference/limits
 
 Important facts:
-- Resux 0.4 is the stable line; it is pre-1.0, so APIs may still change between minor releases.
-- Use npm `latest` for the stable 0.4 line and `next` for prereleases of upcoming versions.
+- Resux 1.0 is the stable line and follows Semantic Versioning; changes are documented in the changelog.
+- Use npm `latest` for the stable 1.0 line and `next` for prereleases of upcoming versions.
 - Normal Resux components do not hydrate through Vue.
 - `resuxjs/ui` components and `resuxjs/icons` Icon/ResuxIcon are Vue runtime components; use explicit Vue/client contexts.
 - `ResuxImg`, `ResuxPicture`, and `ResuxVideo` are handled by the Resux renderer and are not `resuxjs/ui` Vue components.
@@ -135,4 +135,4 @@ Important facts:
 - `RxAutoAnimate` currently runs one mount animation and does not observe child/layout mutations.
 - `useFetch` returns an AsyncDataResource with data/value/pending/error refs.
 - image transforms require sharp; video transforms require ffmpeg.
-- production server/deployment report verification requires RESUX_HALAL_REPORT_SIGNING_SECRET.
+- production server/deployment report verification requires RESUX_HALAL_REPORT_SIGNING_SECRET; `resux build` and `resux start`/`resux preview` need the same secret, or start rejects the report.

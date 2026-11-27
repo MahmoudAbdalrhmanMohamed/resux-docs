@@ -13,7 +13,7 @@ Normal Resux components are written as `.vue` files, but they are **not hydrated
 The browser starts from server HTML and resumes only the scope required by an interaction or client enhancement.
 
 ::: info Documentation target
-These docs track the current framework source and its public `resuxjs/*` package surface. Resux 0.4 is the current stable line and is distributed through npm's `latest` tag; prereleases of upcoming versions use the `next` tag. Check [Project Status](/reference/status) and [Release and Publishing](/reference/release) before choosing a channel.
+These docs track the current framework source and its public `resuxjs/*` package surface. Resux 1.0 is the current stable line and is distributed through npm's `latest` tag; prereleases of upcoming versions use the `next` tag. Check [Project Status](/reference/status) and [Release and Publishing](/reference/release) before choosing a channel.
 :::
 
 ## The request-to-interaction flow
