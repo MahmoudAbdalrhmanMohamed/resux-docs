@@ -26,6 +26,8 @@
 | `server/api/**/*.ts` | `/api` handlers |
 | `server/routes/**/*.ts` | custom handlers |
 
+A method suffix in a server file name, such as `server/api/hello.get.ts`, serves `/api/hello` for that method only (`.get`, `.post`, `.put`, `.delete`, `.patch`, `.head`, `.options`, `.connect`, `.trace`); other methods get a 404. Static routes win over `[param]` routes, and `[param]` routes win over `[...catch]` routes. A trailing slash and percent-encoded characters in a static segment match like they do in the Nitro output.
+
 ## Auto-import directories
 
 - `composables/`
