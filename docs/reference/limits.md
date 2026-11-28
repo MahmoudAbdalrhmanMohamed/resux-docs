@@ -34,15 +34,19 @@ Components inside `v-if` and `v-for` blocks are created in the browser when a bl
 - Named and scoped slots work the same as on the server, with slot content evaluated in the parent scope. A scoped slot depends on the child's props, so a child that uses one is created fresh when its block re-renders. Text in a scoped slot that reads the parent's own state updates on the child's next re-render, not when the parent changes; plain slots are patched live.
 - Children are kept across block re-renders by `:key`. Without a key they are matched by position among siblings of the same component, and development mode logs a warning. A child whose props changed keeps its state and DOM and re-renders in place with the new props. Setup code that copied a prop into its own ref or computed keeps the old value, because props are plain values there. A child whose (unscoped) slot content changed is created fresh and restarts its state.
 - `<component :is="name">` takes the name of a registered or auto-discovered component as a string. Component objects, such as an imported component passed as a value, are not supported and fail with a clear error, as does an unknown name. When the name changes in the browser, the old component is dropped and the new one starts fresh. The same name keeps its state.
-- Components that the server rendered inside a `v-for` or `v-if` block are not matched to the browser's copies. When the parent's state changes, the block re-renders and these children are created again from their props, so a local ref inside such a child can reset. This shows up when the component tag has slot content and the parent state changes in response to the child's emit. Keep state that must survive in the parent, or avoid slot content on components inside a `v-for`.
+- A keyed component that the server rendered inside a `v-for` block keeps its DOM and state when the block first re-renders in the browser, as long as its key, props and emits are unchanged. Children without a `:key`, children with slot content and children whose props changed are created again from their props, so a local ref inside such a child resets. This shows up when the parent state changes in response to the child's emit. Keep state that must survive in the parent, add a `:key`, or avoid slot content on components inside a `v-for`.
 
 ## Component tag attributes
 
-Attributes on a component tag that are not declared props, such as `class`, `id` or `aria-*`, are not passed through to the component's root element. Declare the values as props and bind them inside the component, or put the attribute on an element inside the component. Falling through root attributes is not part of the current model.
+Attributes on a component tag that the child does not declare as props fall through to the child's root element, like Vue. `class` and `style` are merged (the child's own first, then the parent's), and `id`, `aria-*`, `data-*` and any other attribute are set on the root. A declared prop (`defineProps`, `defineModel`) is not repeated on the root, and `defineOptions({ inheritAttrs: false })` turns the fallthrough off. A dynamic `:class` or `:style` on the tag is patched onto the root when its value changes, and the parent's scoped-style marker is on the root. Current limits:
+
+- A child with more than one root element drops the attributes.
+- When the compiler cannot read the declared props (a props type imported from another file, or a props object built elsewhere), only `class`, `style`, `id`, `aria-*` and `data-*` fall through.
+- When the child's root is itself another component, the attributes are not passed on to that inner component. Pass them as props or put the element in between.
 
 ## Server handler imports
 
-Server handlers are copied into the build output before bundling, so a relative import from a handler to another project file (for example `import { x } from '../lib/x'`) fails the build with `UNRESOLVED_IMPORT`. Import npm packages, or keep the helper code inside the handler file.
+Server handlers, server middleware and server plugins can import other project files by relative path or with the `@/` and `~/` aliases (for example `import { x } from '../lib/x'`). Imported `.ts`, `.tsx`, `.js` and `.jsx` files are compiled into the build output, and `export ... from` re-exports (barrel files) are followed. npm packages work as before.
 
 ## No automatic hydration fallback
 
