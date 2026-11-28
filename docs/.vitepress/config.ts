@@ -262,7 +262,7 @@ export default defineConfig({
       { icon: 'github', link: 'https://github.com/MahmoudAbdalrhmanMohamed/resux' }
     ],
     footer: {
-      message: 'Source-aligned documentation for the Resux resumable web framework.<br>Built by Mahmoud Abdelrahman, full-stack developer (Vue, Nuxt, Node). Open to freelance and full-time roles: <a href="https://mahmouddeveloperm.github.io/Portfolio/" target="_blank" rel="noopener">Portfolio</a> · <a href="https://www.linkedin.com/in/mahmoud-full-stack" target="_blank" rel="noopener">LinkedIn</a>',
+      message: 'Source-aligned documentation for the Resux resumable web framework.<br>Built by Mahmoud Abdelrahman, full-stack developer (Vue, Nuxt, Node, Nest.js). Open to freelance and full-time roles: <a href="https://mahmouddeveloperm.github.io/Portfolio/" target="_blank" rel="noopener">Portfolio</a> · <a href="https://www.linkedin.com/in/mahmoud-full-stack" target="_blank" rel="noopener">LinkedIn</a>',
       copyright: 'Copyright (c) 2026 Resux contributors'
     },
     editLink: {
